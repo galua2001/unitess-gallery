@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unitess Gallery - 26 Patterns</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="gallery-viewport">
+        <div id="gallery-container">
+            <!-- Master Block -->
+            <div class="master-block">
+                <div class="master-square" id="master-square">
+                    <canvas id="master-canvas"></canvas>
+                </div>
+
+                <!-- Floating Clear Button on Square -->
+                <button id="floating-clear" title="Clear Canvas">✕</button>
+            </div>
+
+            <!-- Mini Grids will be injected here (26 total) -->
+        </div>
+
+        <div id="side-menu" class="hidden">
+            <div class="menu-content">
+                <div class="menu-header">
+                    <h2 data-i18n="menu_settings">Settings</h2>
+                    <div class="header-actions">
+                        <select id="lang-select">
+                            <option value="ko">KO</option>
+                            <option value="en">EN</option>
+                        </select>
+                        <button id="close-menu">✕</button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_modes">System Modes</h3>
+                    <div class="modes-grid">
+                        <button class="mode-card active" data-mode="square">
+                            <div class="mode-icon square-icon"></div>
+                            <span data-i18n="mode_square">Square</span>
+                        </button>
+                        <button class="mode-card" data-mode="triangle">
+                            <div class="mode-icon triangle-icon"></div>
+                            <span data-i18n="mode_triangle">Triangle</span>
+                        </button>
+                        <button class="mode-card" data-mode="hexagon">
+                            <div class="mode-icon hexagon-icon"></div>
+                            <span data-i18n="mode_hexagon">Hexagon</span>
+                        </button>
+                        <button class="mode-card" data-mode="quiz">
+                            <div class="mode-icon quiz-icon">?</div>
+                            <span data-i18n="mode_quiz">Quiz</span>
+                        </button>
+                        <button class="mode-card" data-mode="learn">
+                            <div class="mode-icon learn-icon">📚</div>
+                            <span data-i18n="mode_learn">Learn</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_stroke">Stroke Style</h3>
+                    <div class="control-group">
+                        <label data-i18n="label_width">Width</label>
+                        <input type="range" id="lineWidth" min="1" max="10" value="2">
+                    </div>
+                    <div class="control-group">
+                        <label data-i18n="label_color">Color (Master)</label>
+                        <input type="color" id="strokeColor" value="#ff0000">
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_appearance">Appearance</h3>
+                    <div class="control-group">
+                        <label data-i18n="label_tile_bg">Tile Background</label>
+                        <input type="color" id="tileBgColor" value="#ffffff">
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_view">View</h3>
+                    <button class="menu-btn" id="reset-view" data-i18n="btn_reset_view">Reset View</button>
+                    <button class="menu-btn" id="toggle-grid" data-i18n="btn_toggle_labels">Toggle Grid Labels</button>
+                    <button class="menu-btn" id="toggle-canvas-grid" data-i18n="btn_toggle_canvas_grid">Toggle Canvas
+                        Grid</button>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_actions">Actions</h3>
+                    <button class="menu-btn primary" id="save-btn" data-i18n="btn_save_image">Save Image</button>
+                </div>
+            </div>
+        </div>
+
+        <button id="chat-toggle">💬</button>
+        <button id="menu-toggle">☰</button>
+
+        <!-- Chat Panel -->
+        <div id="chat-panel" class="chat-hidden">
+            <div class="chat-header">
+                <h2 data-i18n="chat_title">Community</h2>
+                <button id="close-chat">✕</button>
+            </div>
+            <div id="chat-messages">
+                <!-- Messages will be injected here -->
+            </div>
+            <div class="chat-input-area">
+                <button id="share-canvas" title="Share drawing">🖼️</button>
+                <input type="text" id="chat-input" placeholder="Type a message..."
+                    data-i18n-placeholder="chat_placeholder">
+                <button id="send-chat">↑</button>
+            </div>
+        </div>
+
+        <!-- Learn Mode Overlay -->
+        <div id="learn-mode-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <h1 data-i18n="mode_learn">Learn</h1>
+                <button id="exit-learn" class="exit-btn">✕</button>
+            </div>
+            <div class="learn-content">
+                <!-- Left: Master Drawing Area -->
+                <div class="learn-master-area">
+                    <h3 class="learn-area-label">원본 (Original)</h3>
+                    <div class="learn-canvas-container">
+                        <canvas id="learn-master-canvas"></canvas>
+                        <button id="learn-clear" class="learn-floating-clear" title="Clear Canvas">✕</button>
+                        <div class="learn-pattern-id" id="current-pattern-id">1</div>
+                    </div>
+                </div>
+
+                <!-- Center: 3x3 Preview Grid -->
+                <div class="learn-preview-area">
+                    <div class="preview-3x3" id="preview-grid-3x3">
+                        <!-- 9 tiles will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right: Pattern Selections (Matching Image Groups) -->
+                <div class="learn-selector-area">
+                    <div class="selector-columns">
+                        <!-- Basic Groups -->
+                        <div class="selector-group">
+                            <div class="group-header">TTTT & CCCC</div>
+                            <button class="rule-btn active" data-id="1">TTTT</button>
+                            <button class="rule-btn" data-id="2">CCCC</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">C3C1C3C1</div>
+                            <button class="rule-btn" data-id="3">C3C1C3C1(0 180 y=x y=-x)</button>
+                            <button class="rule-btn" data-id="4">C3C1C3C1(90 270 y x)</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">TCTC</div>
+                            <button class="rule-btn" data-id="11">TCTC(0 180 x y)</button>
+                            <button class="rule-btn" data-id="12">TCTC(90 270 y=x y=-x)</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">XYXY</div>
+                            <button class="rule-btn" data-id="5">XYXY(0 XY)</button>
+                            <button class="rule-btn" data-id="6">XYXY(0 YX)</button>
+                        </div>
+
+                        <!-- Complex Groups -->
+                        <div class="selector-group">
+                            <div class="group-header">CGCG</div>
+                            <button class="rule-btn" data-id="13">CGCG(0 y, 180 y, x y, y y)</button>
+                            <button class="rule-btn" data-id="14">CGCG(0 x, 180 x, x x, y x)</button>
+                            <button class="rule-btn" data-id="15">CGCG(90 x, 270 x, y=x x, y=-x x)</button>
+                            <button class="rule-btn" data-id="16">CGCG(90 y, 270 y, y=x y, y=-x y)</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">GGGG</div>
+                            <button class="rule-btn" data-id="7">GGGG(0 y=x, 180 y=x, x y=-x, y y=-x, 90 y=-x, 270 y=-x,
+                                y=-x y=x, y=x y=x)</button>
+                            <button class="rule-btn" data-id="8">GGGG(0 y=-x, 90 y=x, y=x y=-x, y=-x y=-x, y y=x, x
+                                y=x)</button>
+                            <button class="rule-btn" data-id="9">GGGG(0 x, 180 x, y x, x x, 90 y, 270 y, y=x y, y=-x
+                                y)</button>
+                            <button class="rule-btn" data-id="10">GGGG(0 y, 180 y, x y, y y, 90 x, 270 x, y=x x, y=-x
+                                x)</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">TGTG</div>
+                            <button class="rule-btn" data-id="21">TGTG(0 y=-x, 180 y=-x, y=x y=-x, y=-x y=-x, 90 y=x,
+                                270 y=x, y y=x, x y=x)</button>
+                            <button class="rule-btn" data-id="22">TGTG(0 y=x, 180 y=x, y=x y=x, y=-x y=x, 90 y=-x, 270
+                                y=-x, y y=-x, x y=-x)</button>
+                            <button class="rule-btn" data-id="23">TGTG(0 y, 180 y, x y, y y)</button>
+                            <button class="rule-btn" data-id="24">TGTG(0 x, 180 x, x x, y x)</button>
+                            <button class="rule-btn" data-id="25">TGTG(90 x, 270 x, y=x x, y=-x x)</button>
+                            <button class="rule-btn" data-id="26">(90), y</button>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">CCGG</div>
+                            <button class="rule-btn" data-id="17">CCGG(0 y=x, y=x y=-x)</button>
+                            <button class="rule-btn" data-id="20">CCGG(90 y=x, x y=x)</button>
+                            <button class="rule-btn" data-id="18">CCGG(y y=x, 270 y=x)</button>
+                            <button class="rule-btn" data-id="19">CCGG(y=x y=x, 180 y=x)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+
+</html>

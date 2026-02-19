@@ -25,3 +25,12 @@
 - **Repository**: [GitHub](https://github.com/galua2001/unitess-gallery)
 - **Deployment**: [Live Site](https://galua2001.github.io/unitess-gallery/)
 
+## 📱 Mobile Optimization & Advanced Features (2026-02-19)
+- **Status**: Completed (Polished)
+- **Touch Gestures**: 모든 모드(퀴즈, 게임, 부록)에 줌(Zoom), 이동(Pan), 그리기(Draw) 터치 지원.
+- **Responsive Layout**: 스마트폰 가로 모드 강제 적용으로 쾌적한 뷰 제공.
+- **Visual Accuracy**: 삼각형(Triangle) 패턴 7종, 실제 이미지와 완벽히 일치하도록 대칭 규칙 구현.
+- **Repository Integration**: GitHub 연동 및 배포 완료.
+
+---
+**Next Step**: 육각형 패턴(H1~H22) 정교화 및 추가 게임 모드 개발.

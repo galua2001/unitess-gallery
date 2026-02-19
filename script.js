@@ -2827,12 +2827,12 @@ class UnitessGalleryApp {
             const inverted = subIdx === 1;
             // Triangle Patterns (T1-T7) based on Frieze/Wallpaper groups on triangular grid
             switch (patternId) {
-                case 1: // Translations (p1) - Always Upright
-                    if (inverted) ctx.rotate(Math.PI);
+                case 1: // T1: Natural Grid (Upright=F, Inverted=UpsideDown F)
+                    // No transformation needed, let the grid rotation (180) take effect
                     break;
-                case 2: // Reflections (pm) - Upright Mirrored
+                case 2: // T2: Mirror Grid (Upright=MirrorF, Inverted=UpsideDown MirrorF)
                     ctx.scale(-1, 1);
-                    if (inverted) ctx.rotate(Math.PI);
+                    // No rotation correction needed
                     break;
                 case 3: // Rotations (p3) - 120 degree rotations
                     // Rotate based on index to create pinwheel effect

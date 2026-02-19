@@ -14,6 +14,7 @@
 - [x] 마스터 캔버스 '지우기(X)' 기능 및 정밀 가이드(눈금선) 추가
 - [x] 각 모드(사각형/학습/부록) 간 드로잉 로직 독립성 확보
 - [x] 전체 시스템 안정화 및 한국어 언어 설정 기본값 복구
+- [x] GitHub Repository 생성 및 Pages 배포 완료
 
 ---
 ## Current Configuration
@@ -21,4 +22,6 @@
 - **Patterns**: Square(26), Hexagon(22), Triangle(8)
 - **UI System**: Popup Modal & Standardized Grid Frames
 - **Backup Location**: `backup_20260219_appendix_stabilized`
+- **Repository**: [GitHub](https://github.com/galua2001/unitess-gallery)
+- **Deployment**: [Live Site](https://galua2001.github.io/unitess-gallery/)
 

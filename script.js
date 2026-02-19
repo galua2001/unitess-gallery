@@ -7,6 +7,16 @@ class UnitessGalleryApp {
 
         this.strokes = [];
         this.learnStrokes = []; // 학습 모드 전용 드로잉 배열 추가
+
+        // Learn Mode View State (Zoom/Pan)
+        this.learnScale = 1.0;
+        this.learnOffsetX = 0;
+        this.learnOffsetY = 0;
+        this.isLearnPanning = false;
+        this.learnLastMouseX = 0;
+        this.learnLastMouseY = 0;
+        this.learnInitialTouchDist = null;
+        this.learnInitialScale = 1;
         this.isDrawing = false;
 
         // View State (Zoom/Pan)
@@ -1022,6 +1032,10 @@ class UnitessGalleryApp {
             if (e.currentTarget !== activeCanvas) return;
 
             if (e.type === 'mousedown' && e.button !== 0) return;
+
+            // Multi-touch guard: If more than 1 finger, don't draw (allow pinch zoom)
+            if (e.touches && e.touches.length > 1) return;
+
             if (e.type === 'touchstart') e.preventDefault();
 
             this.isDrawing = true;
@@ -1670,6 +1684,117 @@ class UnitessGalleryApp {
         // Initial text display
         const activeBtn = document.querySelector('.rule-btn.active');
         if (activeBtn) document.getElementById('current-pattern-id').textContent = activeBtn.textContent;
+
+        this.addLearnModeEventListeners();
+    }
+
+    addLearnModeEventListeners() {
+        const overlay = document.getElementById('learn-mode-overlay');
+        const content = document.querySelector('.learn-content');
+        if (content) content.style.transformOrigin = 'center top';
+
+        // Critical: Disable browser gestures to allow custom pan/zoom
+        if (overlay) overlay.style.touchAction = 'none';
+
+        // Wheel Zoom
+        overlay.addEventListener('wheel', (e) => {
+            if (!this.isLearnMode) return;
+            e.preventDefault();
+            const zoomSpeed = 0.001;
+            this.learnScale -= e.deltaY * zoomSpeed;
+            this.learnScale = Math.min(Math.max(0.5, this.learnScale), 3.0);
+            this.applyLearnViewTransform();
+        }, { passive: false });
+
+        // Mouse Pan
+        overlay.addEventListener('mousedown', (e) => {
+            if (!this.isLearnMode) return;
+            if (e.target.closest('#learn-master-canvas') || e.target.closest('button') || e.target.closest('.rule-btn') || e.target.closest('.info-btn')) return;
+            this.isLearnPanning = true;
+            this.learnLastMouseX = e.clientX;
+            this.learnLastMouseY = e.clientY;
+            overlay.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!this.isLearnMode || !this.isLearnPanning) return;
+            e.preventDefault();
+            const dx = e.clientX - this.learnLastMouseX;
+            const dy = e.clientY - this.learnLastMouseY;
+            this.learnOffsetX += dx;
+            this.learnOffsetY += dy;
+            this.learnLastMouseX = e.clientX;
+            this.learnLastMouseY = e.clientY;
+            this.applyLearnViewTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (this.isLearnMode) {
+                this.isLearnPanning = false;
+                overlay.style.cursor = 'default';
+            }
+        });
+
+        // Touch Navigation
+        overlay.addEventListener('touchstart', (e) => {
+            if (!this.isLearnMode) return;
+
+            // 1 finger: Pan (unless on canvas/button)
+            if (e.touches.length === 1) {
+                if (e.target.closest('#learn-master-canvas') || e.target.closest('button') || e.target.closest('.rule-btn')) return;
+                this.isLearnPanning = true;
+                this.learnLastMouseX = e.touches[0].clientX;
+                this.learnLastMouseY = e.touches[0].clientY;
+            }
+            // 2 fingers: Zoom
+            else if (e.touches.length === 2) {
+                this.isLearnPanning = false;
+                this.learnInitialTouchDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                this.learnInitialScale = this.learnScale;
+            }
+        }, { passive: false });
+
+        overlay.addEventListener('touchmove', (e) => {
+            if (!this.isLearnMode) return;
+
+            // Allow drawing if 1 finger on canvas
+            if (e.target.closest('#learn-master-canvas') && e.touches.length === 1) return;
+
+            if (e.touches.length === 1 && this.isLearnPanning) {
+                if (e.cancelable) e.preventDefault();
+                const dx = e.touches[0].clientX - this.learnLastMouseX;
+                const dy = e.touches[0].clientY - this.learnLastMouseY;
+                this.learnOffsetX += dx;
+                this.learnOffsetY += dy;
+                this.learnLastMouseX = e.touches[0].clientX;
+                this.learnLastMouseY = e.touches[0].clientY;
+                this.applyLearnViewTransform();
+            } else if (e.touches.length === 2 && this.learnInitialTouchDist) {
+                if (e.cancelable) e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const zoomFactor = dist / this.learnInitialTouchDist;
+                this.learnScale = Math.min(Math.max(0.5, this.learnInitialScale * zoomFactor), 3.0);
+                this.applyLearnViewTransform();
+            }
+        }, { passive: false });
+
+        overlay.addEventListener('touchend', () => {
+            this.isLearnPanning = false;
+            this.learnInitialTouchDist = null;
+        });
+    }
+
+    applyLearnViewTransform() {
+        const content = document.querySelector('.learn-content');
+        if (content) {
+            content.style.transform = `translate(${this.learnOffsetX}px, ${this.learnOffsetY}px) scale(${this.learnScale})`;
+        }
     }
 
     setupQuizMode() {

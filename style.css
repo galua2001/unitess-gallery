@@ -343,6 +343,8 @@ body {
     gap: 30px;
     align-items: center;
     overflow: hidden;
+    min-width: 1200px;
+    /* Force horizontal layout for mobile pan/zoom */
 }
 
 .learn-master-area {

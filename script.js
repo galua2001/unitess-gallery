@@ -2844,15 +2844,11 @@ class UnitessGalleryApp {
                 case 5: // Point Reflections Mirrored (pmg?)
                     ctx.scale(-1, 1);
                     break;
-                case 6: // Line Reflections (cm?) - Inverted ones are mirrored upright
-                    if (inverted) {
-                        ctx.rotate(Math.PI);
-                        ctx.scale(-1, 1);
-                    }
+                case 6: // T6: Upright=Normal 'F', Inverted=Mirrored 'F' (Upside down ㅋ)
+                    if (inverted) ctx.scale(-1, 1);
                     break;
-                case 7: // Rotations Mirrored (p3m1)
-                    ctx.scale(-1, 1);
-                    ctx.rotate((tileIdx % 3) * 120 * Math.PI / 180);
+                case 7: // T7: Upright=Mirrored 'F', Inverted=Normal 'F' (Upside down F)
+                    if (!inverted) ctx.scale(-1, 1);
                     break;
             }
         } else {

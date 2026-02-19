@@ -2511,27 +2511,53 @@ class UnitessGalleryApp {
         const strokes = type === 'triangle' ? this.triangleStrokes : this.hexagonStrokes;
         const grids = type === 'triangle' ? this.triangleGrids : this.hexagonGrids;
 
+        const getClientPos = (e) => {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        };
+
         const startDraw = (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (e.touches && e.touches.length > 1) return; // Multi-touch handled by Zoom/Pan logic
+
             drawing = true;
             strokes.push({ points: [] });
             addPoint(e);
         };
+
         const endDraw = () => { drawing = false; };
+
         const addPoint = (e) => {
             if (!drawing) return;
-            const r = canvas.getBoundingClientRect();
-            // Normalize coordinates to 0-1 range
-            const x = (e.clientX - r.left) / r.width;
-            const y = (e.clientY - r.top) / r.height;
-            strokes[strokes.length - 1].points.push({ x, y });
+            if (e.touches && e.touches.length > 1) return;
+            if (e.cancelable) e.preventDefault();
 
-            this.renderAppendixMaster(canvas, strokes, type);
-            this.updateAppendixGallery(grids, strokes, type);
+            const pos = getClientPos(e);
+            const r = canvas.getBoundingClientRect();
+
+            // Normalize coordinates to 0-1 range
+            const x = (pos.x - r.left) / r.width;
+            const y = (pos.y - r.top) / r.height;
+
+            if (strokes.length > 0) {
+                strokes[strokes.length - 1].points.push({ x, y });
+                this.renderAppendixMaster(canvas, strokes, type);
+                this.updateAppendixGallery(grids, strokes, type);
+            }
         };
 
-        canvas.onmousedown = startDraw;
+        // Mouse Events
+        canvas.addEventListener('mousedown', startDraw);
         window.addEventListener('mouseup', endDraw);
-        canvas.onmousemove = addPoint;
+        canvas.addEventListener('mousemove', addPoint);
+
+        // Touch Events
+        canvas.addEventListener('touchstart', startDraw, { passive: false });
+        window.addEventListener('touchend', endDraw);
+        canvas.addEventListener('touchcancel', endDraw);
+        canvas.addEventListener('touchmove', addPoint, { passive: false });
 
         // Clear Drawing
         const clearBtnId = type === 'triangle' ? 'clear-triangle-draw' : 'clear-hexagon-draw';

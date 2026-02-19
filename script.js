@@ -2478,7 +2478,7 @@ class UnitessGalleryApp {
         // 1. Triangle Gallery Setup
         const triCanvas = document.getElementById('triangle-master-canvas');
         const triGrid = document.getElementById('triangle-gallery-grid');
-        this.setupAppendixShape(triCanvas, triGrid, 'triangle', 8); // 8 patterns
+        this.setupAppendixShape(triCanvas, triGrid, 'triangle', 7); // 7 patterns
 
         // 2. Hexagon Gallery Setup
         const hexCanvas = document.getElementById('hexagon-master-canvas');
@@ -2713,7 +2713,8 @@ class UnitessGalleryApp {
                         ctx.translate(tx, ty);
 
                         // Apply Pattern Symmetry
-                        this.applyAppendixSymmetry(ctx, grid.id, type, idCounterLocal++, 0);
+                        // Pass isInverted as subIdx (1 for true, 0 for false)
+                        this.applyAppendixSymmetry(ctx, grid.id, type, idCounterLocal++, isInverted ? 1 : 0);
 
                         if (isInverted) {
                             ctx.rotate(Math.PI);
@@ -2823,18 +2824,36 @@ class UnitessGalleryApp {
 
     applyAppendixSymmetry(ctx, patternId, type, tileIdx, subIdx) {
         if (type === 'triangle') {
-            // Triangle Patterns (T1-T8)
-            // Resetting to identity/basic state as requested "Concrete transformations later"
-            // This ensures all 16-tri clusters look consistent structurally first.
+            const inverted = subIdx === 1;
+            // Triangle Patterns (T1-T7) based on Frieze/Wallpaper groups on triangular grid
             switch (patternId) {
-                case 1: break;
-                case 2: break;
-                case 3: break;
-                case 4: break;
-                case 5: break;
-                case 6: break;
-                case 7: break;
-                case 8: break;
+                case 1: // Translations (p1) - Always Upright
+                    if (inverted) ctx.rotate(Math.PI);
+                    break;
+                case 2: // Reflections (pm) - Upright Mirrored
+                    ctx.scale(-1, 1);
+                    if (inverted) ctx.rotate(Math.PI);
+                    break;
+                case 3: // Rotations (p3) - 120 degree rotations
+                    // Rotate based on index to create pinwheel effect
+                    ctx.rotate((tileIdx % 3) * 120 * Math.PI / 180);
+                    break;
+                case 4: // Point Reflections (p2) - Natural Grid (Up/Down)
+                    // Identity (Grid logic handles the rest)
+                    break;
+                case 5: // Point Reflections Mirrored (pmg?)
+                    ctx.scale(-1, 1);
+                    break;
+                case 6: // Line Reflections (cm?) - Inverted ones are mirrored upright
+                    if (inverted) {
+                        ctx.rotate(Math.PI);
+                        ctx.scale(-1, 1);
+                    }
+                    break;
+                case 7: // Rotations Mirrored (p3m1)
+                    ctx.scale(-1, 1);
+                    ctx.rotate((tileIdx % 3) * 120 * Math.PI / 180);
+                    break;
             }
         } else {
             // Hexagon Patterns (H1-H22)

@@ -2838,17 +2838,17 @@ class UnitessGalleryApp {
                     // Rotate based on index to create pinwheel effect
                     ctx.rotate((tileIdx % 3) * 120 * Math.PI / 180);
                     break;
-                case 4: // Point Reflections (p2) - Natural Grid (Up/Down)
-                    // Identity (Grid logic handles the rest)
-                    break;
-                case 5: // Point Reflections Mirrored (pmg?)
-                    ctx.scale(-1, 1);
-                    break;
-                case 6: // T6: Upright=Normal 'F', Inverted=Mirrored 'F' (Upside down ㅋ)
+                case 4: // T4 (Blue - Middle Left in Ref?): Upright=F, Inverted=Mirrored F (Upside down ㅋ)
                     if (inverted) ctx.scale(-1, 1);
                     break;
-                case 7: // T7: Upright=Mirrored 'F', Inverted=Normal 'F' (Upside down F)
+                case 5: // T5 (Red - Middle Right in Ref?): Upright=Mirrored F, Inverted=Normal F (Upside down F)
                     if (!inverted) ctx.scale(-1, 1);
+                    break;
+                case 6: // T6 (Blue - Bottom Left in Ref?): Natural Grid (Upright=F, Inverted=Upside down F)
+                    // Identity
+                    break;
+                case 7: // T7 (Red - Bottom Right in Ref?): Mirrored Grid (Upright=Mirrored F, Inverted=Upside down ㅋ)
+                    ctx.scale(-1, 1);
                     break;
             }
         } else {

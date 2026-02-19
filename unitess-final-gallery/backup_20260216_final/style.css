@@ -1,0 +1,597 @@
+:root {
+    --bg-color: #f1f8e9;
+    --tile-bg: #ffffff;
+    --accent-color: #2b4570;
+    --group-color-1: #FF5555;
+    --group-color-2: #55FF55;
+    --group-color-3: #5555FF;
+    --group-color-4: #FFFF55;
+    --group-color-5: #FF55FF;
+    --group-color-6: #55FFFF;
+    --group-color-7: #FFAA00;
+    --group-color-8: #AA55FF;
+    --group-color-9: #00FF99;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --master-stroke: #2c3e50;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    overflow: hidden;
+}
+
+#gallery-viewport {
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+#gallery-container {
+    display: grid;
+    grid-template-columns: repeat(7, 140px);
+    /* 7열로 변경 */
+    grid-auto-rows: 140px;
+    gap: 10px;
+    /* 간격을 10px로 더 밀착 */
+    padding: 30px;
+    width: fit-content;
+}
+
+/* Master Square Styling */
+.master-block {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+    border: 3px solid var(--accent-color);
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+}
+
+.master-square {
+    width: 100%;
+    height: 100%;
+}
+
+.master-square canvas {
+    cursor: crosshair;
+    /* 연필 대용으로 정밀한 십자 포인터 사용 */
+}
+
+#floating-clear {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Grid Tiles */
+.mini-grid {
+    background: var(--tile-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mini-grid:hover {
+    transform: scale(1.03);
+    z-index: 10;
+}
+
+.grid-label {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.mini-tile {
+    width: 100%;
+    height: 100%;
+}
+
+.mini-tile canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.grid-tile-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Side Menu */
+#side-menu {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+#side-menu.hidden {
+    transform: translateX(100%);
+}
+
+.menu-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#menu-toggle {
+    position: fixed;
+    top: 20px;
+    /* 상단으로 이동 */
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Learn Mode Overlay */
+.mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #2c3e50;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    color: white;
+}
+
+.mode-overlay.hidden {
+    display: none;
+}
+
+.learn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.learn-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.2fr 1.8fr 3fr;
+    /* 원래의 넉넉한 비율로 복구 */
+    gap: 30px;
+    align-items: center;
+    overflow: hidden;
+}
+
+.learn-master-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.learn-canvas-container {
+    width: 300px;
+    /* 원래 크기 300px 복구 */
+    height: 300px;
+    background: white;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.learn-canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+.preview-3x3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 450px;
+    /* 원래 크기 450px 복구 */
+    height: 450px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.preview-tile {
+    border: 1.5px solid #2ecc71;
+    /* 선명한 초록색 테두리 복구 */
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Learn Mode Header Buttons */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.explain-guide-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.explain-guide-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Group Styling */
+.btn-group {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.rule-btn {
+    flex: 1;
+    /* 가로 가득 채우기 */
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11.5px;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    color: #3498db;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.info-btn:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Modal System Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.modal-card {
+    background: #2c3e50;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    position: relative;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #95a5a6;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: white;
+}
+
+.modal-content {
+    color: white;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.modal-content h2 {
+    color: #3498db;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    padding-bottom: 10px;
+}
+
+.modal-section {
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.modal-section h3 {
+    color: #3498db;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.modal-formula {
+    background: #1a252f;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    color: #2ecc71;
+    border-left: 4px solid #2ecc71;
+    margin: 10px 0;
+}
+
+.modal-text {
+    line-height: 1.7;
+    font-size: 1.05rem;
+    color: #ecf0f1;
+}
+
+.modal-tags {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-tag {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Scrollbar Styling for Modal */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(52, 152, 219, 0.4);
+    border-radius: 3px;
+}
+
+.selector-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2열 배치 */
+    gap: 4px;
+    /* 버튼 사이 간격 */
+    margin-bottom: 12px;
+}
+
+.group-header {
+    grid-column: 1 / -1;
+    /* 두 칸 모두 차지 */
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.rule-btn {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11.5px;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rule-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.rule-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+}
+
+.learn-pattern-id {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ecf0f1;
+    color: #2c3e50;
+    padding: 5px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+/* Chat Styles */
+#chat-panel {
+    position: fixed;
+    top: 75px;
+    /* 상단 버튼 아래에 위치하도록 변경 */
+    left: 20px;
+    width: 320px;
+    height: 400px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#chat-panel.chat-hidden {
+    display: none;
+}
+
+.chat-header {
+    padding: 15px;
+    background: var(--accent-color);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+#chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.chat-input-area {
+    padding: 10px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 8px;
+}
+
+#chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 15px;
+}
+
+#chat-toggle {
+    position: fixed;
+    top: 20px;
+    /* 상단으로 이동 */
+    left: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#chat-toggle:hover {
+    transform: scale(1.1);
+}

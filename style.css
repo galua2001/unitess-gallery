@@ -1378,8 +1378,18 @@ body {
 }
 
 .shape-id-tag {
-    font-size: 0.75rem;
     color: #f1c40f;
     font-weight: bold;
     text-align: center;
+}
+
+/* Force horizontal layout for Zoom/Pan on mobile */
+.quiz-content,
+.appendix-content {
+    min-width: 1024px;
+}
+
+#falling-game-board {
+    min-width: 800px;
+    /* Preserve game board width */
 }

@@ -250,8 +250,17 @@ class UnitessGalleryApp {
         this.setupAppendixGalleries();
         this.applyViewTransform();
         this.renderLoop();
-        this.applyViewTransform();
-        this.renderLoop();
+
+        // Enable Zoom/Pan for all modes
+        // Learn Mode
+        this.enableZoomPan('learn-mode-overlay', '.learn-content', 'learn');
+        // Quiz Mode
+        this.enableZoomPan('quiz-mode-overlay', '.quiz-content', 'quiz');
+        // Falling Game Mode
+        this.enableZoomPan('falling-game-overlay', '#falling-game-board', 'falling');
+        // Appendix Galleries
+        this.enableZoomPan('triangle-gallery-overlay', '#triangle-gallery-overlay .appendix-content', 'triangle');
+        this.enableZoomPan('hexagon-gallery-overlay', '#hexagon-gallery-overlay .appendix-content', 'hexagon');
     }
 
     setupMasterCanvas() {
@@ -1685,116 +1694,133 @@ class UnitessGalleryApp {
         const activeBtn = document.querySelector('.rule-btn.active');
         if (activeBtn) document.getElementById('current-pattern-id').textContent = activeBtn.textContent;
 
-        this.addLearnModeEventListeners();
+
     }
 
-    addLearnModeEventListeners() {
-        const overlay = document.getElementById('learn-mode-overlay');
-        const content = document.querySelector('.learn-content');
-        if (content) content.style.transformOrigin = 'center top';
+    enableZoomPan(overlayId, contentSelector, stateKey) {
+        const overlay = document.getElementById(overlayId);
+        const content = document.querySelector(contentSelector);
+        if (!overlay || !content) return;
 
-        // Critical: Disable browser gestures to allow custom pan/zoom
-        if (overlay) overlay.style.touchAction = 'none';
+        // Initialize state if not exists
+        const scaleKey = stateKey + 'Scale';
+        const offsetXKey = stateKey + 'OffsetX';
+        const offsetYKey = stateKey + 'OffsetY';
+        const isPanningKey = 'is' + stateKey.charAt(0).toUpperCase() + stateKey.slice(1) + 'Panning';
+        const lastMouseXKey = stateKey + 'LastMouseX';
+        const lastMouseYKey = stateKey + 'LastMouseY';
+        const initDistKey = stateKey + 'InitialTouchDist';
+        const initScaleKey = stateKey + 'InitialScale';
+
+        if (this[scaleKey] === undefined) {
+            this[scaleKey] = 1.0;
+            this[offsetXKey] = 0;
+            this[offsetYKey] = 0;
+            this[isPanningKey] = false;
+        }
+
+        // Ensure properties exist on instance (for Learn mode which might have them, others need defaulting)
+        if (this[lastMouseXKey] === undefined) this[lastMouseXKey] = 0;
+        if (this[lastMouseYKey] === undefined) this[lastMouseYKey] = 0;
+
+        content.style.transformOrigin = 'center top';
+        overlay.style.touchAction = 'none';
+
+        const applyTransform = () => {
+            content.style.transform = `translate(${this[offsetXKey]}px, ${this[offsetYKey]}px) scale(${this[scaleKey]})`;
+        };
 
         // Wheel Zoom
         overlay.addEventListener('wheel', (e) => {
-            if (!this.isLearnMode) return;
+            if (overlay.classList.contains('hidden')) return;
             e.preventDefault();
             const zoomSpeed = 0.001;
-            this.learnScale -= e.deltaY * zoomSpeed;
-            this.learnScale = Math.min(Math.max(0.5, this.learnScale), 3.0);
-            this.applyLearnViewTransform();
+            this[scaleKey] -= e.deltaY * zoomSpeed;
+            this[scaleKey] = Math.min(Math.max(0.5, this[scaleKey]), 3.0);
+            applyTransform();
         }, { passive: false });
 
         // Mouse Pan
         overlay.addEventListener('mousedown', (e) => {
-            if (!this.isLearnMode) return;
-            if (e.target.closest('#learn-master-canvas') || e.target.closest('button') || e.target.closest('.rule-btn') || e.target.closest('.info-btn')) return;
-            this.isLearnPanning = true;
-            this.learnLastMouseX = e.clientX;
-            this.learnLastMouseY = e.clientY;
+            if (overlay.classList.contains('hidden')) return;
+            // Exclude interactive elements
+            if (e.target.closest('canvas') || e.target.closest('button') || e.target.closest('.rule-btn') || e.target.closest('.info-btn') || e.target.closest('.falling-square') || e.target.closest('input')) return;
+
+            this[isPanningKey] = true;
+            this[lastMouseXKey] = e.clientX;
+            this[lastMouseYKey] = e.clientY;
             overlay.style.cursor = 'grabbing';
         });
 
         window.addEventListener('mousemove', (e) => {
-            if (!this.isLearnMode || !this.isLearnPanning) return;
+            if (overlay.classList.contains('hidden') || !this[isPanningKey]) return;
             e.preventDefault();
-            const dx = e.clientX - this.learnLastMouseX;
-            const dy = e.clientY - this.learnLastMouseY;
-            this.learnOffsetX += dx;
-            this.learnOffsetY += dy;
-            this.learnLastMouseX = e.clientX;
-            this.learnLastMouseY = e.clientY;
-            this.applyLearnViewTransform();
+            const dx = e.clientX - this[lastMouseXKey];
+            const dy = e.clientY - this[lastMouseYKey];
+            this[offsetXKey] += dx;
+            this[offsetYKey] += dy;
+            this[lastMouseXKey] = e.clientX;
+            this[lastMouseYKey] = e.clientY;
+            applyTransform();
         });
 
         window.addEventListener('mouseup', () => {
-            if (this.isLearnMode) {
-                this.isLearnPanning = false;
+            // We don't check hidden here because mouseup can happen anywhere
+            if (this[isPanningKey]) {
+                this[isPanningKey] = false;
                 overlay.style.cursor = 'default';
             }
         });
 
         // Touch Navigation
         overlay.addEventListener('touchstart', (e) => {
-            if (!this.isLearnMode) return;
+            if (overlay.classList.contains('hidden')) return;
 
-            // 1 finger: Pan (unless on canvas/button)
             if (e.touches.length === 1) {
-                if (e.target.closest('#learn-master-canvas') || e.target.closest('button') || e.target.closest('.rule-btn')) return;
-                this.isLearnPanning = true;
-                this.learnLastMouseX = e.touches[0].clientX;
-                this.learnLastMouseY = e.touches[0].clientY;
-            }
-            // 2 fingers: Zoom
-            else if (e.touches.length === 2) {
-                this.isLearnPanning = false;
-                this.learnInitialTouchDist = Math.hypot(
+                if (e.target.closest('canvas') || e.target.closest('button') || e.target.closest('.rule-btn') || e.target.closest('.falling-square') || e.target.closest('input')) return;
+                this[isPanningKey] = true;
+                this[lastMouseXKey] = e.touches[0].clientX;
+                this[lastMouseYKey] = e.touches[0].clientY;
+            } else if (e.touches.length === 2) {
+                this[isPanningKey] = false;
+                this[initDistKey] = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
-                this.learnInitialScale = this.learnScale;
+                this[initScaleKey] = this[scaleKey];
             }
         }, { passive: false });
 
         overlay.addEventListener('touchmove', (e) => {
-            if (!this.isLearnMode) return;
+            if (overlay.classList.contains('hidden')) return;
 
-            // Allow drawing if 1 finger on canvas
-            if (e.target.closest('#learn-master-canvas') && e.touches.length === 1) return;
+            if (e.target.closest('canvas') && e.touches.length === 1) return;
 
-            if (e.touches.length === 1 && this.isLearnPanning) {
+            if (e.touches.length === 1 && this[isPanningKey]) {
                 if (e.cancelable) e.preventDefault();
-                const dx = e.touches[0].clientX - this.learnLastMouseX;
-                const dy = e.touches[0].clientY - this.learnLastMouseY;
-                this.learnOffsetX += dx;
-                this.learnOffsetY += dy;
-                this.learnLastMouseX = e.touches[0].clientX;
-                this.learnLastMouseY = e.touches[0].clientY;
-                this.applyLearnViewTransform();
-            } else if (e.touches.length === 2 && this.learnInitialTouchDist) {
+                const dx = e.touches[0].clientX - this[lastMouseXKey];
+                const dy = e.touches[0].clientY - this[lastMouseYKey];
+                this[offsetXKey] += dx;
+                this[offsetYKey] += dy;
+                this[lastMouseXKey] = e.touches[0].clientX;
+                this[lastMouseYKey] = e.touches[0].clientY;
+                applyTransform();
+            } else if (e.touches.length === 2 && this[initDistKey]) {
                 if (e.cancelable) e.preventDefault();
                 const dist = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
-                const zoomFactor = dist / this.learnInitialTouchDist;
-                this.learnScale = Math.min(Math.max(0.5, this.learnInitialScale * zoomFactor), 3.0);
-                this.applyLearnViewTransform();
+                const zoomFactor = dist / this[initDistKey];
+                this[scaleKey] = Math.min(Math.max(0.5, this[initScaleKey] * zoomFactor), 3.0);
+                applyTransform();
             }
         }, { passive: false });
 
         overlay.addEventListener('touchend', () => {
-            this.isLearnPanning = false;
-            this.learnInitialTouchDist = null;
+            this[isPanningKey] = false;
+            this[initDistKey] = null;
         });
-    }
-
-    applyLearnViewTransform() {
-        const content = document.querySelector('.learn-content');
-        if (content) {
-            content.style.transform = `translate(${this.learnOffsetX}px, ${this.learnOffsetY}px) scale(${this.learnScale})`;
-        }
     }
 
     setupQuizMode() {

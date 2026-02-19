@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unitess Gallery - 26 Patterns</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="gallery-viewport">
+        <div id="gallery-container">
+            <!-- Master Block -->
+            <div class="master-block">
+                <div class="master-square" id="master-square">
+                    <canvas id="master-canvas"></canvas>
+                </div>
+
+                <!-- Floating Clear Button on Square -->
+                <button id="floating-clear" title="Clear Canvas">✕</button>
+            </div>
+
+            <!-- Mini Grids will be injected here (26 total) -->
+        </div>
+
+        <!-- Gallery Guide Button -->
+        <button id="gallery-guide-btn" title="Gallery Guide">?</button>
+
+        <div id="side-menu" class="hidden">
+            <div class="menu-content">
+                <div class="menu-header">
+                    <h2 data-i18n="menu_settings">Settings</h2>
+                    <div class="header-actions">
+                        <select id="lang-select">
+                            <option value="ko">KO</option>
+                            <option value="en">EN</option>
+                        </select>
+                        <button id="close-menu">✕</button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_modes">System Modes</h3>
+                    <div class="modes-grid">
+                        <button class="mode-card active" data-mode="square">
+                            <div class="mode-icon square-icon"></div>
+                            <span data-i18n="mode_square">Square</span>
+                        </button>
+                        <button class="mode-card" data-mode="triangle">
+                            <div class="mode-icon triangle-icon"></div>
+                            <span data-i18n="mode_triangle">Triangle</span>
+                        </button>
+                        <button class="mode-card" data-mode="hexagon">
+                            <div class="mode-icon hexagon-icon"></div>
+                            <span data-i18n="mode_hexagon">Hexagon</span>
+                        </button>
+                        <button class="mode-card" data-mode="quiz">
+                            <div class="mode-icon quiz-icon">?</div>
+                            <span data-i18n="mode_quiz">Quiz</span>
+                        </button>
+                        <button class="mode-card" data-mode="learn">
+                            <div class="mode-icon learn-icon">📚</div>
+                            <span data-i18n="mode_learn">Learn</span>
+                        </button>
+                        <button class="mode-card" data-mode="falling">
+                            <div class="mode-icon falling-icon">🎮</div>
+                            <span data-i18n="mode_falling">Falling Game</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_stroke">Stroke Style</h3>
+                    <div class="control-group">
+                        <label data-i18n="label_width">Width</label>
+                        <input type="range" id="lineWidth" min="1" max="10" value="2">
+                    </div>
+                    <div class="control-group">
+                        <label data-i18n="label_color">Color (Master)</label>
+                        <input type="color" id="strokeColor" value="#ff0000">
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_appearance">Appearance</h3>
+                    <div class="control-group">
+                        <label data-i18n="label_tile_bg">Tile Background</label>
+                        <input type="color" id="tileBgColor" value="#ffffff">
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_view">View</h3>
+                    <button class="menu-btn" id="reset-view" data-i18n="btn_reset_view">Reset View</button>
+                    <button class="menu-btn" id="toggle-grid" data-i18n="btn_toggle_labels">Toggle Grid Labels</button>
+                    <button class="menu-btn" id="toggle-canvas-grid" data-i18n="btn_toggle_canvas_grid">Toggle Canvas
+                        Grid</button>
+                </div>
+
+                <div class="menu-section">
+                    <h3 data-i18n="menu_actions">Actions</h3>
+                    <button class="menu-btn primary" id="save-btn" data-i18n="btn_save_image">Save Image</button>
+                </div>
+            </div>
+        </div>
+
+        <button id="chat-toggle">💬</button>
+        <button id="menu-toggle">☰</button>
+
+        <!-- Chat Panel -->
+        <div id="chat-panel" class="chat-hidden">
+            <div class="chat-header">
+                <h2 data-i18n="chat_title">Community</h2>
+                <button id="close-chat">✕</button>
+            </div>
+            <div id="chat-messages">
+                <!-- Messages will be injected here -->
+            </div>
+            <div class="chat-input-area">
+                <button id="share-canvas" title="Share drawing">🖼️</button>
+                <input type="text" id="chat-input" placeholder="Type a message..."
+                    data-i18n-placeholder="chat_placeholder">
+                <button id="send-chat">↑</button>
+            </div>
+        </div>
+
+        <!-- Learn Mode Overlay -->
+        <div id="learn-mode-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="mode_learn">Learn</h1>
+                    <button id="show-general-explain" class="explain-guide-btn" data-i18n="btn_show_guide">설명
+                        (Guide)</button>
+                </div>
+                <button id="exit-learn" class="exit-btn">✕</button>
+            </div>
+            <div class="learn-content">
+                <!-- Left: Master Drawing Area -->
+                <div class="learn-master-area">
+                    <h3 class="learn-area-label">원본 (Original)</h3>
+                    <div class="learn-canvas-container">
+                        <canvas id="learn-master-canvas"></canvas>
+                        <button id="learn-clear" class="learn-floating-clear" title="Clear Canvas">✕</button>
+                        <div class="learn-pattern-id" id="current-pattern-id">1</div>
+                    </div>
+                </div>
+
+                <!-- Center: 3x3 Preview Grid -->
+                <div class="learn-preview-area">
+                    <div class="preview-3x3" id="preview-grid-3x3">
+                        <!-- 9 tiles will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right: Pattern Selections (Matching Image Groups) -->
+                <div class="learn-selector-area">
+                    <!-- New: Compact Info Panel -->
+                    <div id="pattern-detail-panel" class="detail-hidden">
+                        <div class="detail-header">
+                            <span id="detail-title">Pattern Info</span>
+                            <button id="close-detail">✕</button>
+                        </div>
+                        <div id="detail-content"></div>
+                    </div>
+
+                    <div class="selector-columns">
+                        <!-- Basic Groups -->
+                        <div class="selector-group">
+                            <div class="group-header">TTTT & CCCC</div>
+                            <div class="btn-group">
+                                <button class="rule-btn active" data-id="1">TTTT</button>
+                                <button class="info-btn" data-id="1">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="2">CCCC</button>
+                                <button class="info-btn" data-id="2">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">C3C1C3C1</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="3">C3C1C3C1(T)</button>
+                                <button class="info-btn" data-id="3">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="4">C3C1C3C1(C1)</button>
+                                <button class="info-btn" data-id="4">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">TCTC</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="11">TCTC(T)</button>
+                                <button class="info-btn" data-id="11">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="12">TCTC(C1)</button>
+                                <button class="info-btn" data-id="12">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">XYXY</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="5">XYXY-A</button>
+                                <button class="info-btn" data-id="5">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="6">XYXY-B</button>
+                                <button class="info-btn" data-id="6">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <!-- Complex Groups -->
+                        <div class="selector-group">
+                            <div class="group-header">CGCG</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="13">CGCG (T y)</button>
+                                <button class="info-btn" data-id="13">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="14">CGCG (T x)</button>
+                                <button class="info-btn" data-id="14">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="15">CGCG (C1 x)</button>
+                                <button class="info-btn" data-id="15">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="16">CGCG (C1 y)</button>
+                                <button class="info-btn" data-id="16">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">GGGG</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="7">GGGG(T y=x)</button>
+                                <button class="info-btn" data-id="7">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="8">GGGG(T y=-x)</button>
+                                <button class="info-btn" data-id="8">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="9">GGGG(T x)</button>
+                                <button class="info-btn" data-id="9">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="10">GGGG(T y)</button>
+                                <button class="info-btn" data-id="10">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">TGTG</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="21">TGTG(T y=-x)</button>
+                                <button class="info-btn" data-id="21">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="22">TGTG(T y=x)</button>
+                                <button class="info-btn" data-id="22">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="23">TGTG(T y)</button>
+                                <button class="info-btn" data-id="23">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="24">TGTG(T x)</button>
+                                <button class="info-btn" data-id="24">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="25">TGTG(C1 x)</button>
+                                <button class="info-btn" data-id="25">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="26">TGTG(C1 y)</button>
+                                <button class="info-btn" data-id="26">ⓘ</button>
+                            </div>
+                        </div>
+
+                        <div class="selector-group">
+                            <div class="group-header">CCGG</div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="17">CCGG(T y=x)</button>
+                                <button class="info-btn" data-id="17">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="18">CCGG(y y=x)</button>
+                                <button class="info-btn" data-id="18">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="19">CCGG(C1 y=x)</button>
+                                <button class="info-btn" data-id="19">ⓘ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="rule-btn" data-id="20">CCGG(y=x y=x)</button>
+                                <button class="info-btn" data-id="20">ⓘ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Mode Overlay -->
+        <div id="quiz-mode-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="mode_quiz">Quiz Game</h1>
+                    <div class="quiz-status">
+                        <p id="quiz-score-display">Score: <span id="quiz-score">0</span></p>
+                    </div>
+                </div>
+                <button id="exit-quiz" class="exit-btn">✕</button>
+            </div>
+
+            <div class="quiz-content">
+                <div class="quiz-question-area">
+                    <h3 class="quiz-label" id="quiz-question-text">Q. 이 그림의 패턴 규칙은 무엇일까요?</h3>
+                    <div class="quiz-image-container">
+                        <div id="quiz-question-content">
+                            <!-- Question image or text will be injected here -->
+                        </div>
+                    </div>
+                    <div class="quiz-hint-box" id="quiz-hint-box">
+                        <p id="quiz-hint-text"><b>Hint:</b> ⓘ 아이콘을 눌러 각 패턴의 특징을 먼저 살펴보세요!</p>
+                    </div>
+                    <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+                </div>
+
+                <div class="learn-selector-area quiz-choice-area">
+                    <h3 class="quiz-label">
+                        정답을 선택하세요 (Choose the Answer)
+                        <span class="quiz-guide-tip">* 학습 모드에서 그린 나만의 작품이 버튼에 새겨져 게임의 힌트로 사용될 수 있습니다.</span>
+                    </h3>
+                    <div id="quiz-options-container" class="selector-columns">
+                        <!-- Pattern buttons will be generated or copied here -->
+                    </div>
+
+                </div> <!-- Close learn-selector-area -->
+            </div> <!-- Close quiz-content -->
+        </div> <!-- Close quiz-mode-overlay -->
+
+        <!-- Falling Game Overlay (Game 2) -->
+        <div id="falling-game-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="mode_falling">Falling Squares (Game 2)</h1>
+                    <div class="falling-controls">
+                        <div class="score-box">Score: <span id="falling-score">0</span></div>
+                        <div class="speed-box">
+                            <label>Speed</label>
+                            <input type="range" id="falling-speed-slider" min="1" max="5" value="2">
+                        </div>
+                        <button id="start-falling-btn" class="start-btn">Start</button>
+                        <button id="pause-falling-btn" class="pause-btn hidden">Pause</button>
+                        <button id="stop-falling-btn" class="stop-btn hidden">Stop</button>
+                    </div>
+                </div>
+                <div class="falling-guide">
+                    <span class="guide-text">* 왼쪽 클릭: 90도 회전 / 오른쪽 클릭: Y축 대칭(좌우 반전)</span>
+                    <span class="draw-tip">💡 '학습(Learn)' 모에서 나만의 캐릭터를 그리면 게임에 나타납니다!</span>
+                </div>
+                <button id="exit-falling" class="exit-btn">✕</button>
+            </div>
+            <div id="falling-game-board">
+                <!-- Falling squares will be spawned here -->
+            </div>
+        </div>
+
+        <!-- Appendix: Triangle Gallery Overlay -->
+        <div id="triangle-gallery-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="mode_triangle">Triangle Gallery (Appendix)</h1>
+                </div>
+                <button id="exit-triangle" class="exit-btn">✕</button>
+            </div>
+            <div class="appendix-content">
+                <div class="appendix-master-area">
+                    <div class="master-shape-wrapper">
+                        <div class="appendix-canvas-container triangle-container">
+                            <canvas id="triangle-master-canvas"></canvas>
+                        </div>
+                        <div class="shape-label-tag">Master Triangle</div>
+                        <button id="clear-triangle-draw" class="appendix-clear-btn-outer"
+                            title="Clear Drawing">✕</button>
+                    </div>
+                </div>
+                <div id="triangle-gallery-grid" class="shape-grid triangle-grid">
+                    <!-- Triangle patterns will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Appendix: Hexagon Gallery Overlay -->
+        <div id="hexagon-gallery-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="mode_hexagon">Hexagon Gallery (Appendix)</h1>
+                </div>
+                <button id="exit-hexagon" class="exit-btn">✕</button>
+            </div>
+            <div class="appendix-content">
+                <div class="appendix-master-area">
+                    <div class="master-shape-wrapper">
+                        <div class="appendix-canvas-container hexagon-container">
+                            <canvas id="hexagon-master-canvas"></canvas>
+                        </div>
+                        <div class="shape-label-tag">Master Hexagon</div>
+                        <button id="clear-hexagon-draw" class="appendix-clear-btn-outer"
+                            title="Clear Drawing">✕</button>
+                    </div>
+                </div>
+                <div id="hexagon-gallery-grid" class="shape-grid hexagon-grid">
+                    <!-- Hexagon patterns will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Modal -->
+        <div id="explanation-modal" class="modal-overlay hidden">
+            <div class="modal-card">
+                <button id="close-modal" class="modal-close">✕</button>
+                <div class="modal-content" id="modal-content-area">
+                    <h2 id="modal-title">Explanation Title</h2>
+                    <div id="modal-body">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+
+</html>

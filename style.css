@@ -1,0 +1,1383 @@
+:root {
+    --bg-color: #f1f8e9;
+    --tile-bg: #ffffff;
+    --accent-color: #2b4570;
+    --group-color-1: #FF5555;
+    --group-color-2: #55FF55;
+    --group-color-3: #5555FF;
+    --group-color-4: #FFFF55;
+    --group-color-5: #FF55FF;
+    --group-color-6: #55FFFF;
+    --group-color-7: #FFAA00;
+    --group-color-8: #AA55FF;
+    --group-color-9: #00FF99;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --master-stroke: #2c3e50;
+}
+
+.hidden {
+    display: none !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    overflow: hidden;
+}
+
+#gallery-viewport {
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 세로 중앙 정렬 추가 */
+}
+
+#gallery-container {
+    display: grid;
+    grid-template-columns: repeat(7, 140px);
+    /* 7열 유지 */
+    grid-auto-rows: 140px;
+    gap: 15px;
+    /* 간격을 약간 넓혀 여유 공간 확보 */
+    padding: 40px;
+    width: fit-content;
+    transform-origin: center;
+    /* 중앙 기준 확대/축소 */
+}
+
+/* Master Square Styling */
+.master-block {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+    border: 3px solid var(--accent-color);
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+}
+
+.master-square {
+    width: 100%;
+    height: 100%;
+}
+
+.master-square canvas {
+    cursor: crosshair;
+    /* 연필 대용으로 정밀한 십자 포인터 사용 */
+}
+
+#floating-clear {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Grid Tiles */
+.mini-grid {
+    background: var(--tile-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mini-grid:hover {
+    transform: scale(1.03);
+    z-index: 10;
+}
+
+.grid-label {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.mini-tile {
+    width: 100%;
+    height: 100%;
+}
+
+/* Compact Pattern Detail Panel (Inside Learn Selector) */
+.learn-selector-area {
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-top: -60px;
+    /* 추가로 10px 더 올림 (총 60px) */
+}
+
+/* 스크롤바 커스텀 */
+.learn-selector-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.learn-selector-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.selector-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+#pattern-detail-panel {
+    position: absolute;
+    /* 버튼판 위에 띄우기 */
+    top: 80px;
+    /* 40px + 40px */
+    left: 65px;
+    /* 105px - 40px */
+    z-index: 1000;
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border: 2px solid #3498db;
+    width: 34%;
+}
+
+#pattern-detail-panel.detail-hidden {
+    display: none;
+}
+
+#detail-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: fill;
+    /* 상자 비율에 상관없이 꽉 채움 */
+    border-radius: 4px;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+#detail-title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #2b4570;
+}
+
+#close-detail {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: #999;
+}
+
+#detail-content {
+    font-size: 0.85rem;
+}
+
+#detail-content img {
+    margin-bottom: 8px;
+}
+
+.detail-text {
+    line-height: 1.4;
+    color: #555;
+    font-size: 0.8rem;
+}
+
+.mini-tile canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.grid-tile-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Side Menu */
+#side-menu {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+#side-menu.hidden {
+    transform: translateX(100%);
+}
+
+.menu-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#menu-toggle {
+    position: fixed;
+    top: 20px;
+    /* 상단으로 이동 */
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Gallery Guide Button */
+#gallery-guide-btn {
+    position: fixed;
+    top: 20px;
+    right: 80px;
+    /* To the left of menu-toggle */
+    width: 45px;
+    height: 45px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+#gallery-guide-btn:hover {
+    transform: scale(1.1);
+    background: #2980b9;
+}
+
+/* Learn Mode Overlay */
+.mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #2c3e50;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    color: white;
+}
+
+.mode-overlay.hidden {
+    display: none;
+}
+
+.learn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.learn-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.2fr 1.8fr 3fr;
+    /* 원래의 넉넉한 비율로 복구 */
+    gap: 30px;
+    align-items: center;
+    overflow: hidden;
+}
+
+.learn-master-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: -140px;
+    /* 추가로 10px 더 내림 (누적 +60px) */
+}
+
+.learn-preview-area {
+    margin-top: -80px;
+    /* 추가로 10px 더 내림 (누적 +60px) */
+}
+
+.learn-canvas-container {
+    width: 180px;
+    height: 180px;
+    background: white;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.learn-canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+.preview-3x3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 360px;
+    height: 360px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.preview-tile {
+    border: 1.5px solid #2ecc71;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-tile canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Learn Mode Header Buttons */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.explain-guide-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.explain-guide-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Group Styling */
+.btn-group {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.rule-btn {
+    flex: 1;
+    /* 가로 가득 채우기 */
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11.5px;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    color: #3498db;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.info-btn:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Modal System Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.modal-card {
+    background: #2c3e50;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    position: relative;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #95a5a6;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: white;
+}
+
+.modal-content {
+    color: white;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.modal-content h2 {
+    color: #3498db;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    padding-bottom: 10px;
+}
+
+.modal-section {
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.modal-section h3 {
+    color: #3498db;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.modal-formula {
+    background: #1a252f;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    color: #2ecc71;
+    border-left: 4px solid #2ecc71;
+    margin: 10px 0;
+}
+
+.modal-text {
+    line-height: 1.7;
+    font-size: 1.05rem;
+    color: #ecf0f1;
+}
+
+.modal-tags {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-tag {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Falling Game (Game 2) */
+#falling-game-board {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: calc(100vh - 120px);
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.falling-square {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid transparent;
+}
+
+.falling-square:hover {
+    border-color: #3498db;
+}
+
+.falling-square canvas {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+}
+
+/* Control Buttons */
+.start-btn {
+    padding: 5px 18px;
+    background: #27ae60;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pause-btn {
+    padding: 5px 15px;
+    background: #f39c12;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stop-btn {
+    padding: 5px 15px;
+    background: #e74c3c;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.start-btn:hover,
+.pause-btn:hover,
+.stop-btn:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.falling-guide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0 30px;
+    padding: 2px 15px;
+}
+
+.guide-text {
+    color: #f1c40f;
+}
+
+.draw-tip {
+    font-size: 0.85rem;
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.1);
+    padding: 2px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+#falling-score-display {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #3498db;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 20px;
+    border-radius: 25px;
+    letter-spacing: 1px;
+}
+
+/* Game Setup Overlay */
+.game-setup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+}
+
+.game-setup-overlay h2 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.draw-notice {
+    color: #f1c40f;
+    background: rgba(241, 196, 15, 0.15);
+    padding: 15px 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+.level-btns {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.level-btn {
+    padding: 12px 25px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.level-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.level-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+}
+
+.start-game-btn {
+    padding: 15px 50px;
+    background: var(--button-bg, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.start-game-btn:hover {
+    background: #2ecc71;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar Styling for Modal */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(52, 152, 219, 0.4);
+    border-radius: 3px;
+}
+
+.selector-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2열 배치 */
+    gap: 4px;
+    /* 버튼 사이 간격 */
+    margin-bottom: 12px;
+}
+
+.group-header {
+    grid-column: 1 / -1;
+    /* 두 칸 모두 차지 */
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.rule-btn {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11.5px;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rule-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.rule-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+}
+
+.learn-pattern-id {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ecf0f1;
+    color: #2c3e50;
+    padding: 5px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+/* Chat Styles */
+#chat-panel {
+    position: fixed;
+    top: 75px;
+    /* 상단 버튼 아래에 위치하도록 변경 */
+    left: 20px;
+    width: 320px;
+    height: 400px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#chat-panel.chat-hidden {
+    display: none;
+}
+
+.chat-header {
+    padding: 15px;
+    background: var(--accent-color);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+#chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.chat-input-area {
+    padding: 10px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 8px;
+}
+
+#chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 15px;
+}
+
+#chat-toggle {
+    position: fixed;
+    top: 20px;
+    /* 상단으로 이동 */
+    left: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+#chat-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Modal Diagram Decoration */
+.modal-diagram {
+    width: 100%;
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    border: 3px solid #3498db;
+}
+
+.modal-diagram svg {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+}
+
+/* Guide Modal Specific Layout */
+.guide-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.symbol-grid-wrapper {
+    position: relative;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.guide-bg-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.guide-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.pattern-types-img {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    height: 250px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.highlight-red {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.highlight-purple {
+    color: #9b59b6;
+    font-weight: 500;
+}
+
+.small-desc {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 6px;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+/* Quiz Mode Styles */
+#quiz-mode-overlay {
+    z-index: 3000;
+}
+
+.quiz-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    /* 에셔 영역을 좁게 수정 */
+    gap: 20px;
+    padding: 10px 0;
+    overflow: hidden;
+    height: calc(100vh - 120px);
+}
+
+.quiz-label {
+    font-size: 1.1rem;
+    color: #ecf0f1;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.quiz-guide-tip {
+    font-size: 0.8rem;
+    color: #f1c40f;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.quiz-question-area {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.quiz-image-container {
+    background: white;
+    border-radius: 12px;
+    height: 320px;
+    /* 에셔 그림 영역 높이 축소 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+#quiz-question-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quiz-image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.quiz-hint-box {
+    background: rgba(52, 152, 219, 0.15);
+    border-left: 5px solid #3498db;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.quiz-choice-area {
+    background: rgba(0, 0, 0, 0.2) !important;
+    padding: 20px !important;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-top: 0 !important;
+}
+
+#quiz-options-container {
+    flex: 1;
+    overflow: hidden;
+    /* 스크롤바 제거 */
+    padding: 10px 0;
+}
+
+.quiz-feedback {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.quiz-feedback.correct {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+}
+
+.quiz-feedback.wrong {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.quiz-status {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 20px;
+    border-radius: 20px;
+}
+
+@keyframes quizSlideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 9 Group Quiz Grid */
+.quiz-grid-9 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    /* 간격 축소 */
+    padding: 5px;
+    height: 100%;
+}
+
+.quiz-group-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 5px;
+    /* 패딩을 최소화하여 공간 확보 */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-align: center;
+    height: 100%;
+    /* 부모 높이에 맞춤 */
+}
+
+.quiz-group-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-5px);
+    border-color: #3498db;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.group-img-wrapper {
+    width: 100%;
+    flex: 1;
+    /* 가용 공간 모두 사용 */
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    /* 여백 제거 */
+}
+
+.group-img-wrapper img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.group-info {
+    display: flex;
+    flex-direction: row;
+    /* 가로로 배치하여 높이 절약 */
+    justify-content: center;
+    align-items: baseline;
+    gap: 5px;
+    width: 100%;
+    padding: 2px 0;
+}
+
+.group-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    /* 보통 두께 */
+    color: #f1c40f;
+    text-transform: uppercase;
+    /* 대문자로 변경 */
+}
+
+.group-symbol {
+    display: none;
+    /* 심볼은 이름과 중복되므로 숨김 처리 */
+}
+
+.escher-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #2c3e50;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Appendix Gallery Styles */
+.appendix-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.appendix-master-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.master-shape-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.appendix-canvas-container {
+    width: 280px;
+    height: 280px;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Geometric Clip Paths for Master Containers */
+.appendix-canvas-container.triangle-container {
+    clip-path: polygon(50% 10%, 90% 85%, 10% 85%);
+}
+
+.appendix-canvas-container.hexagon-container {
+    clip-path: polygon(50% 5%, 89% 27.5%, 89% 72.5%, 50% 95%, 11% 72.5%, 11% 27.5%);
+}
+
+.appendix-canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+.shape-label-tag {
+    background: #3498db;
+    color: white;
+    padding: 6px 20px;
+    border-radius: 0 0 10px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: -30px;
+    /* Overlap with clipped part if needed, or adjust */
+    z-index: 5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Adjust tag position specifically for Hexagon since its bottom is 95% */
+.hexagon-container+.shape-label-tag {
+    margin-top: -15px;
+}
+
+.appendix-clear-btn-outer {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 34px;
+    height: 34px;
+    background: #e74c3c;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    transition: transform 0.2s;
+}
+
+.appendix-clear-btn-outer:hover {
+    transform: scale(1.1);
+}
+
+.shape-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.shape-item {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.3s;
+}
+
+.shape-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.shape-preview-box {
+    width: 100%;
+    aspect-ratio: 1;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.shape-preview-box canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.shape-id-tag {
+    font-size: 0.75rem;
+    color: #f1c40f;
+    font-weight: bold;
+    text-align: center;
+}

@@ -2905,37 +2905,37 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 5: { // T5 = CC6C6
-                    // Reversing rotation mapping and ensuring bottom edge is exactly 180 visual (local 0)
-                    // - Base (Tile 7): Upright, Visual 0 -> Local 0
-                    // - Bottom Edge (3번): 180 Visual -> Grid is inverted (180), so Local = 180 - 180 = 0
-                    // - Right Edge (2번): -60 (300) Visual -> Local = 300 - 180 = 120
-                    // - Left Edge (1번): +60 Visual -> Local = 60 - 180 = -120 = 240
+                    // Exact logic matching user's diagram with +60 clockwise right progression:
+                    // 'aa' (Tile 7) is Upright, visual 0 -> Local 0
+                    // Crossing Edge 3 (Bottom): 180 visual rotation. Grid is inverted (180), Local = 180-180 = 0.
+                    // Crossing Edge 2 (Right): +60 visual rotation. Grid is inverted (180), Local = 60-180 = -120 = 240.
+                    // Crossing Edge 1 (Left): -60 (300) visual rotation. Grid inverted (180), Local = 300-180 = 120.
                     const table = [
                         [0, 0],   // 1
-                        [0, 240], // 2
+                        [0, 120], // 2
                         [0, 0],   // 3
-                        [0, 120], // 4
-                        [0, 120], // 5
-                        [0, 240], // 6
-                        [0, 0],   // 7 (Base)
-                        [0, 120], // 8 
-                        [0, 240], // 9
+                        [0, 240], // 4
+                        [0, 240], // 5
+                        [0, 120], // 6
+                        [0, 0],   // 7
+                        [0, 240], // 8 
+                        [0, 120], // 9
                         [0, 0],   // 10
-                        [0, 120], // 11
-                        [0, 240], // 12
-                        [0, 0],   // 13 (Bottom of 7)
-                        [0, 120], // 14
-                        [0, 240], // 15
+                        [0, 240], // 11
+                        [0, 120], // 12
+                        [0, 0],   // 13
+                        [0, 240], // 14
+                        [0, 120], // 15
                         [0, 0],   // 16
-                        [0, 240], // 17
+                        [0, 120], // 17
                         [0, 0],   // 18
-                        [0, 120], // 19
-                        [0, 240], // 20
+                        [0, 240], // 19
+                        [0, 120], // 20
                         [0, 0],   // 21
-                        [0, 120], // 22
-                        [0, 240], // 23
+                        [0, 240], // 22
+                        [0, 120], // 23
                         [0, 0],   // 24
-                        [0, 120]  // 25
+                        [0, 240]  // 25
                     ];
                     const state = table[tileIdx];
                     if (state) {

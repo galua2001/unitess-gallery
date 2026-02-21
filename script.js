@@ -2977,9 +2977,43 @@ class UnitessGalleryApp {
                     }
                     break;
                 }
-                case 7: // T7 = CC6C6(2): Mirrored Grid (Upright=Mirrored F, Inverted=Upside down ㅋ)
-                    ctx.scale(-1, 1);
+                case 7: { // T7 = CC6C6(2)
+                    // Rule from user: 2번에서 180도 회전
+                    // Mathematically generated with E2=180, E1=60, E3=-60
+                    const table = [
+                        [0, 0],   // 1
+                        [0, 120], // 2
+                        [0, 120], // 3
+                        [0, 240], // 4
+                        [0, 240], // 5
+                        [0, 240], // 6
+                        [0, 0],   // 7 (Base "aa")
+                        [0, 0],   // 8
+                        [0, 120], // 9
+                        [0, 0],   // 10
+                        [0, 0],   // 11
+                        [0, 120], // 12
+                        [0, 120], // 13
+                        [0, 240], // 14
+                        [0, 240], // 15
+                        [0, 0],   // 16
+                        [0, 120], // 17
+                        [0, 120], // 18
+                        [0, 240], // 19
+                        [0, 240], // 20
+                        [0, 0],   // 21
+                        [0, 0],   // 22
+                        [0, 120], // 23
+                        [0, 120], // 24
+                        [0, 240]  // 25
+                    ];
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
+                }
             }
         } else {
             // Hexagon Patterns (H1-H22)

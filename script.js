@@ -2940,9 +2940,43 @@ class UnitessGalleryApp {
                     }
                     break;
                 }
-                case 6: // T6 = CC6C6(1): Natural Grid (Upright=F, Inverted=Upside down F)
-                    // Identity
+                case 6: { // T6 = CC6C6(1)
+                    // Rule from user: 1번에서만 180도 회전, 다른 곳은 60, -60 회전
+                    // Base `aa` is tile 7 (index 6).
+                    const table = [
+                        [0, 0],   // 1
+                        [0, 120], // 2
+                        [0, 240], // 3
+                        [0, 240], // 4
+                        [0, 240], // 5
+                        [0, 0],   // 6
+                        [0, 0],   // 7 (Base "aa")
+                        [0, 120], // 8
+                        [0, 120], // 9
+                        [0, 0],   // 10
+                        [0, 120], // 11
+                        [0, 120], // 12
+                        [0, 240], // 13
+                        [0, 240], // 14
+                        [0, 0],   // 15
+                        [0, 0],   // 16
+                        [0, 120], // 17
+                        [0, 240], // 18
+                        [0, 240], // 19
+                        [0, 0],   // 20
+                        [0, 0],   // 21
+                        [0, 120], // 22
+                        [0, 120], // 23
+                        [0, 240], // 24
+                        [0, 240]  // 25
+                    ];
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
+                }
                 case 7: // T7 = CC6C6(2): Mirrored Grid (Upright=Mirrored F, Inverted=Upside down ㅋ)
                     ctx.scale(-1, 1);
                     break;

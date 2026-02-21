@@ -2584,7 +2584,13 @@ class UnitessGalleryApp {
 
             const tag = document.createElement('div');
             tag.className = 'shape-id-tag';
-            tag.textContent = `Pattern ID: ${type.charAt(0).toUpperCase()}${i}`;
+
+            let labelText = `${type.charAt(0).toUpperCase()}${i}`;
+            if (type === 'triangle') {
+                const triNames = ["CCC", "CGG", "CGG(1)", "CGG(2)", "CC6C6", "CC6C6(1)", "CC6C6(2)"];
+                if (triNames[i - 1]) labelText += ` = ${triNames[i - 1]}`;
+            }
+            tag.textContent = labelText;
 
             item.appendChild(previewBox);
             item.appendChild(tag);
@@ -2827,27 +2833,115 @@ class UnitessGalleryApp {
             const inverted = subIdx === 1;
             // Triangle Patterns (T1-T7) based on Frieze/Wallpaper groups on triangular grid
             switch (patternId) {
-                case 1: // T1: Natural Grid (Upright=F, Inverted=UpsideDown F)
+                case 1: // T1 = CCC: Natural Grid (Upright=F, Inverted=UpsideDown F)
                     // No transformation needed, let the grid rotation (180) take effect
                     break;
-                case 2: // T2: Mirror Grid (Upright=MirrorF, Inverted=UpsideDown MirrorF)
-                    ctx.scale(-1, 1);
-                    // No rotation correction needed
+                case 2: { // T2 = CGG: Left Edge = 180 Rot (C), Others = Reflection (G)
+                    // Building based on exact user directives step by step:
+                    // Inverted triangles automatically rotate the canvas 180 deg in applyAppendixSymmetry.
+                    // 3, 6, 11, 15 are physically inverted. To draw a standard F that appears upside down to the user,
+                    // we apply NO local transformation to them, i.e., [0, 0].
+                    // User previously mapped: 1=(2,5,9,10,14), 4=(7,12,16) -> [0, 0], 8=(13)
+                    // 8, 13 are 180 rotated version of 1. Because 8, 13 are inverted (physically R180),
+                    // applying the exact same local transform as 1 ([1, 120]) yields a 180 rotated visual matching 1.
+                    const table = [
+                        [1, 120], // 1 (idx 0): base 1
+                        [1, 120], // 2 (idx 1): matches 1
+                        [0, 0],   // 3 (idx 2): Inverted triangle, drawn normally (appears 180 rotated)
+                        [0, 0],   // 4 (idx 3): NO transformation
+                        [1, 120], // 5 (idx 4): matches 1
+                        [0, 0],   // 6 (idx 5): Inverted triangle, drawn normally (appears 180 rotated)
+                        [0, 0],   // 7 (idx 6): NO transformation (matches 4)
+                        [1, 120], // 8 (idx 7): SAME local transform as 1 (appears 180 rotated visually)
+                        [1, 120], // 9 (idx 8): matches 1
+                        [1, 120], // 10 (idx 9): matches 1
+                        [0, 0],   // 11 (idx 10): Inverted triangle, drawn normally (appears 180 rotated)
+                        [0, 0],   // 12 (idx 11): NO transformation (matches 4)
+                        [1, 120], // 13 (idx 12): SAME local transform as 1 (appears 180 rotated visually)
+                        [1, 120], // 14 (idx 13): matches 9 !
+                        [0, 0],   // 15 (idx 14): Inverted triangle, drawn normally (appears 180 rotated)
+                        [0, 0]    // 16 (idx 15): NO transformation (matches 4)
+                    ];
+                    // Handling 14 separately to ensure consistency with user's earlier "3=(6,11,14)"
+                    // Since 14 is NOT an inverted triangle (it's upright), to look like an inverted one, we must mathematically flip it. Let's just follow the user's latest literal list: "3,6,11,15" = [0,0].
+
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
-                case 3: // Rotations (p3) - 120 degree rotations
-                    // Rotate based on index to create pinwheel effect
-                    ctx.rotate((tileIdx % 3) * 120 * Math.PI / 180);
+                }
+                case 3: { // T3 = CGG(1)
+                    // Building based on exact user directives:
+                    // 1,3번 변의 중선에 대한 대칭(Reflection parallel to Right Edge) = [1, 240].
+                    // (1, 4, 5, 9, 12, 16) = [1, 240]
+                    // 2 = (7, 10) = [0, 0] (Inferred base for 2)
+                    // 3 = (8, 15) = [0, 0] (Inferred base for 3)
+                    // (Other unmentioned tiles left as mathematical defaults for CGG1)
+                    const table = [
+                        [1, 240], // 1 (idx 0): 1,3 중선 대칭
+                        [0, 0],   // 2 (idx 1): base 2
+                        [0, 0],   // 3 (idx 2): base 3
+                        [1, 240], // 4 (idx 3): 1,3 중선 대칭
+                        [1, 240], // 5 (idx 4): 1,3 중선 대칭
+                        [1, 240], // 6 (idx 5): unmentioned (math default was 1,120, let's use 1,240 to match the reflection axis)
+                        [0, 0],   // 7 (idx 6): matches 2
+                        [0, 0],   // 8 (idx 7): matches 3
+                        [1, 240], // 9 (idx 8): 1,3 중선 대칭 (overrides '2' group)
+                        [0, 0],   // 10 (idx 9): matches 2
+                        [0, 0],   // 11 (idx 10): unmentioned (math default)
+                        [1, 240], // 12 (idx 11): 1,3 중선 대칭
+                        [1, 240], // 13 (idx 12): unmentioned (matching reflection axis)
+                        [0, 0],   // 14 (idx 13): unmentioned (math default)
+                        [0, 0],   // 15 (idx 14): matches 3
+                        [1, 240]  // 16 (idx 15): 1,3 중선 대칭
+                    ];
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
-                case 4: // T4 (Blue - Middle Left in Ref?): Upright=F, Inverted=Mirrored F (Upside down ㅋ)
-                    if (inverted) ctx.scale(-1, 1);
+                }
+                case 4: { // T4 = CGG(2)
+                    // Building based on exact user directives:
+                    // 3번 변(바닥) = 180도 회전 (C)
+                    // 1, 2번 변의 중점을 잇는 선분에 대한 대칭 (수평 대칭) = [1, 0] (ScaleX -1 + Rotate 0)
+                    // Since Left and Right edges are G (Reflection), and Bottom is C (Rotation 180 = [0,0]),
+                    // we get a perfect alternating zig-zag:
+                    const table = [
+                        [0, 0],   // 1
+                        [1, 0],   // 2
+                        [0, 0],   // 3
+                        [1, 0],   // 4
+                        [0, 0],   // 5
+                        [1, 0],   // 6
+                        [0, 0],   // 7 (Base)
+                        [1, 0],   // 8
+                        [0, 0],   // 9
+                        [1, 0],   // 10
+                        [0, 0],   // 11
+                        [1, 0],   // 12
+                        [0, 0],   // 13 (Bottom of 7 => C => matches 7)
+                        [1, 0],   // 14
+                        [0, 0],   // 15
+                        [1, 0]    // 16
+                    ];
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
-                case 5: // T5 (Red - Middle Right in Ref?): Upright=Mirrored F, Inverted=Normal F (Upside down F)
+                }
+                case 5: // T5 = CC6C6: Upright=Mirrored F, Inverted=Normal F (Upside down F)
                     if (!inverted) ctx.scale(-1, 1);
                     break;
-                case 6: // T6 (Blue - Bottom Left in Ref?): Natural Grid (Upright=F, Inverted=Upside down F)
+                case 6: // T6 = CC6C6(1): Natural Grid (Upright=F, Inverted=Upside down F)
                     // Identity
                     break;
-                case 7: // T7 (Red - Bottom Right in Ref?): Mirrored Grid (Upright=Mirrored F, Inverted=Upside down ㅋ)
+                case 7: // T7 = CC6C6(2): Mirrored Grid (Upright=Mirrored F, Inverted=Upside down ㅋ)
                     ctx.scale(-1, 1);
                     break;
             }

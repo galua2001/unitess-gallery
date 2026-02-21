@@ -2771,16 +2771,16 @@ class UnitessGalleryApp {
                 ctx.restore();
             }
             else {
-                // Modified Hexagon Grid: 19-hex cluster (Pointy-Top)
-                const size = w / 9.5;
+                // Modified Hexagon Grid: 37-hex cluster (Pointy-Top)
+                const size = w / 13;
                 ctx.save(); // CRITICAL: Stop translation accumulation
                 ctx.translate(w / 2, h / 2);
 
-                // Define axial coordinates for a radius-2 hexagon (19 tiles)
+                // Define axial coordinates for a radius-3 hexagon (37 tiles)
                 const hexPositions = [];
-                for (let r = -2; r <= 2; r++) {
-                    for (let q = -2; q <= 2; q++) {
-                        if (Math.abs(q + r) <= 2) {
+                for (let r = -3; r <= 3; r++) {
+                    for (let q = -3; q <= 3; q++) {
+                        if (Math.abs(q + r) <= 3) {
                             hexPositions.push({ q, r });
                         }
                     }
@@ -2814,9 +2814,9 @@ class UnitessGalleryApp {
                     ctx.closePath();
                     ctx.stroke();
 
-                    // 3. Draw ID Label (1-19)
+                    // 3. Draw ID Label
                     ctx.fillStyle = "rgba(0,0,0,0.3)";
-                    ctx.font = "bold 9px Arial";
+                    ctx.font = "bold 8px Arial";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
                     ctx.fillText(idx + 1, 0, 0);

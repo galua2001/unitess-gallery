@@ -2905,38 +2905,34 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 5: { // T5 = CC6C6
-                    // User calculated exact logic:
-                    // - Base (Tile 7): Upright, [0] Visual -> [0, 0] Local
-                    // - Bottom Edge (3번): 180 Visual -> Grid is inverted (180), so Local = 180 - 180 = [0, 0]
-                    // - Right Edge (2번): +60 Visual every step -> Crossing into inverted grid adds virtual 180: Local = 60 - 180 = [0, 240]
-                    // - Left Edge (1번): -60 Visual every step -> Crossing into inverted grid adds virtual 180: Local = -60 - 180 = [0, 120]
-                    // (Propagated perfectly matching these rules)
+                    // Exact mathematical mapping transcribed from the user's provided visual image
+                    // calculating Visual Angle minus Grid Inversion Angle (180 for inverted)
                     const table = [
-                        [0, 0],   // 1
-                        [0, 120], // 2
-                        [0, 0],   // 3
-                        [0, 240], // 4
-                        [0, 240], // 5
-                        [0, 120], // 6
-                        [0, 0],   // 7
-                        [0, 240], // 8
-                        [0, 120], // 9
-                        [0, 0],   // 10
-                        [0, 240], // 11
-                        [0, 120], // 12
-                        [0, 0],   // 13
-                        [0, 240], // 14
-                        [0, 120], // 15
-                        [0, 0],   // 16
-                        [0, 120], // 17
-                        [0, 0],   // 18
-                        [0, 240], // 19
-                        [0, 120], // 20
-                        [0, 0],   // 21
-                        [0, 240], // 22
-                        [0, 120], // 23
-                        [0, 0],   // 24
-                        [0, 240]  // 25
+                        [0, 0],   // 1  (Visual 0, Upright)
+                        [0, 300], // 2  (Visual 300, Upright)
+                        [0, 60],  // 3  (Visual 240, Inverted -> Local 60)
+                        [0, 60],  // 4  (Visual 60, Upright)
+                        [0, 300], // 5  (Visual 300, Upright)
+                        [0, 60],  // 6  (Visual 240, Inverted -> Local 60)
+                        [0, 0],   // 7  (Visual 0, Upright)
+                        [0, 300], // 8  (Visual 120, Inverted -> Local 300)
+                        [0, 60],  // 9  (Visual 60, Upright)
+                        [0, 300], // 10 (Visual 300, Upright)
+                        [0, 60],  // 11 (Visual 240, Inverted -> Local 60)
+                        [0, 0],   // 12 (Visual 0, Upright)
+                        [0, 300], // 13 (Visual 120, Inverted -> Local 300)
+                        [0, 60],  // 14 (Visual 60, Upright)
+                        [0, 0],   // 15 (Visual 180, Inverted -> Local 0)
+                        [0, 120], // 16 (Visual 120, Upright)
+                        [0, 300], // 17 (Visual 300, Upright)
+                        [0, 60],  // 18 (Visual 240, Inverted -> Local 60)
+                        [0, 0],   // 19 (Visual 0, Upright)
+                        [0, 300], // 20 (Visual 120, Inverted -> Local 300)
+                        [0, 60],  // 21 (Visual 60, Upright)
+                        [0, 0],   // 22 (Visual 180, Inverted -> Local 0)
+                        [0, 120], // 23 (Visual 120, Upright)
+                        [0, 60],  // 24 (Visual 240, Inverted -> Local 60)
+                        [0, 180]  // 25 (Visual 180, Upright)
                     ];
                     const state = table[tileIdx];
                     if (state) {

@@ -2696,7 +2696,7 @@ class UnitessGalleryApp {
             let idCounter = 1;
 
             if (type === 'triangle') {
-                const rows = 5; // Changed from 4 to 5
+                const rows = 6; // Changed from 5 to 6
                 const totalW = w * 0.95;
                 const size = totalW / rows;
                 const triH = size * Math.sqrt(3) / 2;
@@ -2842,7 +2842,7 @@ class UnitessGalleryApp {
             switch (patternId) {
                 case 1: { // T1 = CCC: Basic translation (only C transformations, pure rotations that look the same on inverted)
                     // Expanded to 25 tiles (5 rows)
-                    const table = Array(25).fill([0, 0]);
+                    const table = Array(36).fill([0, 0]);
                     const state = table[tileIdx];
                     if (state) {
                         ctx.scale(state[0] ? -1 : 1, 1);

@@ -1,4 +1,4 @@
-const ROWS = 4;
+const ROWS = 5;
 function getIdx(r, i) {
     let base = 0;
     for (let k = 0; k < r; k++) base += (2 * k + 1);
@@ -17,7 +17,7 @@ function mul(a, b) {
 }
 
 function solve(opL, opR, opB) {
-    const states = new Array(16).fill(null);
+    const states = new Array(25).fill(null);
     const startIdx = getIdx(2, 2); // 7 is index 6
     const queue = [{ r: 2, i: 2, s: { m: 0, r: 0 } }];
     states[startIdx] = { m: 0, r: 0 };

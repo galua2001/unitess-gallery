@@ -2718,16 +2718,18 @@ class UnitessGalleryApp {
 
                         ctx.translate(tx, ty);
 
-                        // Apply Pattern Symmetry
+                        const currentTileIdx = idCounterLocal++;
+
+                        // 1. Draw Tile Content
+                        ctx.save();
+                        // Apply Pattern Symmetry ONLY to the inner content (strokes), NOT the grid outline
                         // Pass isInverted as subIdx (1 for true, 0 for false)
-                        this.applyAppendixSymmetry(ctx, grid.id, type, idCounterLocal++, isInverted ? 1 : 0);
+                        this.applyAppendixSymmetry(ctx, grid.id, type, currentTileIdx, isInverted ? 1 : 0);
 
                         if (isInverted) {
                             ctx.rotate(Math.PI);
                         }
 
-                        // 1. Draw Tile Content
-                        ctx.save();
                         // Map Master Triangle (Normalized 0-1) to local Triangle space
                         // MT Bounds: X[0.1-0.9], Y[0.1-0.85] -> Width 0.8, Height 0.75
                         // Local Space: Centroid is (0,0). Tri apex (0, -2/3 triH), Base Y (1/3 triH)
@@ -2741,7 +2743,11 @@ class UnitessGalleryApp {
                         this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, scaledWidth);
                         ctx.restore();
 
-                        // 2. Draw Faint Triangle Border
+                        // 2. Draw Faint Triangle Border (Untouched by content symmetry)
+                        ctx.save();
+                        if (isInverted) {
+                            ctx.rotate(Math.PI);
+                        }
                         ctx.strokeStyle = 'rgba(0,0,0,0.1)';
                         ctx.lineWidth = 1;
                         ctx.beginPath();
@@ -2756,7 +2762,8 @@ class UnitessGalleryApp {
                         ctx.font = "bold 9px Arial";
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
-                        ctx.fillText(idCounterLocal, 0, 0);
+                        ctx.fillText(currentTileIdx + 1, 0, 0);
+                        ctx.restore();
 
                         ctx.restore();
                     }
@@ -2897,9 +2904,47 @@ class UnitessGalleryApp {
                     }
                     break;
                 }
-                case 5: // T5 = CC6C6: Upright=Mirrored F, Inverted=Normal F (Upside down F)
-                    if (!inverted) ctx.scale(-1, 1);
+                case 5: { // T5 = CC6C6
+                    // User calculated exact logic:
+                    // - Base (Tile 7): Upright, [0] Visual -> [0, 0] Local
+                    // - Bottom Edge (3번): 180 Visual -> Grid is inverted (180), so Local = 180 - 180 = [0, 0]
+                    // - Right Edge (2번): +60 Visual every step -> Crossing into inverted grid adds virtual 180: Local = 60 - 180 = [0, 240]
+                    // - Left Edge (1번): -60 Visual every step -> Crossing into inverted grid adds virtual 180: Local = -60 - 180 = [0, 120]
+                    // (Propagated perfectly matching these rules)
+                    const table = [
+                        [0, 0],   // 1
+                        [0, 120], // 2
+                        [0, 0],   // 3
+                        [0, 240], // 4
+                        [0, 240], // 5
+                        [0, 120], // 6
+                        [0, 0],   // 7
+                        [0, 240], // 8
+                        [0, 120], // 9
+                        [0, 0],   // 10
+                        [0, 240], // 11
+                        [0, 120], // 12
+                        [0, 0],   // 13
+                        [0, 240], // 14
+                        [0, 120], // 15
+                        [0, 0],   // 16
+                        [0, 120], // 17
+                        [0, 0],   // 18
+                        [0, 240], // 19
+                        [0, 120], // 20
+                        [0, 0],   // 21
+                        [0, 240], // 22
+                        [0, 120], // 23
+                        [0, 0],   // 24
+                        [0, 240]  // 25
+                    ];
+                    const state = table[tileIdx];
+                    if (state) {
+                        ctx.scale(state[0] ? -1 : 1, 1);
+                        ctx.rotate(state[1] * Math.PI / 180);
+                    }
                     break;
+                }
                 case 6: // T6 = CC6C6(1): Natural Grid (Upright=F, Inverted=Upside down F)
                     // Identity
                     break;

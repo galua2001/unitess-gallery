@@ -2905,11 +2905,11 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 5: { // T5 = CC6C6
-                    // Perfect logic matched to user's "aa" central vertex alignment:
-                    // 'aa' (Tile 7) is Upright, visual 0 -> Local 0
-                    // Crossing Edge 3 (Bottom): 180 rotation. Grid is inverted (180), Local = 180-180 = 0.
-                    // Crossing Edge 2 (Right): -60 rotation. Visual 300, Local = 300-180 = 120.
-                    // Crossing Edge 1 (Left): +60 rotation. Visual 60, Local = 60-180 = -120 = 240.
+                    // Reversing rotation mapping and ensuring bottom edge is exactly 180 visual (local 0)
+                    // - Base (Tile 7): Upright, Visual 0 -> Local 0
+                    // - Bottom Edge (3번): 180 Visual -> Grid is inverted (180), so Local = 180 - 180 = 0
+                    // - Right Edge (2번): -60 (300) Visual -> Local = 300 - 180 = 120
+                    // - Left Edge (1번): +60 Visual -> Local = 60 - 180 = -120 = 240
                     const table = [
                         [0, 0],   // 1
                         [0, 240], // 2
@@ -2917,13 +2917,13 @@ class UnitessGalleryApp {
                         [0, 120], // 4
                         [0, 120], // 5
                         [0, 240], // 6
-                        [0, 0],   // 7
+                        [0, 0],   // 7 (Base)
                         [0, 120], // 8 
                         [0, 240], // 9
                         [0, 0],   // 10
                         [0, 120], // 11
                         [0, 240], // 12
-                        [0, 0],   // 13
+                        [0, 0],   // 13 (Bottom of 7)
                         [0, 120], // 14
                         [0, 240], // 15
                         [0, 0],   // 16

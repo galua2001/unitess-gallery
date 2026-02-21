@@ -2905,34 +2905,34 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 5: { // T5 = CC6C6
-                    // Exact mathematical mapping transcribed from the user's provided visual image
-                    // calculating Visual Angle minus Grid Inversion Angle (180 for inverted)
+                    // Absolute translation directly mapped from the user's provided diagrams:
+                    // Using visual translation minus grid base offset (180 for inversions)
                     const table = [
-                        [0, 0],   // 1  (Visual 0, Upright)
-                        [0, 300], // 2  (Visual 300, Upright)
-                        [0, 60],  // 3  (Visual 240, Inverted -> Local 60)
-                        [0, 60],  // 4  (Visual 60, Upright)
-                        [0, 300], // 5  (Visual 300, Upright)
-                        [0, 60],  // 6  (Visual 240, Inverted -> Local 60)
-                        [0, 0],   // 7  (Visual 0, Upright)
-                        [0, 300], // 8  (Visual 120, Inverted -> Local 300)
-                        [0, 60],  // 9  (Visual 60, Upright)
-                        [0, 300], // 10 (Visual 300, Upright)
-                        [0, 60],  // 11 (Visual 240, Inverted -> Local 60)
-                        [0, 0],   // 12 (Visual 0, Upright)
-                        [0, 300], // 13 (Visual 120, Inverted -> Local 300)
-                        [0, 60],  // 14 (Visual 60, Upright)
-                        [0, 0],   // 15 (Visual 180, Inverted -> Local 0)
-                        [0, 120], // 16 (Visual 120, Upright)
-                        [0, 300], // 17 (Visual 300, Upright)
-                        [0, 60],  // 18 (Visual 240, Inverted -> Local 60)
-                        [0, 0],   // 19 (Visual 0, Upright)
-                        [0, 300], // 20 (Visual 120, Inverted -> Local 300)
-                        [0, 60],  // 21 (Visual 60, Upright)
-                        [0, 0],   // 22 (Visual 180, Inverted -> Local 0)
-                        [0, 120], // 23 (Visual 120, Upright)
-                        [0, 60],  // 24 (Visual 240, Inverted -> Local 60)
-                        [0, 180]  // 25 (Visual 180, Upright)
+                        [0, 0],   // 1
+                        [0, 300], // 2
+                        [0, 60],  // 3
+                        [0, 60],  // 4
+                        [0, 300], // 5
+                        [0, 60],  // 6
+                        [0, 0],   // 7 (Anchor 'aa')
+                        [0, 300], // 8
+                        [0, 60],  // 9
+                        [0, 300], // 10
+                        [0, 60],  // 11
+                        [0, 0],   // 12
+                        [0, 300], // 13
+                        [0, 60],  // 14
+                        [0, 0],   // 15
+                        [0, 120], // 16
+                        [0, 300], // 17
+                        [0, 60],  // 18
+                        [0, 0],   // 19
+                        [0, 300], // 20
+                        [0, 60],  // 21
+                        [0, 0],   // 22
+                        [0, 120], // 23
+                        [0, 60],  // 24
+                        [0, 180]  // 25
                     ];
                     const state = table[tileIdx];
                     if (state) {

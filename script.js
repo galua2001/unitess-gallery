@@ -28,6 +28,9 @@ class UnitessGalleryApp {
         this.lastMouseY = 0;
 
         this.grids = [];
+        this.galleryNeedsUpdate = true;
+        this.triangleNeedsUpdate = true;
+        this.hexagonNeedsUpdate = true;
         this.strokeWidth = 2;
         this.masterStrokeColor = '#ff0000';
         this.showLabels = true;
@@ -1059,6 +1062,7 @@ class UnitessGalleryApp {
             if (e.type === 'touchstart') e.preventDefault();
 
             this.isDrawing = true;
+            this.galleryNeedsUpdate = true;
             const pos = getPos(e);
             const targetStrokes = this.isLearnMode ? this.learnStrokes : this.strokes;
             targetStrokes.push({ points: [pos] });
@@ -1070,6 +1074,7 @@ class UnitessGalleryApp {
             const pos = getPos(e);
             const targetStrokes = this.isLearnMode ? this.learnStrokes : this.strokes;
             targetStrokes[targetStrokes.length - 1].points.push(pos);
+            this.galleryNeedsUpdate = true;
         };
 
         const stopDrawing = () => {
@@ -1101,13 +1106,34 @@ class UnitessGalleryApp {
         this.masterCtx.clearRect(0, 0, this.masterCanvas.width, this.masterCanvas.height);
         if (this.showCanvasGrid) this.drawCanvasGrid(this.masterCtx, this.masterCanvas.width, this.masterCanvas.height);
         this.drawMidpointGuides(this.masterCtx, this.masterCanvas.width, this.masterCanvas.height);
-        this.drawStrokes(this.masterCtx, this.masterCanvas.width, this.masterCanvas.height, 'red');
+        this.drawStrokes(this.masterCtx, this.masterCanvas.width, this.masterCanvas.height, this.masterStrokeColor);
+
+        // Appendix Master Render (only if visible)
+        const triOverlay = document.getElementById('triangle-gallery-overlay');
+        if (triOverlay && !triOverlay.classList.contains('hidden')) {
+            const triCanvas = document.getElementById('triangle-master-canvas');
+            this.renderAppendixMaster(triCanvas, this.triangleStrokes, 'triangle');
+            if (this.triangleNeedsUpdate) {
+                this.updateAppendixGallery(this.triangleGrids, this.triangleStrokes, 'triangle');
+                this.triangleNeedsUpdate = false;
+            }
+        }
+
+        const hexOverlay = document.getElementById('hexagon-gallery-overlay');
+        if (hexOverlay && !hexOverlay.classList.contains('hidden')) {
+            const hexCanvas = document.getElementById('hexagon-master-canvas');
+            this.renderAppendixMaster(hexCanvas, this.hexagonStrokes, 'hexagon');
+            if (this.hexagonNeedsUpdate) {
+                this.updateAppendixGallery(this.hexagonGrids, this.hexagonStrokes, 'hexagon');
+                this.hexagonNeedsUpdate = false;
+            }
+        }
 
         // Learn Mode Render
         if (this.isLearnMode) {
             this.learnMasterCtx.clearRect(0, 0, this.learnMasterCanvas.width, this.learnMasterCanvas.height);
             this.drawCanvasGrid(this.learnMasterCtx, this.learnMasterCanvas.width, this.learnMasterCanvas.height);
-            this.drawStrokes(this.learnMasterCtx, this.learnMasterCanvas.width, this.learnMasterCanvas.height, this.masterStrokeColor, true); // true for learnStrokes
+            this.drawStrokes(this.learnMasterCtx, this.learnMasterCanvas.width, this.learnMasterCanvas.height, this.masterStrokeColor, true);
             this.drawMidpointGuides(this.learnMasterCtx, this.learnMasterCanvas.width, this.learnMasterCanvas.height);
 
             const lerp = (c, t, f) => {
@@ -1148,33 +1174,37 @@ class UnitessGalleryApp {
         }
 
         // Always render gallery grids in background or if not in learn mode
-        this.grids.forEach(grid => {
-            let groupColor = '#ffffff';
-            const id = grid.ruleSet;
-            if (id === 1) groupColor = '#FF5555';
-            else if (id === 2) groupColor = '#55FF55';
-            else if (id >= 3 && id <= 4) groupColor = '#5555FF';
-            else if (id >= 5 && id <= 6) groupColor = '#FFFF55';
-            else if (id >= 7 && id <= 10) groupColor = '#FF55FF';
-            else if (id >= 11 && id <= 12) groupColor = '#55FFFF';
-            else if (id >= 13 && id <= 16) groupColor = '#FFAA00';
-            else if (id >= 17 && id <= 20) groupColor = '#AA55FF';
-            else if (id >= 21 && id <= 26) groupColor = '#00FF99';
+        // Render square gallery (if needs update)
+        if (this.galleryNeedsUpdate) {
+            this.grids.forEach(grid => {
+                let groupColor = '#ffffff';
+                const id = grid.ruleSet;
+                if (id === 1) groupColor = '#FF5555';
+                else if (id === 2) groupColor = '#55FF55';
+                else if (id >= 3 && id <= 4) groupColor = '#5555FF';
+                else if (id >= 5 && id <= 6) groupColor = '#FFFF55';
+                else if (id >= 7 && id <= 10) groupColor = '#FF55FF';
+                else if (id >= 11 && id <= 12) groupColor = '#55FFFF';
+                else if (id >= 13 && id <= 16) groupColor = '#FFAA00';
+                else if (id >= 17 && id <= 20) groupColor = '#AA55FF';
+                else if (id >= 21 && id <= 26) groupColor = '#00FF99';
 
-            grid.tiles.forEach(tile => {
-                const ctx = tile.ctx;
-                const cw = tile.canvas.width;
-                const ch = tile.canvas.height;
-                ctx.clearRect(0, 0, cw, ch);
-                ctx.save();
-                ctx.translate(cw / 2, ch / 2);
-                ctx.rotate(tile.rule.rotation * Math.PI / 180);
-                ctx.scale(tile.rule.scaleX, tile.rule.scaleY);
-                ctx.translate(-cw / 2, -ch / 2);
-                this.drawStrokes(ctx, cw, ch, groupColor);
-                ctx.restore();
+                grid.tiles.forEach(tile => {
+                    const ctx = tile.ctx;
+                    const cw = tile.canvas.width;
+                    const ch = tile.canvas.height;
+                    ctx.clearRect(0, 0, cw, ch);
+                    ctx.save();
+                    ctx.translate(cw / 2, ch / 2);
+                    ctx.rotate(tile.rule.rotation * Math.PI / 180);
+                    ctx.scale(tile.rule.scaleX, tile.rule.scaleY);
+                    ctx.translate(-cw / 2, -ch / 2);
+                    this.drawStrokes(ctx, cw, ch, groupColor);
+                    ctx.restore();
+                });
             });
-        });
+            this.galleryNeedsUpdate = false;
+        }
 
         requestAnimationFrame(() => this.renderLoop());
     }
@@ -2505,8 +2535,8 @@ class UnitessGalleryApp {
         if (rect.width > 0) {
             canvas.width = rect.width;
             canvas.height = rect.height;
-            const strokes = type === 'triangle' ? this.triangleStrokes : this.hexagonStrokes;
-            this.renderAppendixMaster(canvas, strokes, type);
+            if (type === 'triangle') this.triangleNeedsUpdate = true;
+            else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
         }
     }
 
@@ -2554,8 +2584,8 @@ class UnitessGalleryApp {
 
             if (strokes.length > 0) {
                 strokes[strokes.length - 1].points.push({ x, y });
-                this.renderAppendixMaster(canvas, strokes, type);
-                this.updateAppendixGallery(grids, strokes, type);
+                if (type === 'triangle') this.triangleNeedsUpdate = true;
+                else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
             }
         };
 
@@ -2576,8 +2606,8 @@ class UnitessGalleryApp {
         if (clearBtn) {
             clearBtn.onclick = () => {
                 strokes.length = 0; // Clear the array
-                this.renderAppendixMaster(canvas, strokes, type);
-                this.updateAppendixGallery(grids, strokes, type);
+                if (type === 'triangle') this.triangleNeedsUpdate = true;
+                else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
             };
         }
 

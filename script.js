@@ -1078,6 +1078,10 @@ class UnitessGalleryApp {
 
         const stopDrawing = () => {
             this.isDrawing = false;
+            this.updateGallery();
+            // Also update appendix if they have content
+            if (this.triangleGrids.length > 0) this.updateAppendixGallery(this.triangleGrids.slice(0, 10), this.strokes, 'triangle');
+            if (this.hexagonGrids.length > 0) this.updateAppendixGallery(this.hexagonGrids.slice(0, 10), this.strokes, 'hexagon');
         };
 
         this.masterCanvas.addEventListener('mousedown', startDrawing);
@@ -1151,7 +1155,12 @@ class UnitessGalleryApp {
             });
         }
 
-        // Always render gallery grids in background or if not in learn mode
+        // Render gallery grids ONLY on demand, not in the loop, to fix slowness
+        // requestAnimationFrame continues for Master Canvas and Learn Mode
+        requestAnimationFrame(() => this.renderLoop());
+    }
+
+    updateGallery() {
         this.grids.forEach(grid => {
             let groupColor = '#ffffff';
             const id = grid.ruleSet;
@@ -1179,8 +1188,6 @@ class UnitessGalleryApp {
                 ctx.restore();
             });
         });
-
-        requestAnimationFrame(() => this.renderLoop());
     }
 
     setupMenu() {
@@ -2499,13 +2506,17 @@ class UnitessGalleryApp {
         const hexGrid = document.getElementById('hexagon-gallery-grid');
         this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 23); // 23 patterns
 
-        // Seed initial strokes if empty so user sees something immediately
+        // Seed initial strokes by pushing, NOT by reassigning the array reference
         if (this.triangleStrokes.length === 0 && this.strokes.length > 0) {
-            this.triangleStrokes = JSON.parse(JSON.stringify(this.strokes));
+            this.strokes.forEach(s => this.triangleStrokes.push(JSON.parse(JSON.stringify(s))));
         }
         if (this.hexagonStrokes.length === 0 && this.strokes.length > 0) {
-            this.hexagonStrokes = JSON.parse(JSON.stringify(this.strokes));
+            this.strokes.forEach(s => this.hexagonStrokes.push(JSON.parse(JSON.stringify(s))));
         }
+
+        // Initial render for appendix galleries
+        this.updateAppendixGallery(this.triangleGrids, this.triangleStrokes, 'triangle');
+        this.updateAppendixGallery(this.hexagonGrids, this.hexagonStrokes, 'hexagon');
     }
 
     syncAppendixCanvases(type) {
@@ -2516,8 +2527,22 @@ class UnitessGalleryApp {
         if (rect.width > 0) {
             canvas.width = rect.width;
             canvas.height = rect.height;
+
+            // Sync main strokes to appendix if they are empty
+            if (type === 'triangle') {
+                if (this.triangleStrokes.length === 0 && this.strokes.length > 0) {
+                    this.strokes.forEach(s => this.triangleStrokes.push(JSON.parse(JSON.stringify(s))));
+                }
+            } else {
+                if (this.hexagonStrokes.length === 0 && this.strokes.length > 0) {
+                    this.strokes.forEach(s => this.hexagonStrokes.push(JSON.parse(JSON.stringify(s))));
+                }
+            }
+
             const strokes = type === 'triangle' ? this.triangleStrokes : this.hexagonStrokes;
+            const grids = type === 'triangle' ? this.triangleGrids : this.hexagonGrids;
             this.renderAppendixMaster(canvas, strokes, type);
+            this.updateAppendixGallery(grids, strokes, type);
         }
     }
 
@@ -2570,7 +2595,10 @@ class UnitessGalleryApp {
             if (strokes.length > 0) {
                 strokes[strokes.length - 1].points.push({ x, y });
                 this.renderAppendixMaster(canvas, strokes, type);
-                // Removed updateAppendixGallery from here to fix slowness
+
+                // Real-time update for the first few cards to show it's working
+                const previewGrids = grids.slice(0, 3);
+                this.updateAppendixGallery(previewGrids, strokes, type);
             }
         };
 
@@ -2692,8 +2720,8 @@ class UnitessGalleryApp {
             const vertices = [];
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
-                // Flat-top vertices are at 30, 90, 150, 210, 270, 330 degrees
-                const angle = (i * 60 + 30) * Math.PI / 180;
+                // Flat-top orientation: vertices at 0, 60, 120, 180, 240, 300 degrees
+                const angle = (i * 60) * Math.PI / 180;
                 const x = w / 2 + radius * Math.cos(angle);
                 const y = h / 2 + radius * Math.sin(angle);
                 vertices.push({ x, y });
@@ -2784,12 +2812,11 @@ class UnitessGalleryApp {
                         // Local Space: Centroid is (0,0). Tri apex (0, -2/3 triH), Base Y (1/3 triH)
                         const scaleFactorX = size / 0.8;
                         const scaleFactorY = triH / 0.75;
-                        ctx.scale(scaleFactorX, scaleFactorY);
+                        ctx.scale(scaleFactorX * 0.9, scaleFactorY * 0.9);
                         ctx.translate(-0.5, -0.6); // Align centroids (MT centroid is 0.5, 0.6)
 
                         // Draw strokes with adjusted line width
-                        const scaledWidth = this.appendixStrokeWidth / ((scaleFactorX + scaleFactorY) / 2);
-                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, scaledWidth);
+                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / (scaleFactorX * 0.9));
                         ctx.restore();
 
                         // 2. Draw Faint Triangle Border (Untouched by content symmetry)
@@ -2855,8 +2882,8 @@ class UnitessGalleryApp {
 
                     ctx.beginPath();
                     for (let i = 0; i < 6; i++) {
-                        // Flat-top vertices (sides)
-                        const angle = (i * 60 + 30) * Math.PI / 180;
+                        // Flat-top orientation: vertices at 0, 60, 120, 180, 240, 300 degrees
+                        const angle = (i * 60) * Math.PI / 180;
                         const px = size * Math.cos(angle);
                         const py = size * Math.sin(angle);
                         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
@@ -2874,8 +2901,14 @@ class UnitessGalleryApp {
                     // 2. Draw Tile Content (Master drawing) OVER the background
                     ctx.save();
                     this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
-                    ctx.translate(-size, -size);
-                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.appendixStrokeWidth);
+
+                    // Hexagon Tile centering and scaling
+                    // size = w / 13 (approx 13.84). 
+                    // We want the drawing to fill the hex. Let's use a bigger multiplier.
+                    ctx.scale(size * 2, size * 2);
+                    ctx.translate(-0.5, -0.5);
+
+                    this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / (size * 2));
                     ctx.restore();
 
                     // 3. Draw ID Label

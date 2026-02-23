@@ -1,10 +1,7 @@
 class UnitessGalleryApp {
     constructor() {
         this.viewport = document.getElementById('gallery-viewport');
-        this.zoomWrapper = document.getElementById('zoom-wrapper');
-        this.squareContainer = document.getElementById('gallery-container');
-        this.triangleContainer = document.getElementById('triangle-gallery-grid');
-        this.hexagonContainer = document.getElementById('hexagon-gallery-grid');
+        this.container = document.getElementById('gallery-container');
         this.masterCanvas = document.getElementById('master-canvas');
         this.masterCtx = this.masterCanvas.getContext('2d');
 
@@ -266,14 +263,15 @@ class UnitessGalleryApp {
         this.renderLoop();
 
         // Enable Zoom/Pan for all modes
-        // (Triangle and Hexagon now share the main viewport zoom)
-
         // Learn Mode
         this.enableZoomPan('learn-mode-overlay', '.learn-content', 'learn');
         // Quiz Mode
         this.enableZoomPan('quiz-mode-overlay', '.quiz-content', 'quiz');
         // Falling Game Mode
         this.enableZoomPan('falling-game-overlay', '#falling-game-board', 'falling');
+        // Appendix Galleries
+        this.enableZoomPan('triangle-gallery-overlay', '#triangle-gallery-overlay .appendix-content', 'triangle');
+        this.enableZoomPan('hexagon-gallery-overlay', '#hexagon-gallery-overlay .appendix-content', 'hexagon');
     }
 
     setupMasterCanvas() {
@@ -356,7 +354,7 @@ class UnitessGalleryApp {
                 }
             }
 
-            this.squareContainer.appendChild(gridDiv);
+            this.container.appendChild(gridDiv);
             this.grids.push(gridData);
         });
     }
@@ -950,7 +948,7 @@ class UnitessGalleryApp {
 
         // Pan with mouse (Desktop)
         this.viewport.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.master-square')) return; // Drawing area
+            if (e.target.closest('#master-square')) return; // Drawing area
             this.isPanning = true;
             this.lastMouseX = e.clientX;
             this.lastMouseY = e.clientY;
@@ -960,7 +958,7 @@ class UnitessGalleryApp {
         // Touch Navigation (Mobile)
         this.viewport.addEventListener('touchstart', (e) => {
             // 마스터 캔버스나 그 자식 요소(드로잉 영역) 터치 시 내비게이션 중단
-            if (e.target.closest('.master-square')) {
+            if (e.target.closest('#master-square')) {
                 this.isPanning = false;
                 return;
             }
@@ -993,7 +991,7 @@ class UnitessGalleryApp {
 
         window.addEventListener('touchmove', (e) => {
             // 드로잉 중이거나 마스터 캔버스 위라면 내비게이션 무시
-            if (this.isDrawing || e.target.closest('.master-square')) return;
+            if (this.isDrawing || e.target.closest('#master-square')) return;
 
             if (e.touches.length === 1 && this.isPanning) {
                 const dx = e.touches[0].clientX - this.lastMouseX;
@@ -1030,9 +1028,7 @@ class UnitessGalleryApp {
     }
 
     applyViewTransform() {
-        if (this.zoomWrapper) {
-            this.zoomWrapper.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
-        }
+        this.container.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
     }
 
     setupDrawingSystem() {
@@ -1078,10 +1074,6 @@ class UnitessGalleryApp {
 
         const stopDrawing = () => {
             this.isDrawing = false;
-            this.updateGallery();
-            // Also update appendix if they have content
-            if (this.triangleGrids.length > 0) this.updateAppendixGallery(this.triangleGrids.slice(0, 10), this.strokes, 'triangle');
-            if (this.hexagonGrids.length > 0) this.updateAppendixGallery(this.hexagonGrids.slice(0, 10), this.strokes, 'hexagon');
         };
 
         this.masterCanvas.addEventListener('mousedown', startDrawing);
@@ -1155,12 +1147,7 @@ class UnitessGalleryApp {
             });
         }
 
-        // Render gallery grids ONLY on demand, not in the loop, to fix slowness
-        // requestAnimationFrame continues for Master Canvas and Learn Mode
-        requestAnimationFrame(() => this.renderLoop());
-    }
-
-    updateGallery() {
+        // Always render gallery grids in background or if not in learn mode
         this.grids.forEach(grid => {
             let groupColor = '#ffffff';
             const id = grid.ruleSet;
@@ -1188,6 +1175,8 @@ class UnitessGalleryApp {
                 ctx.restore();
             });
         });
+
+        requestAnimationFrame(() => this.renderLoop());
     }
 
     setupMenu() {
@@ -1214,6 +1203,7 @@ class UnitessGalleryApp {
                 console.log(`Navigating to ${mode} mode...`);
 
                 // Placeholder for actual navigation or module loading
+                // Learn Mode Activation
                 if (mode === 'learn') {
                     this.isLearnMode = true;
                     document.getElementById('learn-mode-overlay').classList.remove('hidden');
@@ -1222,23 +1212,15 @@ class UnitessGalleryApp {
                     this.isQuizMode = true;
                     this.startNewQuiz();
                     document.getElementById('quiz-mode-overlay').classList.remove('hidden');
-                } else if (mode === 'square') {
-                    this.squareContainer.classList.remove('hidden-gallery');
-                    this.triangleContainer.classList.add('hidden-gallery');
-                    this.hexagonContainer.classList.add('hidden-gallery');
                 } else if (mode === 'triangle') {
-                    this.squareContainer.classList.add('hidden-gallery');
-                    this.triangleContainer.classList.remove('hidden-gallery');
-                    this.hexagonContainer.classList.add('hidden-gallery');
+                    document.getElementById('triangle-gallery-overlay').classList.remove('hidden');
                     this.syncAppendixCanvases('triangle');
                 } else if (mode === 'hexagon') {
-                    this.squareContainer.classList.add('hidden-gallery');
-                    this.triangleContainer.classList.add('hidden-gallery');
-                    this.hexagonContainer.classList.remove('hidden-gallery');
+                    document.getElementById('hexagon-gallery-overlay').classList.remove('hidden');
                     this.syncAppendixCanvases('hexagon');
                 } else if (mode === 'falling') {
                     this.startFallingGame();
-                } else {
+                } else if (mode !== 'square') {
                     alert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} ${this.i18n[this.currentLang].alert_mode_ready}`);
                 }
             };
@@ -1250,7 +1232,15 @@ class UnitessGalleryApp {
             document.getElementById('learn-mode-overlay').classList.add('hidden');
         };
 
-        // Removals: exitTriangle, exitHexagon are gone due to unified viewport
+        const exitTriangle = document.getElementById('exit-triangle');
+        if (exitTriangle) exitTriangle.onclick = () => {
+            document.getElementById('triangle-gallery-overlay').classList.add('hidden');
+        };
+
+        const exitHexagon = document.getElementById('exit-hexagon');
+        if (exitHexagon) exitHexagon.onclick = () => {
+            document.getElementById('hexagon-gallery-overlay').classList.add('hidden');
+        };
 
         const exitQuiz = document.getElementById('exit-quiz');
         if (exitQuiz) exitQuiz.onclick = () => {
@@ -2505,18 +2495,6 @@ class UnitessGalleryApp {
         const hexCanvas = document.getElementById('hexagon-master-canvas');
         const hexGrid = document.getElementById('hexagon-gallery-grid');
         this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 23); // 23 patterns
-
-        // Seed initial strokes by pushing, NOT by reassigning the array reference
-        if (this.triangleStrokes.length === 0 && this.strokes.length > 0) {
-            this.strokes.forEach(s => this.triangleStrokes.push(JSON.parse(JSON.stringify(s))));
-        }
-        if (this.hexagonStrokes.length === 0 && this.strokes.length > 0) {
-            this.strokes.forEach(s => this.hexagonStrokes.push(JSON.parse(JSON.stringify(s))));
-        }
-
-        // Initial render for appendix galleries
-        this.updateAppendixGallery(this.triangleGrids, this.triangleStrokes, 'triangle');
-        this.updateAppendixGallery(this.hexagonGrids, this.hexagonStrokes, 'hexagon');
     }
 
     syncAppendixCanvases(type) {
@@ -2527,22 +2505,8 @@ class UnitessGalleryApp {
         if (rect.width > 0) {
             canvas.width = rect.width;
             canvas.height = rect.height;
-
-            // Sync main strokes to appendix if they are empty
-            if (type === 'triangle') {
-                if (this.triangleStrokes.length === 0 && this.strokes.length > 0) {
-                    this.strokes.forEach(s => this.triangleStrokes.push(JSON.parse(JSON.stringify(s))));
-                }
-            } else {
-                if (this.hexagonStrokes.length === 0 && this.strokes.length > 0) {
-                    this.strokes.forEach(s => this.hexagonStrokes.push(JSON.parse(JSON.stringify(s))));
-                }
-            }
-
             const strokes = type === 'triangle' ? this.triangleStrokes : this.hexagonStrokes;
-            const grids = type === 'triangle' ? this.triangleGrids : this.hexagonGrids;
             this.renderAppendixMaster(canvas, strokes, type);
-            this.updateAppendixGallery(grids, strokes, type);
         }
     }
 
@@ -2574,11 +2538,7 @@ class UnitessGalleryApp {
             addPoint(e);
         };
 
-        const endDraw = () => {
-            drawing = false;
-            // Update the whole gallery ONLY when drawing ends for performance
-            this.updateAppendixGallery(grids, strokes, type);
-        };
+        const endDraw = () => { drawing = false; };
 
         const addPoint = (e) => {
             if (!drawing) return;
@@ -2595,11 +2555,7 @@ class UnitessGalleryApp {
             if (strokes.length > 0) {
                 strokes[strokes.length - 1].points.push({ x, y });
                 this.renderAppendixMaster(canvas, strokes, type);
-
-                // Real-time update for first 10 patterns to show progress without lag
-                if (grids.length > 0) {
-                    this.updateAppendixGallery(grids.slice(0, 10), strokes, type);
-                }
+                this.updateAppendixGallery(grids, strokes, type);
             }
         };
 
@@ -2625,33 +2581,20 @@ class UnitessGalleryApp {
             };
         }
 
-        const layout = [];
-        for (let r = 0; r < 10; r++) {
-            for (let c = 0; c < 7; c++) {
-                if (r === 0 && c === 0) continue; // Skip master position (1,1)
-                if (layout.length >= count) break;
-                layout.push({ r, c });
-            }
-            if (layout.length >= count) break;
-        }
-
         // Create Grid Items
         for (let i = 1; i <= count; i++) {
-            const pos = layout[i - 1];
             const item = document.createElement('div');
-            item.className = `mini-grid grid-item col-${pos.c}`;
-            item.style.gridRow = pos.r + 1;
-            item.style.gridColumn = pos.c + 1;
+            item.className = 'shape-item';
 
+            const previewBox = document.createElement('div');
+            previewBox.className = 'shape-preview-box';
             const pCanvas = document.createElement('canvas');
-            pCanvas.style.width = '100%';
-            pCanvas.style.height = '100%';
-            pCanvas.style.borderRadius = '10px';
             pCanvas.width = 180;
             pCanvas.height = 180;
+            previewBox.appendChild(pCanvas);
 
             const tag = document.createElement('div');
-            tag.className = 'grid-label';
+            tag.className = 'shape-id-tag';
 
             let labelText = `${type.charAt(0).toUpperCase()}${i}`;
             if (type === 'triangle') {
@@ -2669,7 +2612,7 @@ class UnitessGalleryApp {
             }
             tag.textContent = labelText;
 
-            item.appendChild(pCanvas);
+            item.appendChild(previewBox);
             item.appendChild(tag);
             gridContainer.appendChild(item);
 
@@ -2721,7 +2664,6 @@ class UnitessGalleryApp {
             const vertices = [];
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
-                // Flat-top orientation: vertices at 0, 60, 120, 180, 240, 300 degrees
                 const angle = (i * 60) * Math.PI / 180;
                 const x = w / 2 + radius * Math.cos(angle);
                 const y = h / 2 + radius * Math.sin(angle);
@@ -2809,14 +2751,16 @@ class UnitessGalleryApp {
                         }
 
                         // Map Master Triangle (Normalized 0-1) to local Triangle space
-                        // Master Triangle bounds: X[0.1, 0.9], Y[0.1, 0.85]
-                        // Center is approx (0.5, 0.475).
-                        // We scale to fill the local triangle (size).
-                        const s = size * 1.25;
-                        ctx.scale(s, s);
-                        ctx.translate(-0.5, -0.475);
+                        // MT Bounds: X[0.1-0.9], Y[0.1-0.85] -> Width 0.8, Height 0.75
+                        // Local Space: Centroid is (0,0). Tri apex (0, -2/3 triH), Base Y (1/3 triH)
+                        const scaleFactorX = size / 0.8;
+                        const scaleFactorY = triH / 0.75;
+                        ctx.scale(scaleFactorX, scaleFactorY);
+                        ctx.translate(-0.5, -0.6); // Align centroids (MT centroid is 0.5, 0.6)
 
-                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / s);
+                        // Draw strokes with adjusted line width
+                        const scaledWidth = this.appendixStrokeWidth / ((scaleFactorX + scaleFactorY) / 2);
+                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, scaledWidth);
                         ctx.restore();
 
                         // 2. Draw Faint Triangle Border (Untouched by content symmetry)
@@ -2871,7 +2815,6 @@ class UnitessGalleryApp {
 
                 hexPositions.forEach((pos, idx) => {
                     ctx.save();
-                    // Spacing for Flat-top orientation
                     const tx = size * 1.5 * pos.q;
                     const ty = size * (Math.sqrt(3) * pos.r + (Math.sqrt(3) / 2) * pos.q);
                     ctx.translate(tx, ty);
@@ -2882,7 +2825,6 @@ class UnitessGalleryApp {
 
                     ctx.beginPath();
                     for (let i = 0; i < 6; i++) {
-                        // Flat-top orientation: vertices at 0, 60, 120, 180, 240, 300 degrees
                         const angle = (i * 60) * Math.PI / 180;
                         const px = size * Math.cos(angle);
                         const py = size * Math.sin(angle);
@@ -2901,15 +2843,8 @@ class UnitessGalleryApp {
                     // 2. Draw Tile Content (Master drawing) OVER the background
                     ctx.save();
                     this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
-
-                    // Hexagon Tile centering and scaling
-                    // Master drawing is usually around (0.5, 0.5).
-                    // Size is w/13. We scale to fill.
-                    const s = size * 2.2;
-                    ctx.scale(s, s);
-                    ctx.translate(-0.5, -0.5);
-
-                    this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / s);
+                    ctx.translate(-size, -size);
+                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.appendixStrokeWidth);
                     ctx.restore();
 
                     // 3. Draw ID Label

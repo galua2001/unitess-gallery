@@ -2596,9 +2596,10 @@ class UnitessGalleryApp {
                 strokes[strokes.length - 1].points.push({ x, y });
                 this.renderAppendixMaster(canvas, strokes, type);
 
-                // Real-time update for the first few cards to show it's working
-                const previewGrids = grids.slice(0, 3);
-                this.updateAppendixGallery(previewGrids, strokes, type);
+                // Real-time update for first 10 patterns to show progress without lag
+                if (grids.length > 0) {
+                    this.updateAppendixGallery(grids.slice(0, 10), strokes, type);
+                }
             }
         };
 
@@ -2808,15 +2809,14 @@ class UnitessGalleryApp {
                         }
 
                         // Map Master Triangle (Normalized 0-1) to local Triangle space
-                        // MT Bounds: X[0.1-0.9], Y[0.1-0.85] -> Width 0.8, Height 0.75
-                        // Local Space: Centroid is (0,0). Tri apex (0, -2/3 triH), Base Y (1/3 triH)
-                        const scaleFactorX = size / 0.8;
-                        const scaleFactorY = triH / 0.75;
-                        ctx.scale(scaleFactorX * 0.9, scaleFactorY * 0.9);
-                        ctx.translate(-0.5, -0.6); // Align centroids (MT centroid is 0.5, 0.6)
+                        // Master Triangle bounds: X[0.1, 0.9], Y[0.1, 0.85]
+                        // Center is approx (0.5, 0.475).
+                        // We scale to fill the local triangle (size).
+                        const s = size * 1.25;
+                        ctx.scale(s, s);
+                        ctx.translate(-0.5, -0.475);
 
-                        // Draw strokes with adjusted line width
-                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / (scaleFactorX * 0.9));
+                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / s);
                         ctx.restore();
 
                         // 2. Draw Faint Triangle Border (Untouched by content symmetry)
@@ -2903,12 +2903,13 @@ class UnitessGalleryApp {
                     this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
 
                     // Hexagon Tile centering and scaling
-                    // size = w / 13 (approx 13.84). 
-                    // We want the drawing to fill the hex. Let's use a bigger multiplier.
-                    ctx.scale(size * 2, size * 2);
+                    // Master drawing is usually around (0.5, 0.5).
+                    // Size is w/13. We scale to fill.
+                    const s = size * 2.2;
+                    ctx.scale(s, s);
                     ctx.translate(-0.5, -0.5);
 
-                    this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / (size * 2));
+                    this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, this.appendixStrokeWidth / s);
                     ctx.restore();
 
                     // 3. Draw ID Label

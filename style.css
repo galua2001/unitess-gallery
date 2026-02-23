@@ -42,17 +42,67 @@ body {
     /* 세로 중앙 정렬 추가 */
 }
 
-#gallery-container {
+#zoom-wrapper {
+    position: relative;
+    transform-origin: center;
+    /* Zoom is applied here */
+}
+
+/* Base style for all gallery grids (square, triangle, hexagon) */
+.gallery-grid {
     display: grid;
     grid-template-columns: repeat(7, 140px);
-    /* 7열 유지 */
     grid-auto-rows: 140px;
     gap: 15px;
-    /* 간격을 약간 넓혀 여유 공간 확보 */
     padding: 40px;
     width: fit-content;
     transform-origin: center;
-    /* 중앙 기준 확대/축소 */
+}
+
+.gallery-grid.hidden-gallery {
+    display: none !important;
+}
+
+/* Triangle Layout Specifics */
+#triangle-gallery-grid .master-block,
+#triangle-gallery-grid .mini-grid {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.1));
+}
+
+#triangle-gallery-grid .master-block .floating-clear {
+    top: 75%;
+    right: 10%;
+}
+
+#triangle-gallery-grid .mini-grid .grid-label {
+    bottom: 5px;
+    right: 50%;
+    transform: translateX(50%);
+}
+
+/* Hexagon Layout Specifics */
+#hexagon-gallery-grid .master-block,
+#hexagon-gallery-grid .mini-grid {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.1));
+}
+
+#hexagon-gallery-grid .master-block .floating-clear {
+    top: 25%;
+    right: 5%;
+}
+
+#hexagon-gallery-grid .mini-grid .grid-label {
+    bottom: 12px;
+    right: 50%;
+    transform: translateX(50%);
 }
 
 /* Master Square Styling */
@@ -76,7 +126,7 @@ body {
     /* 연필 대용으로 정밀한 십자 포인터 사용 */
 }
 
-#floating-clear {
+.floating-clear {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -1289,7 +1339,7 @@ body {
 }
 
 .appendix-canvas-container.hexagon-container {
-    clip-path: polygon(50% 5%, 89% 27.5%, 89% 72.5%, 50% 95%, 11% 72.5%, 11% 27.5%);
+    clip-path: polygon(95% 50%, 72.5% 89%, 27.5% 89%, 5% 50%, 27.5% 11%, 72.5% 11%);
 }
 
 .appendix-canvas-container canvas {

@@ -1,7 +1,10 @@
 class UnitessGalleryApp {
     constructor() {
         this.viewport = document.getElementById('gallery-viewport');
-        this.container = document.getElementById('gallery-container');
+        this.zoomWrapper = document.getElementById('zoom-wrapper');
+        this.squareContainer = document.getElementById('gallery-container');
+        this.triangleContainer = document.getElementById('triangle-gallery-grid');
+        this.hexagonContainer = document.getElementById('hexagon-gallery-grid');
         this.masterCanvas = document.getElementById('master-canvas');
         this.masterCtx = this.masterCanvas.getContext('2d');
 
@@ -220,11 +223,22 @@ class UnitessGalleryApp {
         // Appendix Pattern Config (Colors matching the screenshot)
         this.appendixColors = {
             hex: [
-                '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', // 1-5 Red
-                '#f1c40f', '#f1c40f', '#f1c40f', '#f1c40f', '#f1c40f', // 6-10 Yellow
-                '#2ecc71', '#2ecc71', '#2ecc71', '#2ecc71', '#2ecc71', // 11-15 Green
-                '#9b59b6', '#9b59b6', '#9b59b6', '#9b59b6', '#9b59b6', // 16-20 Purple
-                '#3498db', '#3498db'                                   // 21-22 Blue
+                // H1 (was H22): Purple
+                '#9b59b6',
+                // H2~H3 (was H20~H21): Blue
+                '#3498db', '#3498db',
+                // H4~H8 (+ H23): Red
+                '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c',
+                // H9~H13: Orange
+                '#e67e22', '#e67e22', '#e67e22', '#e67e22', '#e67e22',
+                // H14~H16 (was H11~H13): Yellow
+                '#f1c40f', '#f1c40f', '#f1c40f',
+                // H17~H19 (was H14~H16): Green
+                '#2ecc71', '#2ecc71', '#2ecc71',
+                // H20~H22: Turquoise
+                '#1abc9c', '#1abc9c', '#1abc9c',
+                // H23 (Added): Red (Lost twin of H4)
+                '#e74c3c'
             ],
             tri: [
                 '#000000', // 1 Black
@@ -252,15 +266,14 @@ class UnitessGalleryApp {
         this.renderLoop();
 
         // Enable Zoom/Pan for all modes
+        // (Triangle and Hexagon now share the main viewport zoom)
+
         // Learn Mode
         this.enableZoomPan('learn-mode-overlay', '.learn-content', 'learn');
         // Quiz Mode
         this.enableZoomPan('quiz-mode-overlay', '.quiz-content', 'quiz');
         // Falling Game Mode
         this.enableZoomPan('falling-game-overlay', '#falling-game-board', 'falling');
-        // Appendix Galleries
-        this.enableZoomPan('triangle-gallery-overlay', '#triangle-gallery-overlay .appendix-content', 'triangle');
-        this.enableZoomPan('hexagon-gallery-overlay', '#hexagon-gallery-overlay .appendix-content', 'hexagon');
     }
 
     setupMasterCanvas() {
@@ -343,7 +356,7 @@ class UnitessGalleryApp {
                 }
             }
 
-            this.container.appendChild(gridDiv);
+            this.squareContainer.appendChild(gridDiv);
             this.grids.push(gridData);
         });
     }
@@ -937,7 +950,7 @@ class UnitessGalleryApp {
 
         // Pan with mouse (Desktop)
         this.viewport.addEventListener('mousedown', (e) => {
-            if (e.target.closest('#master-square')) return; // Drawing area
+            if (e.target.closest('.master-square')) return; // Drawing area
             this.isPanning = true;
             this.lastMouseX = e.clientX;
             this.lastMouseY = e.clientY;
@@ -947,7 +960,7 @@ class UnitessGalleryApp {
         // Touch Navigation (Mobile)
         this.viewport.addEventListener('touchstart', (e) => {
             // 마스터 캔버스나 그 자식 요소(드로잉 영역) 터치 시 내비게이션 중단
-            if (e.target.closest('#master-square')) {
+            if (e.target.closest('.master-square')) {
                 this.isPanning = false;
                 return;
             }
@@ -980,7 +993,7 @@ class UnitessGalleryApp {
 
         window.addEventListener('touchmove', (e) => {
             // 드로잉 중이거나 마스터 캔버스 위라면 내비게이션 무시
-            if (this.isDrawing || e.target.closest('#master-square')) return;
+            if (this.isDrawing || e.target.closest('.master-square')) return;
 
             if (e.touches.length === 1 && this.isPanning) {
                 const dx = e.touches[0].clientX - this.lastMouseX;
@@ -1017,7 +1030,9 @@ class UnitessGalleryApp {
     }
 
     applyViewTransform() {
-        this.container.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
+        if (this.zoomWrapper) {
+            this.zoomWrapper.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
+        }
     }
 
     setupDrawingSystem() {
@@ -1192,7 +1207,6 @@ class UnitessGalleryApp {
                 console.log(`Navigating to ${mode} mode...`);
 
                 // Placeholder for actual navigation or module loading
-                // Learn Mode Activation
                 if (mode === 'learn') {
                     this.isLearnMode = true;
                     document.getElementById('learn-mode-overlay').classList.remove('hidden');
@@ -1201,15 +1215,23 @@ class UnitessGalleryApp {
                     this.isQuizMode = true;
                     this.startNewQuiz();
                     document.getElementById('quiz-mode-overlay').classList.remove('hidden');
+                } else if (mode === 'square') {
+                    this.squareContainer.classList.remove('hidden-gallery');
+                    this.triangleContainer.classList.add('hidden-gallery');
+                    this.hexagonContainer.classList.add('hidden-gallery');
                 } else if (mode === 'triangle') {
-                    document.getElementById('triangle-gallery-overlay').classList.remove('hidden');
+                    this.squareContainer.classList.add('hidden-gallery');
+                    this.triangleContainer.classList.remove('hidden-gallery');
+                    this.hexagonContainer.classList.add('hidden-gallery');
                     this.syncAppendixCanvases('triangle');
                 } else if (mode === 'hexagon') {
-                    document.getElementById('hexagon-gallery-overlay').classList.remove('hidden');
+                    this.squareContainer.classList.add('hidden-gallery');
+                    this.triangleContainer.classList.add('hidden-gallery');
+                    this.hexagonContainer.classList.remove('hidden-gallery');
                     this.syncAppendixCanvases('hexagon');
                 } else if (mode === 'falling') {
                     this.startFallingGame();
-                } else if (mode !== 'square') {
+                } else {
                     alert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} ${this.i18n[this.currentLang].alert_mode_ready}`);
                 }
             };
@@ -1221,15 +1243,7 @@ class UnitessGalleryApp {
             document.getElementById('learn-mode-overlay').classList.add('hidden');
         };
 
-        const exitTriangle = document.getElementById('exit-triangle');
-        if (exitTriangle) exitTriangle.onclick = () => {
-            document.getElementById('triangle-gallery-overlay').classList.add('hidden');
-        };
-
-        const exitHexagon = document.getElementById('exit-hexagon');
-        if (exitHexagon) exitHexagon.onclick = () => {
-            document.getElementById('hexagon-gallery-overlay').classList.add('hidden');
-        };
+        // Removals: exitTriangle, exitHexagon are gone due to unified viewport
 
         const exitQuiz = document.getElementById('exit-quiz');
         if (exitQuiz) exitQuiz.onclick = () => {
@@ -2483,7 +2497,15 @@ class UnitessGalleryApp {
         // 2. Hexagon Gallery Setup
         const hexCanvas = document.getElementById('hexagon-master-canvas');
         const hexGrid = document.getElementById('hexagon-gallery-grid');
-        this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 22); // 22 patterns
+        this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 23); // 23 patterns
+
+        // Seed initial strokes if empty so user sees something immediately
+        if (this.triangleStrokes.length === 0 && this.strokes.length > 0) {
+            this.triangleStrokes = JSON.parse(JSON.stringify(this.strokes));
+        }
+        if (this.hexagonStrokes.length === 0 && this.strokes.length > 0) {
+            this.hexagonStrokes = JSON.parse(JSON.stringify(this.strokes));
+        }
     }
 
     syncAppendixCanvases(type) {
@@ -2527,7 +2549,11 @@ class UnitessGalleryApp {
             addPoint(e);
         };
 
-        const endDraw = () => { drawing = false; };
+        const endDraw = () => {
+            drawing = false;
+            // Update the whole gallery ONLY when drawing ends for performance
+            this.updateAppendixGallery(grids, strokes, type);
+        };
 
         const addPoint = (e) => {
             if (!drawing) return;
@@ -2544,7 +2570,7 @@ class UnitessGalleryApp {
             if (strokes.length > 0) {
                 strokes[strokes.length - 1].points.push({ x, y });
                 this.renderAppendixMaster(canvas, strokes, type);
-                this.updateAppendixGallery(grids, strokes, type);
+                // Removed updateAppendixGallery from here to fix slowness
             }
         };
 
@@ -2570,29 +2596,51 @@ class UnitessGalleryApp {
             };
         }
 
+        const layout = [];
+        for (let r = 0; r < 10; r++) {
+            for (let c = 0; c < 7; c++) {
+                if (r === 0 && c === 0) continue; // Skip master position (1,1)
+                if (layout.length >= count) break;
+                layout.push({ r, c });
+            }
+            if (layout.length >= count) break;
+        }
+
         // Create Grid Items
         for (let i = 1; i <= count; i++) {
+            const pos = layout[i - 1];
             const item = document.createElement('div');
-            item.className = 'shape-item';
+            item.className = `mini-grid grid-item col-${pos.c}`;
+            item.style.gridRow = pos.r + 1;
+            item.style.gridColumn = pos.c + 1;
 
-            const previewBox = document.createElement('div');
-            previewBox.className = 'shape-preview-box';
             const pCanvas = document.createElement('canvas');
+            pCanvas.style.width = '100%';
+            pCanvas.style.height = '100%';
+            pCanvas.style.borderRadius = '10px';
             pCanvas.width = 180;
             pCanvas.height = 180;
-            previewBox.appendChild(pCanvas);
 
             const tag = document.createElement('div');
-            tag.className = 'shape-id-tag';
+            tag.className = 'grid-label';
 
             let labelText = `${type.charAt(0).toUpperCase()}${i}`;
             if (type === 'triangle') {
                 const triNames = ["CCC", "CGG", "CGG(1)", "CGG(2)", "CC6C6", "CC6C6(1)", "CC6C6(2)"];
                 if (triNames[i - 1]) labelText += ` = ${triNames[i - 1]}`;
+            } else if (type === 'hexagon') {
+                const hexNames = [
+                    "tttttt", "240-120-240-120-240-120", "120-240-120-240-120-240",
+                    "TCCTYY", "-2tcct-2", "22tcct", "cct22t", "ct-2-2tc",
+                    "ycxyxc", "c-2c1-21", "-1c2c-12", "c-12-1c2", "1-21c-2c",
+                    "tcctcc", "ctcctc", "cctcct", "tyytyy", "22t22t",
+                    "-2t-2-2t-2", "txxtxx", "1t11t1", "-1-1t-1-1t", "tyytcc"
+                ];
+                if (hexNames[i - 1]) labelText += ` = ${hexNames[i - 1]}`;
             }
             tag.textContent = labelText;
 
-            item.appendChild(previewBox);
+            item.appendChild(pCanvas);
             item.appendChild(tag);
             gridContainer.appendChild(item);
 
@@ -2644,7 +2692,8 @@ class UnitessGalleryApp {
             const vertices = [];
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
-                const angle = (i * 60 - 30) * Math.PI / 180;
+                // Flat-top vertices are at 30, 90, 150, 210, 270, 330 degrees
+                const angle = (i * 60 + 30) * Math.PI / 180;
                 const x = w / 2 + radius * Math.cos(angle);
                 const y = h / 2 + radius * Math.sin(angle);
                 vertices.push({ x, y });
@@ -2787,32 +2836,47 @@ class UnitessGalleryApp {
                 }
 
                 // Sort positions to have a clean numbering: top-to-bottom, then left-to-right
-                hexPositions.sort((a, b) => a.r - b.r || a.q - b.q);
+                hexPositions.sort((a, b) => {
+                    const tyA = a.r + 0.5 * a.q;
+                    const tyB = b.r + 0.5 * b.q;
+                    return tyA - tyB || a.q - b.q;
+                });
 
                 hexPositions.forEach((pos, idx) => {
                     ctx.save();
-                    const tx = size * (Math.sqrt(3) * pos.q + Math.sqrt(3) / 2 * pos.r);
-                    const ty = size * (1.5 * pos.r);
+                    // Spacing for Flat-top orientation
+                    const tx = size * 1.5 * pos.q;
+                    const ty = size * (Math.sqrt(3) * pos.r + (Math.sqrt(3) / 2) * pos.q);
                     ctx.translate(tx, ty);
 
-                    // 1. Draw Tile Content (Master drawing)
-                    ctx.save();
-                    ctx.translate(-size, -size);
-                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.appendixStrokeWidth);
-                    ctx.restore();
+                    // 1. Draw Faint Hexagon Background and Border FIRST
+                    const cIndex = ((pos.q - pos.r) % 3 + 3) % 3;
+                    const bgAlpha = cIndex === 0 ? 0.0 : cIndex === 1 ? 0.04 : 0.08;
 
-                    // 2. Draw Faint Hexagon Border
-                    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-                    ctx.lineWidth = 1;
                     ctx.beginPath();
                     for (let i = 0; i < 6; i++) {
-                        const angle = (i * 60 - 30) * Math.PI / 180;
+                        // Flat-top vertices (sides)
+                        const angle = (i * 60 + 30) * Math.PI / 180;
                         const px = size * Math.cos(angle);
                         const py = size * Math.sin(angle);
                         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
                     }
                     ctx.closePath();
+
+                    if (bgAlpha > 0) {
+                        ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
+                        ctx.fill();
+                    }
+                    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                    ctx.lineWidth = 1;
                     ctx.stroke();
+
+                    // 2. Draw Tile Content (Master drawing) OVER the background
+                    ctx.save();
+                    this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
+                    ctx.translate(-size, -size);
+                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.appendixStrokeWidth);
+                    ctx.restore();
 
                     // 3. Draw ID Label
                     ctx.fillStyle = "rgba(0,0,0,0.3)";
@@ -2835,7 +2899,7 @@ class UnitessGalleryApp {
         });
     }
 
-    applyAppendixSymmetry(ctx, patternId, type, tileIdx, subIdx) {
+    applyAppendixSymmetry(ctx, patternId, type, tileIdx, subIdx, hexPos) {
         if (type === 'triangle') {
             const inverted = subIdx === 1;
             // Triangle Patterns (T1-T7) based on Frieze/Wallpaper groups on triangular grid
@@ -3029,32 +3093,119 @@ class UnitessGalleryApp {
             }
         } else {
             // Hexagon Patterns (H1-H22)
-            const group = Math.floor((patternId - 1) / 5);
-            const sub = (patternId - 1) % 5;
+            const hexConfig = {
+                1: { a: 't', f: 't', e: 't', d: 't', c: 't', b: 't' },   // H1 (was H22)
+                2: { a: '240', f: '120', e: '240', d: '120', c: '240', b: '120' }, // H2 (was H21)
+                3: { a: '120', f: '240', e: '120', d: '240', c: '120', b: '240' }, // H3 (was H20)
+                4: { a: 't', f: 'c', e: 'c', d: 't', c: 'y', b: 'y' }, // H4 (was H1)
+                5: { a: '-2', f: 't', e: 'c', d: 'c', c: 't', b: '-2' }, // H5 (was H2)
+                6: { a: '2', f: '2', e: 't', d: 'c', c: 'c', b: 't' }, // H6 (was H3)
+                7: { a: 'c', f: 'c', e: 't', d: '2', c: '2', b: 't' }, // H7 (was H4)
+                8: { a: 'c', f: 't', e: '-2', d: '-2', c: 't', b: 'c' }, // H8 (was H5)
+                9: { a: 'y', f: 'c', e: 'x', d: 'y', c: 'x', b: 'c' }, // H9 (was H6)
+                10: { a: 'c', f: '-2', e: 'c', d: '1', c: '-2', b: '1' }, // H10 (was H7)
+                11: { a: '-1', f: 'c', e: '2', d: 'c', c: '-1', b: '2' }, // H11 (was H8)
+                12: { a: 'c', f: '-1', e: '2', d: '-1', c: 'c', b: '2' }, // H12 (was H9)
+                13: { a: '1', f: '-2', e: '1', d: 'c', c: '-2', b: 'c' }, // H13 (was H10)
+                14: { a: 't', f: 'c', e: 'c', d: 't', c: 'c', b: 'c' },  // H14 (was H11)
+                15: { a: 'c', f: 't', e: 'c', d: 'c', c: 't', b: 'c' },  // H15 (was H12)
+                16: { a: 'c', f: 'c', e: 't', d: 'c', c: 'c', b: 't' },  // H16 (was H13)
+                17: { a: 't', f: 'y', e: 'y', d: 't', c: 'y', b: 'y' },  // H17 (was H14)
+                18: { a: '2', f: '2', e: 't', d: '2', c: '2', b: 't' },  // H18 (was H15)
+                19: { a: '-2', f: 't', e: '-2', d: '-2', c: 't', b: '-2' }, // H19 (was H16)
+                20: { a: 't', f: 'x', e: 'x', d: 't', c: 'x', b: 'x' },  // H20 (was H17)
+                21: { a: '1', f: 't', e: '1', d: '1', c: 't', b: '1' },  // H21 (was H18)
+                22: { a: '-1', f: '-1', e: 't', d: '-1', c: '-1', b: 't' }, // H22 (was H19)
+                23: { a: 't', f: 'y', e: 'y', d: 't', c: 'c', b: 'c' }   // H23 tyytcc
+            };
 
-            switch (group) {
-                case 0: // Basic rotations
-                    ctx.rotate(tileIdx * sub * 60 * Math.PI / 180);
-                    break;
-                case 1: // Reflections
-                    if (tileIdx % 2 === 1) ctx.scale(-1, 1);
-                    ctx.rotate(sub * 30 * Math.PI / 180);
-                    break;
-                case 2: // Complex
-                    ctx.rotate(tileIdx * 120 * Math.PI / 180);
-                    if (sub > 2) ctx.scale(1, -1);
-                    break;
-                case 3: // Glide-like
-                    ctx.translate(sub * 10, 0);
-                    if (tileIdx % 3 === 0) ctx.rotate(180 * Math.PI / 180);
-                    break;
-                default:
-                    ctx.rotate(tileIdx * 90 * Math.PI / 180);
-                    break;
+            const ruleSet = hexConfig[patternId];
+            if (ruleSet && hexPos) {
+                const state = this.getHexagonState(ruleSet, hexPos.q, hexPos.r);
+                // Apply matrix to canvas: ctx.transform(m11, m21, m12, m22, dx, dy)
+                // Note array structure: [m11, m12, m21, m22] -> transform needs m11, m21, m12, m22.
+                ctx.transform(state[0], state[2], state[1], state[3], 0, 0);
+            } else if (!ruleSet) {
+                // Placeholder for other hexagon patterns
+                const group = Math.floor((patternId - 1) / 5);
+                const sub = (patternId - 1) % 5;
+                if (patternId % 7 === 0) ctx.scale(-1, 1);
             }
-            if (patternId % 7 === 0) ctx.scale(-1, 1);
         }
     }
+
+    getHexagonState(patternRules, q, r) {
+        const ops = {
+            't': [1, 0, 0, 1],
+            'c': [-1, 0, 0, -1],
+            'y': [-1, 0, 0, 1],
+            'x': [1, 0, 0, -1],
+            '1': [-0.5, -Math.sqrt(3) / 2, -Math.sqrt(3) / 2, 0.5],
+            '-1': [-0.5, Math.sqrt(3) / 2, Math.sqrt(3) / 2, 0.5],
+            '2': [0.5, -Math.sqrt(3) / 2, -Math.sqrt(3) / 2, -0.5],
+            '-2': [0.5, Math.sqrt(3) / 2, Math.sqrt(3) / 2, -0.5],
+            '120': [-0.5, -Math.sqrt(3) / 2, Math.sqrt(3) / 2, -0.5],
+            '240': [-0.5, Math.sqrt(3) / 2, -Math.sqrt(3) / 2, -0.5]
+        };
+
+        const angles = {
+            'a': -90,
+            'b': -30,
+            'c': 30,
+            'd': 90,
+            'e': 150,
+            'f': -150
+        };
+
+        const edgeByAngle = {};
+        for (let k in angles) edgeByAngle[angles[k]] = k;
+
+        const mult = (A, B) => {
+            return [
+                A[0] * B[0] + A[1] * B[2], A[0] * B[1] + A[1] * B[3],
+                A[2] * B[0] + A[3] * B[2], A[2] * B[1] + A[3] * B[3]
+            ];
+        };
+
+        let state = [1, 0, 0, 1];
+
+        const step = (worldEdge) => {
+            const worldAngle = angles[worldEdge] * Math.PI / 180;
+            // Get vector of the world edge to step across
+            const vx = Math.cos(worldAngle);
+            const vy = Math.sin(worldAngle);
+
+            // Invert current state to map world vector to local vector
+            // Since operations are orthogonal, inverse = transpose
+            const invState = [state[0], state[2], state[1], state[3]];
+            const lv_x = invState[0] * vx + invState[1] * vy;
+            const lv_y = invState[2] * vx + invState[3] * vy;
+
+            // Find closest local angle
+            let lAngle = Math.atan2(lv_y, lv_x) * 180 / Math.PI;
+            lAngle = Math.round(lAngle / 30) * 30;
+            if (lAngle <= -180) lAngle += 360;
+            if (lAngle > 180) lAngle -= 360;
+
+            const localEdge = edgeByAngle[lAngle];
+            const rule = patternRules[localEdge] || 't';
+            const opMatrix = ops[rule] || ops['t'];
+
+            // New state relates to the world framework
+            state = mult(state, opMatrix);
+        };
+
+        let currQ = 0;
+        while (currQ < q) { step('c'); currQ++; }
+        while (currQ > q) { step('f'); currQ--; }
+
+        let currR = 0;
+        while (currR < r) { step('d'); currR++; }
+        while (currR > r) { step('a'); currR--; }
+
+        return state;
+    }
+
     drawMasterTriGrid(ctx, w, h) {
         ctx.save();
         const centerX = w / 2;
@@ -3119,8 +3270,8 @@ class UnitessGalleryApp {
             for (let r = -6; r <= 6; r++) {
                 if (Math.abs(q + r) > 6) continue;
 
-                const tx = centerX + gridSize * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
-                const ty = centerY + gridSize * (1.5 * r);
+                const tx = centerX + gridSize * 1.5 * q;
+                const ty = centerY + gridSize * (Math.sqrt(3) * r + (Math.sqrt(3) / 2) * q);
 
                 // Only draw if the small hex center is roughly within the main hex
                 const dist = Math.sqrt((tx - centerX) ** 2 + (ty - centerY) ** 2);
@@ -3128,7 +3279,7 @@ class UnitessGalleryApp {
 
                 ctx.beginPath();
                 for (let i = 0; i < 6; i++) {
-                    const angle = (i * 60 - 30) * Math.PI / 180;
+                    const angle = (i * 60) * Math.PI / 180;
                     const px = tx + gridSize * Math.cos(angle);
                     const py = ty + gridSize * Math.sin(angle);
                     if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);

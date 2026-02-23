@@ -10,18 +10,39 @@
 
 <body>
     <div id="gallery-viewport">
-        <div id="gallery-container">
-            <!-- Master Block -->
-            <div class="master-block">
-                <div class="master-square" id="master-square">
-                    <canvas id="master-canvas"></canvas>
+        <div id="zoom-wrapper">
+            <div id="gallery-container" class="gallery-grid">
+                <!-- Master Block -->
+                <div class="master-block square-master-block">
+                    <div class="master-square" id="master-square">
+                        <canvas id="master-canvas"></canvas>
+                    </div>
+                    <!-- Floating Clear Button on Square -->
+                    <button id="floating-clear" class="floating-clear" title="Clear Canvas">✕</button>
                 </div>
 
-                <!-- Floating Clear Button on Square -->
-                <button id="floating-clear" title="Clear Canvas">✕</button>
+                <!-- Mini Grids will be injected here (26 total) -->
             </div>
 
-            <!-- Mini Grids will be injected here (26 total) -->
+            <!-- Triangle Mode Container -->
+            <div id="triangle-gallery-grid" class="gallery-grid hidden-gallery">
+                <div class="master-block triangle-master-block">
+                    <div class="master-square" id="master-triangle">
+                        <canvas id="triangle-master-canvas"></canvas>
+                    </div>
+                    <button id="clear-triangle-draw" class="floating-clear" title="Clear Canvas">✕</button>
+                </div>
+            </div>
+
+            <!-- Hexagon Mode Container -->
+            <div id="hexagon-gallery-grid" class="gallery-grid hidden-gallery">
+                <div class="master-block hexagon-master-block">
+                    <div class="master-square" id="master-hexagon">
+                        <canvas id="hexagon-master-canvas"></canvas>
+                    </div>
+                    <button id="clear-hexagon-draw" class="floating-clear" title="Clear Canvas">✕</button>
+                </div>
+            </div>
         </div>
 
         <!-- Gallery Guide Button -->
@@ -373,55 +394,10 @@
             </div>
         </div>
 
-        <!-- Appendix: Triangle Gallery Overlay -->
-        <div id="triangle-gallery-overlay" class="mode-overlay hidden">
-            <div class="learn-header">
-                <div class="header-left">
-                    <h1 data-i18n="mode_triangle">Triangle Gallery (Appendix)</h1>
-                </div>
-                <button id="exit-triangle" class="exit-btn">✕</button>
-            </div>
-            <div class="appendix-content">
-                <div class="appendix-master-area">
-                    <div class="master-shape-wrapper">
-                        <div class="appendix-canvas-container triangle-container">
-                            <canvas id="triangle-master-canvas"></canvas>
-                        </div>
-                        <div class="shape-label-tag">Master Triangle</div>
-                        <button id="clear-triangle-draw" class="appendix-clear-btn-outer"
-                            title="Clear Drawing">✕</button>
-                    </div>
-                </div>
-                <div id="triangle-gallery-grid" class="shape-grid triangle-grid">
-                    <!-- Triangle patterns will be injected here -->
-                </div>
-            </div>
-        </div>
+        <!-- Appendix Modal Removed for Unified Viewport -->
 
         <!-- Appendix: Hexagon Gallery Overlay -->
-        <div id="hexagon-gallery-overlay" class="mode-overlay hidden">
-            <div class="learn-header">
-                <div class="header-left">
-                    <h1 data-i18n="mode_hexagon">Hexagon Gallery (Appendix)</h1>
-                </div>
-                <button id="exit-hexagon" class="exit-btn">✕</button>
-            </div>
-            <div class="appendix-content">
-                <div class="appendix-master-area">
-                    <div class="master-shape-wrapper">
-                        <div class="appendix-canvas-container hexagon-container">
-                            <canvas id="hexagon-master-canvas"></canvas>
-                        </div>
-                        <div class="shape-label-tag">Master Hexagon</div>
-                        <button id="clear-hexagon-draw" class="appendix-clear-btn-outer"
-                            title="Clear Drawing">✕</button>
-                    </div>
-                </div>
-                <div id="hexagon-gallery-grid" class="shape-grid hexagon-grid">
-                    <!-- Hexagon patterns will be injected here -->
-                </div>
-            </div>
-        </div>
+        <!-- Hexagon Modal Removed for Unified Viewport -->
 
         <!-- Explanation Modal -->
         <div id="explanation-modal" class="modal-overlay hidden">

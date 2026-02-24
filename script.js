@@ -192,16 +192,16 @@ class UnitessGalleryApp {
             9: { name: "XYXY", label: "축 대칭", symbol: "XY", img: "symbol/xyxy-A.png", patterns: [5, 6] }
         };
 
-        // 퀴즈 문제 데이터 (실제 에셔 그림 파일 매칭)
+        // 퀴즈 문제 데이터 (동일 그룹 내 무작위 이미지 선택 지원)
         this.quizData = [
-            { id: 1, escherNo: "Symmetry No.1", groupId: 1, img: "gameimage/tttt_1game.png", hint: "한 방향으로 미끄러지듯 이동하는 가장 기본적인 평행이동 패턴입니다." },
-            { id: 2, escherNo: "Symmetry No.21", groupId: 2, img: "gameimage/cccc_1game.png", hint: "중심점을 기준으로 사방이 회전하며 맞물리는 구조입니다." },
-            { id: 3, escherNo: "Symmetry No.3", groupId: 3, img: "gameimage/C3C1_1game.png", hint: "서로 다른 회전 중심이 섞여 있는 복합 회전 패턴입니다." },
-            { id: 4, escherNo: "Symmetry No.11", groupId: 4, img: "gameimage/tctc_1game.png", hint: "평행이동과 회전이 조화롭게 섞여 있습니다." },
-            { id: 5, escherNo: "Symmetry No.25", groupId: 5, img: "gameimage/tgtg_1game.png", hint: "옆으로 이동하면서 동시에 반사(거울)되는 글라이드 대칭입니다." },
-            { id: 6, escherNo: "Symmetry No.45", groupId: 6, img: "gameimage/cgcg_1game.png", hint: "회전과 글라이드 대칭이 정교하게 결합되어 있습니다." },
-            { id: 7, escherNo: "Symmetry No.7", groupId: 7, img: "gameimage/gggg_1game.png", hint: "여러 방향의 글라이드 대칭이 복합적으로 나타납니다." },
-            { id: 8, escherNo: "Symmetry No.17", groupId: 8, img: "gameimage/ccgg_1game.png", hint: "회전과 반사가 모두 포함된 가장 복잡하고 완성도 높은 대칭군입니다." }
+            { id: 1, escherNo: "Symmetry No.1", groupId: 1, images: ["gameimage/tttt_1game.png", "gameimage/tttt_2.png", "gameimage/tttt_3.png"], hint: "한 방향으로 미끄러지듯 이동하는 가장 기본적인 평행이동 패턴입니다." },
+            { id: 2, escherNo: "Symmetry No.21", groupId: 2, images: ["gameimage/cccc_1game.png", "gameimage/cccc_2.png", "gameimage/cccc_3.png"], hint: "중심점을 기준으로 사방이 회전하며 맞물리는 구조입니다." },
+            { id: 3, escherNo: "Symmetry No.3", groupId: 3, images: ["gameimage/c3c1_2.png", "gameimage/c3c1_3.png"], hint: "서로 다른 회전 중심이 섞여 있는 복합 회전 패턴입니다." },
+            { id: 4, escherNo: "Symmetry No.11", groupId: 4, images: ["gameimage/tctc_1game.png", "gameimage/tctc_2game.png"], hint: "평행이동과 회전이 조화롭게 섞여 있습니다." },
+            { id: 5, escherNo: "Symmetry No.25", groupId: 5, images: ["gameimage/tgtg_1game.png", "gameimage/tgtg_2.png", "gameimage/tgtg_3.png", "gameimage/tgtg_4.png"], hint: "옆으로 이동하면서 동시에 반사(거울)되는 글라이드 대칭입니다." },
+            { id: 6, escherNo: "Symmetry No.45", groupId: 6, images: ["gameimage/cgcg_1game.png", "gameimage/cgcg_2.png", "gameimage/cgcg_3.png"], hint: "회전과 글라이드 대칭이 정교하게 결합되어 있습니다." },
+            { id: 7, escherNo: "Symmetry No.7", groupId: 7, images: ["gameimage/gggg_1game.png", "gameimage/gggg_2.png", "gameimage/gggg_3.png"], hint: "여러 방향의 글라이드 대칭이 복합적으로 나타납니다." },
+            { id: 8, escherNo: "Symmetry No.17", groupId: 8, images: ["gameimage/ccgg_1game.png", "gameimage/ccgg_2.png", "gameimage/ccgg_3.png"], hint: "회전과 반사가 모두 포함된 가장 복잡하고 완성도 높은 대칭군입니다." }
         ];
 
         // Game 2: Falling Squares State
@@ -275,17 +275,26 @@ class UnitessGalleryApp {
         // Appendix Galleries
         this.enableZoomPan('triangle-gallery-overlay', '#triangle-gallery-overlay .appendix-content', 'triangle');
         this.enableZoomPan('hexagon-gallery-overlay', '#hexagon-gallery-overlay .appendix-content', 'hexagon');
+
+        // 윈도우 로드 혹은 초기화 직후 레이아웃이 틀어지는 경우를 대비해 추가 리사이즈 트리거
+        setTimeout(() => {
+            if (this.resizeMaster) this.resizeMaster();
+            this.syncAppendixCanvases('triangle');
+            this.syncAppendixCanvases('hexagon');
+        }, 500);
     }
 
     setupMasterCanvas() {
-        const resize = () => {
-            const rect = this.masterCanvas.parentElement.getBoundingClientRect();
-            this.masterCanvas.width = rect.width;
-            this.masterCanvas.height = rect.height;
-            if (this.learnMasterCanvas) this.syncLearnCanvas();
+        this.resizeMaster = () => {
+            const parent = this.masterCanvas.parentElement;
+            if (parent.offsetWidth > 0) {
+                this.masterCanvas.width = parent.offsetWidth;
+                this.masterCanvas.height = parent.offsetHeight;
+                if (this.learnMasterCanvas) this.syncLearnCanvas();
+            }
         };
-        window.addEventListener('resize', resize);
-        resize();
+        window.addEventListener('resize', this.resizeMaster);
+        this.resizeMaster();
     }
 
     getSymbolById(gridId) {
@@ -1994,6 +2003,9 @@ class UnitessGalleryApp {
         const randomIndex = Math.floor(Math.random() * this.quizData.length);
         this.currentQuiz = this.quizData[randomIndex];
 
+        // 해당 퀴즈 데이터 내의 여러 이미지 중 하나를 무작위 선택
+        const randomImg = this.currentQuiz.images[Math.floor(Math.random() * this.currentQuiz.images.length)];
+
         const contentArea = document.getElementById('quiz-question-content');
         const feedback = document.getElementById('quiz-feedback');
         const questionText = document.getElementById('quiz-question-text');
@@ -2003,7 +2015,7 @@ class UnitessGalleryApp {
 
         if (contentArea) {
             contentArea.innerHTML = `
-                <img src="${this.currentQuiz.img}?v=${Date.now()}" alt="Escher Quiz" style="max-width:100%; max-height:100%; object-fit:contain;">
+                <img src="${randomImg}?v=${Date.now()}" alt="Escher Quiz" style="max-width:100%; max-height:100%; object-fit:contain;">
             `;
         }
 
@@ -2380,9 +2392,11 @@ class UnitessGalleryApp {
     // Drawing in Learn Mode (Moved to setupDrawingSystem)
 
     syncLearnCanvas() {
-        const rect = this.learnMasterCanvas.parentElement.getBoundingClientRect();
-        this.learnMasterCanvas.width = rect.width;
-        this.learnMasterCanvas.height = rect.height;
+        const parent = this.learnMasterCanvas.parentElement;
+        if (parent.offsetWidth > 0) {
+            this.learnMasterCanvas.width = parent.offsetWidth;
+            this.learnMasterCanvas.height = parent.offsetHeight;
+        }
     }
 
     drawStrokes(ctx, w, h, color, isLearn = false) {
@@ -2531,10 +2545,10 @@ class UnitessGalleryApp {
         const id = type === 'triangle' ? 'triangle-master-canvas' : 'hexagon-master-canvas';
         const canvas = document.getElementById(id);
         if (!canvas) return;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        if (rect.width > 0) {
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+        const parent = canvas.parentElement;
+        if (parent.offsetWidth > 0) {
+            canvas.width = parent.offsetWidth;
+            canvas.height = parent.offsetHeight;
             if (type === 'triangle') this.triangleNeedsUpdate = true;
             else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
         }
@@ -2543,9 +2557,9 @@ class UnitessGalleryApp {
     setupAppendixShape(canvas, gridContainer, type, count) {
         if (!canvas || !gridContainer) return;
         const ctx = canvas.getContext('2d');
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        const parent = canvas.parentElement;
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
 
         // Drawing Event
         let drawing = false;

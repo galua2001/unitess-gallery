@@ -72,6 +72,8 @@ body {
 }
 
 .master-square canvas {
+    width: 100%;
+    height: 100%;
     cursor: crosshair;
     /* 연필 대용으로 정밀한 십자 포인터 사용 */
 }

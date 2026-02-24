@@ -1241,8 +1241,16 @@ class UnitessGalleryApp {
                 const mode = card.dataset.mode;
                 console.log(`Navigating to ${mode} mode...`);
 
-                // Placeholder for actual navigation or module loading
-                // Learn Mode Activation
+                // First hide all overlays
+                const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
+                overlays.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                this.isLearnMode = false;
+                this.isQuizMode = false;
+
+                // Mode Activation
                 if (mode === 'learn') {
                     this.isLearnMode = true;
                     document.getElementById('learn-mode-overlay').classList.remove('hidden');
@@ -1258,8 +1266,11 @@ class UnitessGalleryApp {
                     document.getElementById('hexagon-gallery-overlay').classList.remove('hidden');
                     this.syncAppendixCanvases('hexagon');
                 } else if (mode === 'falling') {
+                    document.getElementById('falling-game-overlay').classList.remove('hidden');
                     this.startFallingGame();
-                } else if (mode !== 'square') {
+                } else if (mode === 'square') {
+                    // All overlays are already hidden so square gallery is visible underneath!
+                } else {
                     alert(`${mode.charAt(0).toUpperCase() + mode.slice(1)} ${this.i18n[this.currentLang].alert_mode_ready}`);
                 }
             };
@@ -1296,9 +1307,15 @@ class UnitessGalleryApp {
         // Stroke Style
         document.getElementById('lineWidth').oninput = (e) => {
             this.strokeWidth = parseInt(e.target.value);
+            this.galleryNeedsUpdate = true;
+            this.triangleNeedsUpdate = true;
+            this.hexagonNeedsUpdate = true;
         };
         document.getElementById('strokeColor').oninput = (e) => {
             this.masterStrokeColor = e.target.value;
+            this.galleryNeedsUpdate = true;
+            this.triangleNeedsUpdate = true;
+            this.hexagonNeedsUpdate = true;
         };
 
         // View Controls
@@ -1312,6 +1329,8 @@ class UnitessGalleryApp {
         document.getElementById('toggle-grid').onclick = () => {
             this.showLabels = !this.showLabels;
             document.body.classList.toggle('labels-hidden', !this.showLabels);
+            this.triangleNeedsUpdate = true;
+            this.hexagonNeedsUpdate = true;
         };
 
         document.getElementById('toggle-canvas-grid').onclick = () => {
@@ -2530,15 +2549,19 @@ class UnitessGalleryApp {
     }
 
     setupAppendixGalleries() {
-        // 1. Triangle Gallery Setup
+        // 1. Triangle Gallery Setup (7 patterns)
         const triCanvas = document.getElementById('triangle-master-canvas');
         const triGrid = document.getElementById('triangle-gallery-grid');
-        this.setupAppendixShape(triCanvas, triGrid, 'triangle', 7); // 7 patterns
+        this.setupAppendixShape(triCanvas, triGrid, 'triangle', 7); // 7 patterns + 1 Master = 8 items
 
-        // 2. Hexagon Gallery Setup
+        // 2. Hexagon Gallery Setup (23 patterns)
         const hexCanvas = document.getElementById('hexagon-master-canvas');
         const hexGrid = document.getElementById('hexagon-gallery-grid');
-        this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 23); // 23 patterns
+        this.setupAppendixShape(hexCanvas, hexGrid, 'hexagon', 23);
+
+        // Initial Trigger for Guides
+        this.triangleNeedsUpdate = true;
+        this.hexagonNeedsUpdate = true;
     }
 
     syncAppendixCanvases(type) {
@@ -2558,8 +2581,8 @@ class UnitessGalleryApp {
         if (!canvas || !gridContainer) return;
         const ctx = canvas.getContext('2d');
         const parent = canvas.parentElement;
-        canvas.width = parent.offsetWidth;
-        canvas.height = parent.offsetHeight;
+        canvas.width = 1000;  // High internal resolution
+        canvas.height = 1000;
 
         // Drawing Event
         let drawing = false;
@@ -2593,11 +2616,14 @@ class UnitessGalleryApp {
             const r = canvas.getBoundingClientRect();
 
             // Normalize coordinates to 0-1 range
-            const x = (pos.x - r.left) / r.width;
-            const y = (pos.y - r.top) / r.height;
+            const nx = (pos.x - r.left) / r.width;
+            const ny = (pos.y - r.top) / r.height;
+
+            // Check if point is inside the allowed shape area
+            if (!this.isPointInShape(nx, ny, type)) return;
 
             if (strokes.length > 0) {
-                strokes[strokes.length - 1].points.push({ x, y });
+                strokes[strokes.length - 1].points.push({ x: nx, y: ny });
                 if (type === 'triangle') this.triangleNeedsUpdate = true;
                 else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
             }
@@ -2633,8 +2659,8 @@ class UnitessGalleryApp {
             const previewBox = document.createElement('div');
             previewBox.className = 'shape-preview-box';
             const pCanvas = document.createElement('canvas');
-            pCanvas.width = 180;
-            pCanvas.height = 180;
+            pCanvas.width = 400; // Increased resolution for sharpness
+            pCanvas.height = 400;
             previewBox.appendChild(pCanvas);
 
             const tag = document.createElement('div');
@@ -2673,14 +2699,36 @@ class UnitessGalleryApp {
         const h = canvas.height;
         ctx.clearRect(0, 0, w, h);
 
-        // 1. Draw Background Grid (Removed as requested)
-        // if (type === 'triangle') {
-        //     this.drawMasterTriGrid(ctx, w, h);
-        // } else {
-        //     this.drawMasterHexGrid(ctx, w, h);
-        // }
+        // 1. Define Shape Area for Clipping
+        ctx.save();
+        ctx.beginPath();
+        if (type === 'triangle') {
+            ctx.moveTo(w * 0.5, h * 0.05);
+            ctx.lineTo(w * 0.98, h * 0.88);
+            ctx.lineTo(w * 0.02, h * 0.88);
+        } else {
+            const radius = Math.min(w, h) * 0.48;
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60) * Math.PI / 180;
+                const x = w / 2 + radius * Math.cos(angle);
+                const y = h / 2 + radius * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
 
-        // 2. Draw Base Shape Outline (Dashed) & Midpoints
+        // APPLY CLIP: Grid and Strokes will only show inside
+        ctx.clip();
+
+        // 2. Draw Square Background Grid (Clipped)
+        this.drawCanvasGrid(ctx, w, h);
+
+        // 3. Draw Strokes (Clipped)
+        this.drawStrokesOntoCanvas(ctx, w, h, strokes, this.masterStrokeColor, this.strokeWidth);
+
+        ctx.restore(); // REMOVE CLIP for guide lines
+
+        // 4. Draw Base Shape Outline (Dashed) & Midpoints
         ctx.save();
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 2;
@@ -2688,9 +2736,10 @@ class UnitessGalleryApp {
 
         const midpoints = [];
         if (type === 'triangle') {
-            const v1 = { x: w / 2, y: h * 0.1 };
-            const v2 = { x: w * 0.9, y: h * 0.85 };
-            const v3 = { x: w * 0.1, y: h * 0.85 };
+            // Even Larger Triangle Vertices: Height 0.93, Width 0.98
+            const v1 = { x: w * 0.5, y: h * 0.02 };
+            const v2 = { x: w * 0.99, y: h * 0.95 };
+            const v3 = { x: w * 0.01, y: h * 0.95 };
 
             ctx.beginPath();
             ctx.moveTo(v1.x, v1.y);
@@ -2698,13 +2747,12 @@ class UnitessGalleryApp {
             ctx.lineTo(v3.x, v3.y);
             ctx.closePath();
             ctx.stroke();
-
-            // Calculate midpoints
             midpoints.push({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
             midpoints.push({ x: (v2.x + v3.x) / 2, y: (v2.y + v3.y) / 2 });
             midpoints.push({ x: (v3.x + v1.x) / 2, y: (v3.y + v1.y) / 2 });
         } else {
-            const radius = Math.min(w, h) * 0.45;
+            // Even Larger Hexagon (Radius 0.495)
+            const radius = Math.min(w, h) * 0.495;
             const vertices = [];
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
@@ -2714,36 +2762,68 @@ class UnitessGalleryApp {
                 vertices.push({ x, y });
                 if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.closePath();
-            ctx.stroke();
-
-            // Calculate midpoints of 6 sides
+            ctx.closePath(); ctx.stroke();
             for (let i = 0; i < 6; i++) {
-                const v1 = vertices[i];
-                const v2 = vertices[(i + 1) % 6];
+                const v1 = vertices[i]; const v2 = vertices[(i + 1) % 6];
                 midpoints.push({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
             }
         }
         ctx.restore();
 
-        // 3. Draw Midpoint Markers (Red dots)
+        // 5. Draw Midpoint Markers
         ctx.save();
         ctx.fillStyle = '#ff4757';
         midpoints.forEach(pt => {
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
-            ctx.fill();
-            // Subtle glow
-            ctx.shadowBlur = 5;
-            ctx.shadowColor = 'rgba(255, 71, 87, 0.5)';
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
-            ctx.stroke();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(255, 71, 87, 0.5)';
+            ctx.strokeStyle = 'white'; ctx.lineWidth = 1; ctx.stroke();
         });
         ctx.restore();
+    }
 
-        // 4. Draw Strokes
-        this.drawStrokesOntoCanvas(ctx, w, h, strokes, '#2c3e50', 4);
+    isPointInShape(nx, ny, type) {
+        if (type === 'triangle') {
+            // Normalized triangle vertices
+            const v1 = { x: 0.5, y: 0.05 };
+            const v2 = { x: 0.98, y: 0.88 };
+            const v3 = { x: 0.02, y: 0.88 };
+
+            // Barycentric coordinates point-in-triangle test
+            const denominator = (v2.y - v3.y) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.y - v3.y);
+            const a = ((v2.y - v3.y) * (nx - v3.x) + (v3.x - v2.x) * (ny - v3.y)) / denominator;
+            const b = ((v3.y - v1.y) * (nx - v3.x) + (v1.x - v3.x) * (ny - v3.y)) / denominator;
+            const c = 1 - a - b;
+            return a >= 0 && b >= 0 && c >= 0;
+        } else {
+            // Normalized Hexagon test (relative to 0.5, 0.5 with radius 0.48)
+            const dx = Math.abs(nx - 0.5);
+            const dy = Math.abs(ny - 0.5);
+            const r = 0.48;
+            // Test if point is within the hexagon bounding box and edges
+            if (dx > r || dy > r * Math.sqrt(3) / 2) return false;
+            return (r * Math.sqrt(3) / 2 - dy) >= (Math.sqrt(3) / 3) * (dx - r / 2) || dx <= r / 2;
+            // Simpler approach: check 6 half-planes or just distance for approx 
+            // but the above is correct for a flat-topped (which our drawing is after rotation logic)
+            // Wait, our hexagon is pointy-top in master drawing code:
+            // vertices.push({ x: w / 2 + radius * Math.cos(angle), y: h/2 + ... }) starting at 0 deg.
+            // 0 deg is (1, 0) -> Right. So it's Pointy-side, Flat-top? No, 0, 60, 120... 
+            // 0 (Right), 60 (Bottom-Right), 120 (Bottom-Left), 180 (Left)... Pointy Side.
+            // Let's use a more universal crossing number algorithm.
+            const hRadius = 0.48;
+            const verts = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60) * Math.PI / 180;
+                verts.push({ x: 0.5 + hRadius * Math.cos(angle), y: 0.5 + hRadius * Math.sin(angle) });
+            }
+            let isInside = false;
+            for (let i = 0, j = verts.length - 1; i < verts.length; j = i++) {
+                if (((verts[i].y > ny) !== (verts[j].y > ny)) &&
+                    (nx < (verts[j].x - verts[i].x) * (ny - verts[i].y) / (verts[j].y - verts[i].y) + verts[i].x)) {
+                    isInside = !isInside;
+                }
+            }
+            return isInside;
+        }
     }
 
     updateAppendixGallery(grids, strokes, type) {
@@ -2760,13 +2840,13 @@ class UnitessGalleryApp {
             let idCounter = 1;
 
             if (type === 'triangle') {
-                const rows = 6; // Changed from 5 to 6
+                const rows = 6;
                 const totalW = w * 0.95;
                 const size = totalW / rows;
                 const triH = size * Math.sqrt(3) / 2;
 
                 ctx.save();
-                // Center the large triangle cluster
+                // perfectly Center the large triangle cluster in the middle of the card
                 ctx.translate(w / 2, h / 2 - (rows * triH) / 2 + triH / 3);
 
                 let idCounterLocal = 0;
@@ -2786,8 +2866,6 @@ class UnitessGalleryApp {
 
                         // 1. Draw Tile Content
                         ctx.save();
-                        // Apply Pattern Symmetry ONLY to the inner content (strokes), NOT the grid outline
-                        // Pass isInverted as subIdx (1 for true, 0 for false)
                         this.applyAppendixSymmetry(ctx, grid.id, type, currentTileIdx, isInverted ? 1 : 0);
 
                         if (isInverted) {
@@ -2795,40 +2873,38 @@ class UnitessGalleryApp {
                         }
 
                         // Map Master Triangle (Normalized 0-1) to local Triangle space
-                        // MT Bounds: X[0.1-0.9], Y[0.1-0.85] -> Width 0.8, Height 0.75
-                        // Local Space: Centroid is (0,0). Tri apex (0, -2/3 triH), Base Y (1/3 triH)
-                        const scaleFactorX = size / 0.8;
-                        const scaleFactorY = triH / 0.75;
+                        const scaleFactorX = size / 0.98;
+                        const scaleFactorY = triH / 0.93;
                         ctx.scale(scaleFactorX, scaleFactorY);
-                        ctx.translate(-0.5, -0.6); // Align centroids (MT centroid is 0.5, 0.6)
+                        ctx.translate(-0.5, -0.6033);
 
-                        // Draw strokes with adjusted line width
-                        const scaledWidth = this.appendixStrokeWidth / ((scaleFactorX + scaleFactorY) / 2);
+                        const scaledWidth = this.strokeWidth / ((scaleFactorX + scaleFactorY) / 2);
                         this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, scaledWidth);
                         ctx.restore();
 
-                        // 2. Draw Faint Triangle Border (Untouched by content symmetry)
-                        ctx.save();
-                        if (isInverted) {
-                            ctx.rotate(Math.PI);
+                        // 2. Draw Faint Border
+                        if (this.showLabels) {
+                            ctx.save();
+                            if (isInverted) ctx.rotate(Math.PI);
+                            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(0, -triH * 2 / 3);
+                            ctx.lineTo(size / 2, triH / 3);
+                            ctx.lineTo(-size / 2, triH / 3);
+                            ctx.closePath();
+                            ctx.stroke();
+                            ctx.restore();
                         }
-                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(0, -triH * 2 / 3);
-                        ctx.lineTo(size / 2, triH / 3);
-                        ctx.lineTo(-size / 2, triH / 3);
-                        ctx.closePath();
-                        ctx.stroke();
 
                         // 3. Draw ID Label
-                        ctx.fillStyle = "rgba(0,0,0,0.3)";
-                        ctx.font = "bold 9px Arial";
-                        ctx.textAlign = "center";
-                        ctx.textBaseline = "middle";
-                        ctx.fillText(currentTileIdx + 1, 0, 0);
-                        ctx.restore();
-
+                        if (this.showLabels) {
+                            ctx.fillStyle = "rgba(0,0,0,0.3)";
+                            ctx.font = "bold 9px Arial";
+                            ctx.textAlign = "center";
+                            ctx.textBaseline = "middle";
+                            ctx.fillText(currentTileIdx + 1, 0, 0);
+                        }
                         ctx.restore();
                     }
                 }
@@ -2864,40 +2940,44 @@ class UnitessGalleryApp {
                     ctx.translate(tx, ty);
 
                     // 1. Draw Faint Hexagon Background and Border FIRST
-                    const cIndex = ((pos.q - pos.r) % 3 + 3) % 3;
-                    const bgAlpha = cIndex === 0 ? 0.0 : cIndex === 1 ? 0.04 : 0.08;
+                    if (this.showLabels) {
+                        const cIndex = ((pos.q - pos.r) % 3 + 3) % 3;
+                        const bgAlpha = cIndex === 0 ? 0.0 : cIndex === 1 ? 0.04 : 0.08;
 
-                    ctx.beginPath();
-                    for (let i = 0; i < 6; i++) {
-                        const angle = (i * 60) * Math.PI / 180;
-                        const px = size * Math.cos(angle);
-                        const py = size * Math.sin(angle);
-                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        ctx.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (i * 60) * Math.PI / 180;
+                            const px = size * Math.cos(angle);
+                            const py = size * Math.sin(angle);
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+
+                        if (bgAlpha > 0) {
+                            ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
+                            ctx.fill();
+                        }
+                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
                     }
-                    ctx.closePath();
 
-                    if (bgAlpha > 0) {
-                        ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
-                        ctx.fill();
-                    }
-                    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-
-                    // 2. Draw Tile Content (Master drawing) OVER the background
+                    // 2. Draw Tile Content (Master drawing)
                     ctx.save();
                     this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
                     ctx.translate(-size, -size);
-                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.appendixStrokeWidth);
+                    const hexWidth = this.strokeWidth * 0.4; // Proportional scaling
+                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, hexWidth);
                     ctx.restore();
 
-                    // 3. Draw ID Label
-                    ctx.fillStyle = "rgba(0,0,0,0.3)";
-                    ctx.font = "bold 8px Arial";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(idx + 1, 0, 0);
-
+                    // 3. Draw ID Label (If toggled)
+                    if (this.showLabels) {
+                        ctx.fillStyle = "rgba(0,0,0,0.3)";
+                        ctx.font = "bold 8px Arial";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(idx + 1, 0, 0);
+                    }
                     ctx.restore();
                 });
                 ctx.restore(); // Restore from initial translate(w/2, h/2)

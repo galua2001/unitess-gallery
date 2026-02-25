@@ -1975,6 +1975,23 @@ body {
     padding-top: 8px;
 }
 
+.load-shared-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.load-shared-btn:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+}
+
 .heart-container {
     display: flex;
     align-items: center;

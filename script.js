@@ -3611,10 +3611,17 @@ class UnitessGalleryApp {
         if (!masterCanvas) return;
 
         // Share the original master drawing, not the pattern preview
+        // Also save stroke data for restoration
+        let strokesToSave = [];
+        if (type === 'square') strokesToSave = JSON.parse(JSON.stringify(this.strokes));
+        else if (type === 'triangle') strokesToSave = JSON.parse(JSON.stringify(this.triangleStrokes));
+        else if (type === 'hexagon') strokesToSave = JSON.parse(JSON.stringify(this.hexagonStrokes));
+
         this.pendingShare = {
             img: masterCanvas.toDataURL(),
             type: type,
             patternId: id,
+            strokes: strokesToSave,
             time: Date.now()
         };
         document.getElementById('share-name-input').value = "";
@@ -3638,6 +3645,8 @@ class UnitessGalleryApp {
                 hearts: 0,
                 time: this.pendingShare.time,
                 type: this.pendingShare.type,
+                patternId: this.pendingShare.patternId,
+                strokes: this.pendingShare.strokes,
                 liked: false
             };
             this.sharedPatterns.push(shareItem);
@@ -3676,7 +3685,7 @@ class UnitessGalleryApp {
 
             card.innerHTML = `
                 <div class="share-card-type-tag">${typeLabel}</div>
-                <img src="${item.img}" class="share-card-img master-thumb">
+                <img src="${item.img}" class="share-card-img master-thumb" title="클릭하면 이 그림으로 돌아갑니다" style="cursor:pointer;">
                 <div class="share-card-info">
                     <div class="share-card-header">
                         <span class="share-card-name">${item.name}</span>
@@ -3687,11 +3696,85 @@ class UnitessGalleryApp {
                             <span class="heart-icon">❤️</span>
                             <span class="heart-count">${item.hearts}</span>
                         </div>
+                        <button class="load-shared-btn" onclick="app.loadSharedPattern(${item.id})">🎨 불러오기</button>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
         });
+    }
+
+    loadSharedPattern(id) {
+        const item = this.sharedPatterns.find(p => p.id === id);
+        if (!item || !item.strokes) return;
+
+        // Close share overlay
+        document.getElementById('original-share-overlay').classList.add('hidden');
+
+        if (item.type === 'square') {
+            // Switch to square mode
+            ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay',
+                'triangle-gallery-overlay', 'hexagon-gallery-overlay'].forEach(oid => {
+                    document.getElementById(oid).classList.add('hidden');
+                });
+
+            // Restore strokes
+            this.strokes = JSON.parse(JSON.stringify(item.strokes));
+
+            // Activate the matching gallery tile
+            if (item.patternId) {
+                const grid = this.grids.find(g => g.ruleSet === item.patternId);
+                if (grid) {
+                    this.grids.forEach(g => g.isActive = false);
+                    grid.isActive = true;
+                }
+            }
+
+            // Redraw master canvas from strokes
+            const masterCanvas = document.getElementById('master-canvas');
+            const ctx = masterCanvas.getContext('2d');
+            ctx.clearRect(0, 0, masterCanvas.width, masterCanvas.height);
+            this.drawStrokes(ctx, masterCanvas.width, masterCanvas.height, 'transparent');
+
+            // Re-render all gallery tiles with the new strokes
+            this.galleryNeedsUpdate = true;
+
+        } else if (item.type === 'triangle') {
+            document.getElementById('triangle-gallery-overlay').classList.remove('hidden');
+            ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay',
+                'hexagon-gallery-overlay', 'original-share-overlay'].forEach(oid => {
+                    const el = document.getElementById(oid);
+                    if (el) el.classList.add('hidden');
+                });
+
+            // 기존 배열 참조를 유지하면서 내용만 교체 (드로잉 핸들러 closure 참조 보존)
+            const loadedTriStrokes = JSON.parse(JSON.stringify(item.strokes));
+            this.triangleStrokes.splice(0, this.triangleStrokes.length, ...loadedTriStrokes);
+
+            const triCanvas = document.getElementById('triangle-master-canvas');
+            this.syncAppendixCanvases('triangle');
+            this.renderAppendixMaster(triCanvas, this.triangleStrokes, 'triangle');
+            this.triangleNeedsUpdate = true;
+
+        } else if (item.type === 'hexagon') {
+            document.getElementById('hexagon-gallery-overlay').classList.remove('hidden');
+            ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay',
+                'triangle-gallery-overlay', 'original-share-overlay'].forEach(oid => {
+                    const el = document.getElementById(oid);
+                    if (el) el.classList.add('hidden');
+                });
+
+            // 기존 배열 참조를 유지하면서 내용만 교체 (드로잉 핸들러 closure 참조 보존)
+            const loadedHexStrokes = JSON.parse(JSON.stringify(item.strokes));
+            this.hexagonStrokes.splice(0, this.hexagonStrokes.length, ...loadedHexStrokes);
+
+            const hexCanvas = document.getElementById('hexagon-master-canvas');
+            this.syncAppendixCanvases('hexagon');
+            this.renderAppendixMaster(hexCanvas, this.hexagonStrokes, 'hexagon');
+            this.hexagonNeedsUpdate = true;
+        }
+
+        this.appendMessage('received', `"${item.name}" 작품을 불러왔습니다!`);
     }
 
     toggleHeart(id) {

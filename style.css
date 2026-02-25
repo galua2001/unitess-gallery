@@ -92,6 +92,36 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 20;
+}
+
+
+/* Floating Master Share Buttons */
+.floating-share-btn,
+.appendix-share-btn-outer {
+    position: absolute;
+    top: 34px;
+    /* below Clear (5+24+5) */
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(230, 126, 34, 0.4);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    transition: all 0.2s;
+}
+
+.floating-share-btn:hover,
+.appendix-share-btn-outer:hover {
+    background: rgba(230, 126, 34, 0.8);
+    transform: scale(1.1);
 }
 
 /* Grid Tiles */
@@ -127,6 +157,263 @@ body {
 .mini-tile {
     width: 100%;
     height: 100%;
+}
+
+/* Move & Save Button Overlay */
+.mini-grid,
+.shape-item {
+    position: relative;
+}
+
+.save-move-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #2b4570;
+    color: white;
+    border: 1.5px solid white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 15;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+.mini-grid:hover .save-move-btn,
+.shape-item:hover .save-move-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.save-move-btn:hover {
+    background: #3498db;
+    transform: scale(1.1);
+}
+
+
+/* Print Space Panel */
+.print-space-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 350px;
+    max-height: 80vh;
+    background: white;
+    border: 3px solid #2b4570;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: #333;
+}
+
+#triangle-print-space,
+#hexagon-print-space {
+    right: 20px;
+    bottom: 20px;
+}
+
+.print-space-header {
+    background: #2b4570;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.print-space-header h3 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.print-btn {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.print-btn:hover {
+    background: #27ae60;
+}
+
+.close-print-space {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.print-space-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background: #f9f9f9;
+}
+
+.print-item {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 5px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.print-item canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #eee;
+}
+
+.print-item .item-tag {
+    font-size: 10px;
+    margin-top: 5px;
+    font-weight: bold;
+    color: #666;
+}
+
+.remove-print-item {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+@media print {
+    @page {
+        margin: 10mm;
+        size: A4;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #gallery-viewport,
+    .mode-overlay {
+        background: white !important;
+        position: static !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .print-space-panel {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .print-space-panel.printing-active {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-height: none;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        display: block !important;
+    }
+
+    .print-space-panel.printing-active * {
+        visibility: visible;
+    }
+
+    .print-space-header {
+        background: transparent !important;
+        color: #333 !important;
+        padding: 0 0 20px 0 !important;
+        border-bottom: 2px solid #333 !important;
+        margin-bottom: 20px !important;
+    }
+
+    .print-space-header h3 {
+        font-size: 1.5rem !important;
+        font-weight: bold;
+    }
+
+    .close-print-space,
+    .print-btn,
+    .remove-print-item {
+        display: none !important;
+    }
+
+    .print-space-items {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+        background: white !important;
+        padding: 0 !important;
+    }
+
+    .print-item {
+        border: 1px solid #ccc !important;
+        border-radius: 4px !important;
+        padding: 10px !important;
+        page-break-inside: avoid;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: white !important;
+    }
+
+    .print-item canvas {
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        border: 1px solid #eee !important;
+    }
+
+    .print-item .item-tag {
+        margin-top: 10px !important;
+        font-size: 12px !important;
+        color: #333 !important;
+        text-align: center;
+        border-top: 1px dashed #eee;
+        padding-top: 5px;
+    }
 }
 
 /* Compact Pattern Detail Panel (Inside Learn Selector) */
@@ -233,12 +520,12 @@ body {
     height: 100%;
 }
 
-/* Side Menu */
 #side-menu {
     position: fixed;
     right: 0;
     top: 0;
-    width: 300px;
+    width: 260px;
+    /* Narrower width */
     height: 100%;
     background: white;
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
@@ -252,25 +539,183 @@ body {
 }
 
 .menu-content {
-    padding: 30px;
+    padding: 20px;
+    /* Reduced padding */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
+    /* Tighter gap */
+}
+
+.menu-header {
+    display: flex;
+    justify-content: flex-end;
+    /* Lang and close at top right */
+    align-items: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+#lang-select {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+#close-menu {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+}
+
+.menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-section h3 {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: 1.5px solid #f0f0f0;
+    padding-bottom: 4px;
+    margin-bottom: 5px;
+}
+
+.modes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.mode-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-card.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.mode-icon {
+    font-size: 1.2rem;
+}
+
+.mode-card span {
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.control-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.control-group label {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: bold;
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+}
+
+.control-group input[type="color"] {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.view-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.menu-btn.mini {
+    padding: 6px;
+    font-size: 0.75rem;
+    color: #555;
+}
+
+.menu-btn.primary {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    margin-top: 5px;
+}
+
+.menu-btn.primary.small {
+    padding: 10px;
+    font-size: 0.85rem;
+}
+
+.menu-btn:active {
+    transform: scale(0.98);
 }
 
 #menu-toggle {
     position: fixed;
-    top: 20px;
-    /* 상단으로 이동 */
-    right: 20px;
-    width: 45px;
-    height: 45px;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
     background: var(--accent-color);
     color: white;
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
@@ -283,20 +728,18 @@ body {
     transform: scale(1.1);
 }
 
-/* Gallery Guide Button */
 #gallery-guide-btn {
     position: fixed;
-    top: 20px;
-    right: 80px;
-    /* To the left of menu-toggle */
-    width: 45px;
-    height: 45px;
+    top: 15px;
+    right: 65px;
+    width: 40px;
+    height: 40px;
     background: #3498db;
     color: white;
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -1360,6 +1803,7 @@ body {
     transform: scale(1.1);
 }
 
+
 .shape-grid {
     display: contents;
     /* Let shape-items jump to parent grid */
@@ -1415,6 +1859,200 @@ body {
 #falling-game-board {
     min-width: 800px;
     /* Preserve game board width */
+}
+
+/* Original Share (Community Gallery) Styling */
+.share-gallery-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.share-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+    padding-bottom: 50px;
+}
+
+.share-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    color: #333;
+    transition: transform 0.3s;
+    position: relative;
+    /* For type tag */
+}
+
+.share-card-type-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(43, 69, 112, 0.85);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+}
+
+.share-card:hover {
+    transform: translateY(-5px);
+}
+
+.share-card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    display: block;
+    object-fit: contain;
+    border-bottom: 2px solid #eee;
+}
+
+.share-card-img.master-thumb {
+    background: #f8f9fa;
+    padding: 10px;
+    box-sizing: border-box;
+    background-image:
+        linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+}
+
+.share-card-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.share-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.share-card-name {
+    font-weight: bold;
+    font-size: 1.05rem;
+    color: #2c3e50;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.share-card-time {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.share-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
+}
+
+.heart-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.heart-container:hover {
+    transform: scale(1.1);
+}
+
+.heart-icon {
+    font-size: 1.2rem;
+    color: #ccc;
+    transition: color 0.2s;
+}
+
+.heart-container.liked .heart-icon {
+    color: #e74c3c;
+}
+
+.heart-count {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.share-sort-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.sort-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sort-btn.active {
+    background: #e67e22;
+    border-color: #e67e22;
+}
+
+.modal-card.mini {
+    max-width: 400px;
+    padding: 30px;
+    text-align: center;
+    gap: 15px;
+}
+
+.modal-card.mini input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    font-size: 1rem;
+    outline: none;
+}
+
+.modal-card.mini input:focus {
+    border-color: #e67e22;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-buttons button.primary {
+    background: #e67e22;
+    color: white;
+}
+
+.modal-buttons button:hover {
+    filter: brightness(1.1);
 }
 
 /* Visibility Toggles */

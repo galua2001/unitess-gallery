@@ -57,10 +57,11 @@ class UnitessGalleryApp {
                 menu_stroke: "Stroke Style",
                 label_width: "Width",
                 label_color: "Color (Master)",
+                menu_modes: "Polygons",
                 menu_view: "View",
-                btn_reset_view: "Reset View",
-                btn_toggle_labels: "Toggle Grid Labels",
-                btn_toggle_canvas_grid: "Toggle Canvas Grid",
+                btn_reset_view: "Reset",
+                btn_toggle_labels: "Labels",
+                btn_toggle_canvas_grid: "Grid",
                 menu_actions: "Actions",
                 btn_save_image: "Export Gallery PNG",
                 btn_clear: "Clear",
@@ -72,25 +73,34 @@ class UnitessGalleryApp {
                 btn_show_guide: "Guide",
                 btn_gallery_help: "Gallery Help",
                 alert_mode_ready: " Mode is being prepared!",
-                mode_falling: "Falling Game (Game 2)"
+                mode_falling: "Falling Game (Game 2)",
+                print_space_title: "My Print Space",
+                move_and_save: "🖨️",
+                btn_original_share: "Original Share",
+                sort_newest: "Newest",
+                sort_hearts: "Hearts",
+                share_title: "Share Original",
+                share_prompt: "Enter name for this work:",
+                btn_cancel: "Cancel",
+                btn_confirm: "Share"
             },
             ko: {
                 menu_settings: "설정",
-                menu_modes: "시스템 모드",
+                menu_modes: "다각형",
                 mode_square: "사각형",
                 mode_triangle: "삼각형",
                 mode_hexagon: "육각형",
                 mode_quiz: "퀴즈게임",
                 mode_learn: "학습",
-                menu_stroke: "브러쉬 스타일",
+                menu_stroke: "브러쉬",
                 label_width: "굵기",
-                label_color: "색상 (마스터)",
-                menu_view: "보기 설정",
-                btn_reset_view: "화면 초기화",
-                btn_toggle_labels: "레이블 토글",
-                btn_toggle_canvas_grid: "드로잉 그리드 토글",
+                label_color: "색상",
+                menu_view: "보기",
+                btn_reset_view: "초기화",
+                btn_toggle_labels: "레이블",
+                btn_toggle_canvas_grid: "그리드",
                 menu_actions: "작업",
-                btn_save_image: "갤러리 이미지 저장",
+                btn_save_image: "이미지 저장",
                 btn_clear: "지우기",
                 menu_learn: "도움말",
                 menu_appearance: "테마 설정",
@@ -100,7 +110,16 @@ class UnitessGalleryApp {
                 btn_show_guide: "설명",
                 btn_gallery_help: "갤러리 설명",
                 alert_mode_ready: " Mode 준비 중입니다!",
-                mode_falling: "낙하 게임 (Game 2)"
+                mode_falling: "낙하 게임 (Game 2)",
+                print_space_title: "나의 프린트 공간",
+                move_and_save: "🖨️",
+                btn_original_share: "원본공유",
+                sort_newest: "최신순",
+                sort_hearts: "하트순",
+                share_title: "원본 공유하기",
+                share_prompt: "이 작품의 이름을 적어주세요:",
+                btn_cancel: "취소",
+                btn_confirm: "공유하기"
             }
         };
 
@@ -219,6 +238,10 @@ class UnitessGalleryApp {
         this.triangleGrids = [];
         this.hexagonGrids = [];
         this.appendixStrokeWidth = 3;
+        this.printSpaceData = { square: [], triangle: [], hexagon: [] };
+        this.sharedPatterns = []; // { id, img, name, hearts, time, liked }
+        this.currentSort = 'time';
+        this.pendingShare = null;
 
         // Appendix Pattern Config (Colors matching the screenshot)
         this.appendixColors = {
@@ -260,8 +283,8 @@ class UnitessGalleryApp {
         this.setupQuizMode();
         this.setupFallingGameMode();
         this.setupDrawingSystem();
-        this.updateLanguage();
         this.setupAppendixGalleries();
+        this.updateLanguage();
         this.applyViewTransform();
         this.renderLoop();
 
@@ -367,6 +390,18 @@ class UnitessGalleryApp {
             }
 
             this.container.appendChild(gridDiv);
+
+            // Add Move & Save Button
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'save-move-btn';
+            saveBtn.textContent = '프린트'; // Initial text
+            saveBtn.dataset.i18n = 'move_and_save';
+            saveBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.saveToPrintSpace('square', gridId);
+            };
+            gridDiv.appendChild(saveBtn);
+
             this.grids.push(gridData);
         });
     }
@@ -1105,6 +1140,11 @@ class UnitessGalleryApp {
             e.stopPropagation();
             this.strokes = [];
         };
+        const squareShare = document.getElementById('floating-share-square');
+        if (squareShare) squareShare.onclick = (e) => {
+            e.stopPropagation();
+            this.openShareModal('square', 1);
+        };
         document.getElementById('learn-clear').onclick = (e) => {
             e.stopPropagation();
             this.learnStrokes = [];
@@ -1226,6 +1266,13 @@ class UnitessGalleryApp {
         toggleBtn.onclick = () => menu.classList.toggle('hidden');
         closeBtn.onclick = () => menu.classList.add('hidden');
 
+        // Add close event for print spaces
+        document.querySelectorAll('.close-print-space').forEach(btn => {
+            btn.onclick = (e) => {
+                e.target.closest('.print-space-panel').classList.add('hidden');
+            };
+        });
+
         // Close menu on ESC
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') menu.classList.add('hidden');
@@ -1242,7 +1289,7 @@ class UnitessGalleryApp {
                 console.log(`Navigating to ${mode} mode...`);
 
                 // First hide all overlays
-                const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
+                const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay', 'original-share-overlay'];
                 overlays.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.classList.add('hidden');
@@ -1319,33 +1366,40 @@ class UnitessGalleryApp {
         };
 
         // View Controls
-        document.getElementById('reset-view').onclick = () => {
+        const resetViewBtn = document.getElementById('reset-view');
+        if (resetViewBtn) resetViewBtn.onclick = () => {
             this.scale = 0.9;
             this.offsetX = 0;
             this.offsetY = 0;
             this.applyViewTransform();
         };
 
-        document.getElementById('toggle-grid').onclick = () => {
+        const toggleGridBtn = document.getElementById('toggle-grid');
+        if (toggleGridBtn) toggleGridBtn.onclick = () => {
             this.showLabels = !this.showLabels;
             document.body.classList.toggle('labels-hidden', !this.showLabels);
             this.triangleNeedsUpdate = true;
             this.hexagonNeedsUpdate = true;
         };
 
-        document.getElementById('toggle-canvas-grid').onclick = () => {
+        const toggleCanvasGridBtn = document.getElementById('toggle-canvas-grid');
+        if (toggleCanvasGridBtn) toggleCanvasGridBtn.onclick = () => {
             this.showCanvasGrid = !this.showCanvasGrid;
         };
 
-        // Appearance
-        document.getElementById('tileBgColor').oninput = (e) => {
-            document.documentElement.style.setProperty('--tile-bg', e.target.value);
-            // Master square is also white by default, let's update it too
-            document.querySelector('.master-square').style.backgroundColor = e.target.value;
-        };
+        // Appearance (Safely check if tileBgColor exists, though it was removed from UI)
+        const tileBgInput = document.getElementById('tileBgColor');
+        if (tileBgInput) {
+            tileBgInput.oninput = (e) => {
+                document.documentElement.style.setProperty('--tile-bg', e.target.value);
+                const ms = document.querySelector('.master-square');
+                if (ms) ms.style.backgroundColor = e.target.value;
+            };
+        }
 
         // Actions
-        document.getElementById('save-btn').onclick = () => {
+        const saveBtn = document.getElementById('save-btn');
+        if (saveBtn) saveBtn.onclick = () => {
             this.saveGalleryImage();
         };
 
@@ -1362,6 +1416,38 @@ class UnitessGalleryApp {
         if (galleryHelpBtn) {
             galleryHelpBtn.onclick = () => this.showGalleryHelp();
         }
+
+        // Original Share Navigation
+        document.getElementById('nav-original-share').onclick = () => {
+            const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
+            overlays.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('original-share-overlay').classList.remove('hidden');
+            this.renderSharedGallery();
+            document.getElementById('side-menu').classList.add('hidden');
+        };
+
+        document.getElementById('exit-share').onclick = () => {
+            document.getElementById('original-share-overlay').classList.add('hidden');
+        };
+
+        // Share Sorting
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.currentSort = btn.dataset.sort;
+                this.renderSharedGallery();
+            };
+        });
+
+        // Naming Modal Actions
+        document.getElementById('cancel-share').onclick = () => {
+            document.getElementById('naming-modal').classList.add('hidden');
+            this.pendingShare = null;
+        };
+        document.getElementById('confirm-share').onclick = () => {
+            this.confirmOriginalShare();
+        };
     }
 
     setupChat() {
@@ -2651,6 +2737,14 @@ class UnitessGalleryApp {
             };
         }
 
+        const shareBtnId = type === 'triangle' ? 'floating-share-triangle' : 'floating-share-hexagon';
+        const shareBtn = document.getElementById(shareBtnId);
+        if (shareBtn) {
+            shareBtn.onclick = () => {
+                this.openShareModal(type, 1);
+            };
+        }
+
         // Create Grid Items
         for (let i = 1; i <= count; i++) {
             const item = document.createElement('div');
@@ -2659,17 +2753,17 @@ class UnitessGalleryApp {
             const previewBox = document.createElement('div');
             previewBox.className = 'shape-preview-box';
             const pCanvas = document.createElement('canvas');
-            pCanvas.width = 400; // Increased resolution for sharpness
-            pCanvas.height = 400;
+            pCanvas.width = 600; // Match high resolution
+            pCanvas.height = 600;
             previewBox.appendChild(pCanvas);
 
             const tag = document.createElement('div');
             tag.className = 'shape-id-tag';
 
-            let labelText = `${type.charAt(0).toUpperCase()}${i}`;
+            let labelText = "";
             if (type === 'triangle') {
                 const triNames = ["CCC", "CGG", "CGG(1)", "CGG(2)", "CC6C6", "CC6C6(1)", "CC6C6(2)"];
-                if (triNames[i - 1]) labelText += ` = ${triNames[i - 1]}`;
+                labelText = triNames[i - 1] || "";
             } else if (type === 'hexagon') {
                 const hexNames = [
                     "tttttt", "240-120-240-120-240-120", "120-240-120-240-120-240",
@@ -2678,11 +2772,23 @@ class UnitessGalleryApp {
                     "tcctcc", "ctcctc", "cctcct", "tyytyy", "22t22t",
                     "-2t-2-2t-2", "txxtxx", "1t11t1", "-1-1t-1-1t", "tyytcc"
                 ];
-                if (hexNames[i - 1]) labelText += ` = ${hexNames[i - 1]}`;
+                labelText = hexNames[i - 1] || "";
             }
             tag.textContent = labelText;
 
             item.appendChild(previewBox);
+
+            // Add Move & Save Button for Appendix Shapes
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'save-move-btn';
+            saveBtn.textContent = '프린트';
+            saveBtn.dataset.i18n = 'move_and_save';
+            saveBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.saveToPrintSpace(type, i);
+            };
+            item.appendChild(saveBtn);
+
             item.appendChild(tag);
             gridContainer.appendChild(item);
 
@@ -2878,11 +2984,12 @@ class UnitessGalleryApp {
                         ctx.scale(scaleFactorX, scaleFactorY);
                         ctx.translate(-0.5, -0.6033);
 
-                        const scaledWidth = this.strokeWidth / ((scaleFactorX + scaleFactorY) / 2);
-                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, scaledWidth);
+                        // Increased stroke width for better visibility on high-res
+                        const scaledWidth = (this.strokeWidth * 0.8) / ((scaleFactorX + scaleFactorY) / 2);
+                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, Math.max(scaledWidth, 0.04));
                         ctx.restore();
 
-                        // 2. Draw Faint Border
+                        // 2. Draw Faint Border (If labels toggled)
                         if (this.showLabels) {
                             ctx.save();
                             if (isInverted) ctx.rotate(Math.PI);
@@ -2939,25 +3046,21 @@ class UnitessGalleryApp {
                     const ty = size * (Math.sqrt(3) * pos.r + (Math.sqrt(3) / 2) * pos.q);
                     ctx.translate(tx, ty);
 
-                    // 1. Draw Faint Hexagon Background and Border FIRST
+                    // 1. Draw Faint Hexagon Background and Border (Always show)
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i * 60) * Math.PI / 180;
+                        const px = size * Math.cos(angle);
+                        const py = size * Math.sin(angle);
+                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+
+                    // ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
+                    // ctx.fill();
+
                     if (this.showLabels) {
-                        const cIndex = ((pos.q - pos.r) % 3 + 3) % 3;
-                        const bgAlpha = cIndex === 0 ? 0.0 : cIndex === 1 ? 0.04 : 0.08;
-
-                        ctx.beginPath();
-                        for (let i = 0; i < 6; i++) {
-                            const angle = (i * 60) * Math.PI / 180;
-                            const px = size * Math.cos(angle);
-                            const py = size * Math.sin(angle);
-                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-                        }
-                        ctx.closePath();
-
-                        if (bgAlpha > 0) {
-                            ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
-                            ctx.fill();
-                        }
-                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                        ctx.strokeStyle = 'rgba(0,0,0,0.12)';
                         ctx.lineWidth = 1;
                         ctx.stroke();
                     }
@@ -2966,8 +3069,9 @@ class UnitessGalleryApp {
                     ctx.save();
                     this.applyAppendixSymmetry(ctx, grid.id, type, idx, 0, pos);
                     ctx.translate(-size, -size);
-                    const hexWidth = this.strokeWidth * 0.4; // Proportional scaling
-                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, hexWidth);
+                    // Increased stroke width multiplier for hexagon thumbnails
+                    const hexStrokeWidth = this.strokeWidth * 0.8;
+                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, hexStrokeWidth);
                     ctx.restore();
 
                     // 3. Draw ID Label (If toggled)
@@ -3383,6 +3487,225 @@ class UnitessGalleryApp {
         }
         ctx.restore();
     }
+
+    saveToPrintSpace(type, id) {
+        let sourceCanvas = null;
+        let tag = "";
+
+        if (type === 'square') {
+            const grid = this.grids.find(g => g.ruleSet === id);
+            if (!grid) return;
+            tag = grid.symbol || `S${id}`;
+            sourceCanvas = this.createPatternThumbnail(type, id);
+        } else {
+            const grids = type === 'triangle' ? this.triangleGrids : this.hexagonGrids;
+            const grid = grids.find(g => g.id === id);
+            if (!grid) return;
+            tag = `${type.charAt(0).toUpperCase()}${id}`;
+            sourceCanvas = grid.canvas;
+        }
+
+        if (!sourceCanvas) return;
+
+        const dataUrl = sourceCanvas.toDataURL();
+        this.printSpaceData[type].push({ img: dataUrl, tag: tag });
+        this.updatePrintSpaceUI(type);
+
+        const panel = document.getElementById(`${type}-print-space`);
+        if (panel) panel.classList.remove('hidden');
+    }
+
+    createPatternThumbnail(type, id) {
+        const tempCanvas = document.createElement('canvas');
+        // Increase resolution for printing (4x of original 150x150)
+        tempCanvas.width = 600;
+        tempCanvas.height = 600;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = this.tileBgColor || '#ffffff';
+        ctx.fillRect(0, 0, 600, 600);
+
+        if (type === 'square') {
+            const size = 600 / 6;
+            let groupColor = '#ffffff';
+            if (id === 1) groupColor = '#FF5555';
+            else if (id === 2) groupColor = '#55FF55';
+            else if (id >= 3 && id <= 4) groupColor = '#5555FF';
+            else if (id >= 5 && id <= 6) groupColor = '#FFFF55';
+            else if (id >= 7 && id <= 10) groupColor = '#FF55FF';
+            else if (id >= 11 && id <= 12) groupColor = '#55FFFF';
+            else if (id >= 13 && id <= 16) groupColor = '#FFAA00';
+            else if (id >= 17 && id <= 20) groupColor = '#AA55FF';
+            else if (id >= 21 && id <= 26) groupColor = '#00FF99';
+
+            for (let r = 0; r < 6; r++) {
+                for (let c = 0; c < 6; c++) {
+                    const rule = this.getTileRule(id, r, c);
+                    ctx.save();
+                    ctx.translate(c * size + size / 2, r * size + size / 2);
+                    ctx.rotate(rule.rotation * Math.PI / 180);
+                    ctx.scale(rule.scaleX, rule.scaleY);
+                    ctx.translate(-size / 2, -size / 2);
+                    this.drawStrokes(ctx, size, size, groupColor);
+                    ctx.restore();
+                }
+            }
+        }
+        return tempCanvas;
+    }
+
+    updatePrintSpaceUI(type) {
+        const container = document.getElementById(`${type}-print-items`);
+        if (!container) return;
+
+        container.innerHTML = '';
+        this.printSpaceData[type].forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'print-item';
+            div.innerHTML = `
+                <img src="${item.img}" style="width:100%; border-radius:4px;">
+                <div class="item-tag">${item.tag}</div>
+                <button class="remove-print-item" onclick="app.removePrintItem('${type}', ${index})">✕</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    removePrintItem(type, index) {
+        this.printSpaceData[type].splice(index, 1);
+        this.updatePrintSpaceUI(type);
+    }
+
+    printPanel(type) {
+        if (this.printSpaceData[type].length === 0) {
+            alert('인쇄할 패턴이 없습니다. 먼저 패턴을 이동저장해주세요.');
+            return;
+        }
+
+        // Remove printing-active from all panels first just in case
+        document.querySelectorAll('.print-space-panel').forEach(p => p.classList.remove('printing-active'));
+
+        const panel = document.getElementById(`${type}-print-space`);
+        if (panel) {
+            panel.classList.add('printing-active');
+            window.print();
+
+            // Remove after a short delay so the browser can capture the state
+            setTimeout(() => {
+                panel.classList.remove('printing-active');
+            }, 1000);
+        }
+    }
+
+    openShareModal(type, id) {
+        // Find the correct master canvas for the current type
+        let masterCanvas = null;
+        if (type === 'square') {
+            masterCanvas = document.getElementById('master-canvas');
+        } else if (type === 'triangle') {
+            masterCanvas = document.getElementById('triangle-master-canvas');
+        } else if (type === 'hexagon') {
+            masterCanvas = document.getElementById('hexagon-master-canvas');
+        }
+
+        if (!masterCanvas) return;
+
+        // Share the original master drawing, not the pattern preview
+        this.pendingShare = {
+            img: masterCanvas.toDataURL(),
+            type: type,
+            patternId: id,
+            time: Date.now()
+        };
+        document.getElementById('share-name-input').value = "";
+        document.getElementById('naming-modal').classList.remove('hidden');
+        document.getElementById('share-name-input').focus();
+    }
+
+    confirmOriginalShare() {
+        const nameInput = document.getElementById('share-name-input');
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('저장이름을 입력해주세요!');
+            return;
+        }
+
+        if (this.pendingShare) {
+            const shareItem = {
+                id: Date.now(),
+                img: this.pendingShare.img,
+                name: name,
+                hearts: 0,
+                time: this.pendingShare.time,
+                type: this.pendingShare.type,
+                liked: false
+            };
+            this.sharedPatterns.push(shareItem);
+            document.getElementById('naming-modal').classList.add('hidden');
+            this.pendingShare = null;
+
+            // Show shared gallery immediately
+            const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
+            overlays.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('original-share-overlay').classList.remove('hidden');
+            this.renderSharedGallery();
+
+            // Notification
+            this.appendMessage('sent', `새로운 작품을 공유했습니다: "${name}"`);
+        }
+    }
+
+    renderSharedGallery() {
+        const grid = document.getElementById('share-grid');
+        if (!grid) return;
+
+        let sorted = [...this.sharedPatterns];
+        if (this.currentSort === 'heart') {
+            sorted.sort((a, b) => b.hearts - a.hearts);
+        } else {
+            sorted.sort((a, b) => b.time - a.time);
+        }
+
+        grid.innerHTML = '';
+        sorted.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'share-card';
+
+            const timeStr = new Date(item.time).toLocaleString();
+            const typeLabel = item.type === 'square' ? '사각형' : (item.type === 'triangle' ? '삼각형' : '육각형');
+
+            card.innerHTML = `
+                <div class="share-card-type-tag">${typeLabel}</div>
+                <img src="${item.img}" class="share-card-img master-thumb">
+                <div class="share-card-info">
+                    <div class="share-card-header">
+                        <span class="share-card-name">${item.name}</span>
+                        <span class="share-card-time">${timeStr}</span>
+                    </div>
+                    <div class="share-card-footer">
+                        <div class="heart-container ${item.liked ? 'liked' : ''}" onclick="app.toggleHeart(${item.id})">
+                            <span class="heart-icon">❤️</span>
+                            <span class="heart-count">${item.hearts}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    toggleHeart(id) {
+        const item = this.sharedPatterns.find(p => p.id === id);
+        if (item) {
+            if (item.liked) {
+                item.hearts--;
+                item.liked = false;
+            } else {
+                item.hearts++;
+                item.liked = true;
+            }
+            this.renderSharedGallery();
+        }
+    }
 }
 
-new UnitessGalleryApp();
+window.app = new UnitessGalleryApp();

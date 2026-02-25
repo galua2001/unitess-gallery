@@ -19,9 +19,20 @@
 
                 <!-- Floating Clear Button on Square -->
                 <button id="floating-clear" title="Clear Canvas">✕</button>
+                <button id="floating-share-square" class="floating-share-btn" title="Share Original">🌍</button>
             </div>
 
             <!-- Mini Grids will be injected here (26 total) -->
+        </div>
+
+        <!-- Square Print Space -->
+        <div id="square-print-space" class="print-space-panel hidden">
+            <div class="print-space-header">
+                <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
+                <button class="print-btn" onclick="app.printPanel('square')">프린트</button>
+                <button class="close-print-space">✕</button>
+            </div>
+            <div class="print-space-items" id="square-print-items"></div>
         </div>
 
         <!-- Gallery Guide Button -->
@@ -30,7 +41,6 @@
         <div id="side-menu" class="hidden">
             <div class="menu-content">
                 <div class="menu-header">
-                    <h2 data-i18n="menu_settings">Settings</h2>
                     <div class="header-actions">
                         <select id="lang-select">
                             <option value="ko">KO</option>
@@ -41,7 +51,7 @@
                 </div>
 
                 <div class="menu-section">
-                    <h3 data-i18n="menu_modes">System Modes</h3>
+                    <h3 data-i18n="menu_modes">Polygon Modes</h3>
                     <div class="modes-grid">
                         <button class="mode-card active" data-mode="square">
                             <div class="mode-icon square-icon"></div>
@@ -71,36 +81,26 @@
                 </div>
 
                 <div class="menu-section">
-                    <h3 data-i18n="menu_stroke">Stroke Style</h3>
-                    <div class="control-group">
-                        <label data-i18n="label_width">Width</label>
-                        <input type="range" id="lineWidth" min="1" max="10" value="2">
-                    </div>
-                    <div class="control-group">
-                        <label data-i18n="label_color">Color (Master)</label>
-                        <input type="color" id="strokeColor" value="#ff0000">
-                    </div>
-                </div>
-
-                <div class="menu-section">
-                    <h3 data-i18n="menu_appearance">Appearance</h3>
-                    <div class="control-group">
-                        <label data-i18n="label_tile_bg">Tile Background</label>
-                        <input type="color" id="tileBgColor" value="#ffffff">
+                    <h3 data-i18n="menu_stroke">Brush</h3>
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label data-i18n="label_width">Size</label>
+                            <input type="range" id="lineWidth" min="1" max="10" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label data-i18n="label_color">Color</label>
+                            <input type="color" id="strokeColor" value="#ff0000">
+                        </div>
                     </div>
                 </div>
 
                 <div class="menu-section">
                     <h3 data-i18n="menu_view">View</h3>
-                    <button class="menu-btn" id="reset-view" data-i18n="btn_reset_view">Reset View</button>
-                    <button class="menu-btn" id="toggle-grid" data-i18n="btn_toggle_labels">Toggle Grid Labels</button>
-                    <button class="menu-btn" id="toggle-canvas-grid" data-i18n="btn_toggle_canvas_grid">Toggle Canvas
-                        Grid</button>
-                </div>
-
-                <div class="menu-section">
-                    <h3 data-i18n="menu_actions">Actions</h3>
-                    <button class="menu-btn primary" id="save-btn" data-i18n="btn_save_image">Save Image</button>
+                    <div class="view-buttons duo">
+                        <button class="menu-btn mini" id="toggle-grid" data-i18n="btn_toggle_labels">Labels</button>
+                        <button class="menu-btn mini" id="nav-original-share"
+                            data-i18n="btn_original_share">Share</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -390,10 +390,22 @@
                         <div class="shape-label-tag">Master Triangle</div>
                         <button id="clear-triangle-draw" class="appendix-clear-btn-outer"
                             title="Clear Drawing">✕</button>
+                        <button id="floating-share-triangle" class="appendix-share-btn-outer"
+                            title="Share Original">🌍</button>
                     </div>
                 </div>
                 <div id="triangle-gallery-grid" class="shape-grid triangle-grid">
                     <!-- Triangle patterns will be injected here -->
+                </div>
+
+                <!-- Triangle Print Space -->
+                <div id="triangle-print-space" class="print-space-panel hidden">
+                    <div class="print-space-header">
+                        <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
+                        <button class="print-btn" onclick="app.printPanel('triangle')">프린트</button>
+                        <button class="close-print-space">✕</button>
+                    </div>
+                    <div class="print-space-items" id="triangle-print-items"></div>
                 </div>
             </div>
         </div>
@@ -415,10 +427,54 @@
                         <div class="shape-label-tag">Master Hexagon</div>
                         <button id="clear-hexagon-draw" class="appendix-clear-btn-outer"
                             title="Clear Drawing">✕</button>
+                        <button id="floating-share-hexagon" class="appendix-share-btn-outer"
+                            title="Share Original">🌍</button>
                     </div>
                 </div>
                 <div id="hexagon-gallery-grid" class="shape-grid hexagon-grid">
                     <!-- Hexagon patterns will be injected here -->
+                </div>
+
+                <!-- Hexagon Print Space -->
+                <div id="hexagon-print-space" class="print-space-panel hidden">
+                    <div class="print-space-header">
+                        <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
+                        <button class="print-btn" onclick="app.printPanel('hexagon')">프린트</button>
+                        <button class="close-print-space">✕</button>
+                    </div>
+                    <div class="print-space-items" id="hexagon-print-items"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Original Share Overlay (Community Gallery) -->
+        <div id="original-share-overlay" class="mode-overlay hidden">
+            <div class="learn-header">
+                <div class="header-left">
+                    <h1 data-i18n="btn_original_share">원본공유</h1>
+                    <div class="share-sort-controls">
+                        <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
+                        <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
+                    </div>
+                </div>
+                <button id="exit-share" class="exit-btn">✕</button>
+            </div>
+            <div class="share-gallery-container">
+                <div id="share-grid" class="share-grid">
+                    <!-- Shared patterns will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Naming Modal for Sharing -->
+        <div id="naming-modal" class="modal-overlay hidden">
+            <div class="modal-card mini">
+                <h3 data-i18n="share_title">원본 공유하기</h3>
+                <p data-i18n="share_prompt">이 작품의 이름을 적어주세요:</p>
+                <input type="text" id="share-name-input" placeholder="저장이름을 입력하세요">
+                <div class="modal-buttons">
+                    <button id="cancel-share" data-i18n="btn_cancel">취소</button>
+                    <button id="confirm-share" class="primary" data-i18n="btn_confirm">공유하기</button>
                 </div>
             </div>
         </div>

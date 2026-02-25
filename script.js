@@ -152,9 +152,9 @@ class UnitessGalleryApp {
                 galleryHelp: {
                     title: "Unitess 갤러리 활용 가이드",
                     content: `
-                        <p class='modal-text'>사각형 안의 중점을 잇는 곡선을 그려보세요. 회전과 대칭이 조화롭게 어우러진 26가지 테셀레이션 패턴의 아름다움을 감상하실 수 있습니다.</p>
+                        <p class='modal-text'>사각형 안의 중점을 잇는 곡선을 그려보세요. 회전과 대칭이 조화롭게 어우러진 테셀레이션 패턴의 아름다움을 감상하실 수 있습니다.</p>
                         <p class='modal-text'>설정 메뉴를 통해 이를 더 자세히 배우는 <b>학습 모드</b>, 재미있는 <b>게임</b>, 그리고 확장된 <b>삼각형과 육각형 부록 갤러리</b>도 만나보세요.</p>
-                        <p class='modal-text highlight-purple'>또한 만든 작품을 저장하거나 대화창에서 다른 사용자들과 자유롭게 이야기를 나누며 영감을 공유해보세요.</p>
+                        <p class='modal-text highlight-purple'>또한 작품을 프린트 하거나 원본을 공유해서 다른 사용자들과 영감을 나눠보세요.</p>
                     `
                 }
             },
@@ -186,9 +186,9 @@ class UnitessGalleryApp {
                 galleryHelp: {
                     title: "Unitess Gallery Guide",
                     content: `
-                        <p class='modal-text'>Try drawing curves that connect the midpoints of the square. Discover the beauty of 26 unique tessellation patterns created through harmonious rotations and symmetries.</p>
+                        <p class='modal-text'>Try drawing curves that connect the midpoints of the square. Discover the beauty of tessellation patterns created through harmonious rotations and symmetries.</p>
                         <p class='modal-text'>Explore the <b>Learn Mode</b>, play <b>Games</b>, or visit the expanded <b>Triangle and Hexagon appendix galleries</b> via the settings menu.</p>
-                        <p class='modal-text highlight-blue'>You can also save your patterns and share inspirations with others in the community chat.</p>
+                        <p class='modal-text highlight-blue'>You can also save your patterns and share your originals with others.</p>
                     `
                 }
             }
@@ -268,6 +268,113 @@ class UnitessGalleryApp {
                 '#3498db', '#3498db', '#3498db', // 2-4 Blue
                 '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c'  // 5-8 Red
             ]
+        };
+
+        this.explanationData = {
+            1: {
+                ko: { title: "TTTT", text: "", imageHTML: `<img src="symbol/TTTT.png" alt="Diagram">` },
+                en: { title: "TTTT", text: "", imageHTML: `<img src="symbol/TTTT.png" alt="Diagram">` }
+            },
+            2: {
+                ko: { title: "CCCC", text: "", imageHTML: `<img src="symbol/CCCC.png" alt="Diagram">` },
+                en: { title: "CCCC", text: "", imageHTML: `<img src="symbol/CCCC.png" alt="Diagram">` }
+            },
+            3: {
+                ko: { title: "C3C1C3C1(T)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(T).png" alt="Diagram">` },
+                en: { title: "C3C1C3C1(T)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(T).png" alt="Diagram">` }
+            },
+            4: {
+                ko: { title: "C3C1C3C1(C1)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(C1).png" alt="Diagram">` },
+                en: { title: "C3C1C3C1(C1)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(C1).png" alt="Diagram">` }
+            },
+            11: {
+                ko: { title: "TCTC(T)", text: "", imageHTML: `<img src="symbol/TCTC(T).png" alt="Diagram">` },
+                en: { title: "TCTC(T)", text: "", imageHTML: `<img src="symbol/TCTC(T).png" alt="Diagram">` }
+            },
+            12: {
+                ko: { title: "TCTC(C1)", text: "", imageHTML: `<img src="symbol/TCTC(C1).png" alt="Diagram">` },
+                en: { title: "TCTC(C1)", text: "", imageHTML: `<img src="symbol/TCTC(C1).png" alt="Diagram">` }
+            },
+            5: {
+                ko: { title: "XYXY-A", text: "", imageHTML: `<img src="symbol/xyxy-A.png" alt="Diagram">` },
+                en: { title: "XYXY-A", text: "", imageHTML: `<img src="symbol/xyxy-A.png" alt="Diagram">` }
+            },
+            6: {
+                ko: { title: "XYXY-B", text: "", imageHTML: `<img src="symbol/xyxy-B.png" alt="Diagram">` },
+                en: { title: "XYXY-B", text: "", imageHTML: `<img src="symbol/xyxy-B.png" alt="Diagram">` }
+            },
+            13: {
+                ko: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png" alt="Diagram">` },
+                en: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png" alt="Diagram">` }
+            },
+            14: {
+                ko: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png" alt="Diagram">` },
+                en: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png" alt="Diagram">` }
+            },
+            15: {
+                ko: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png" alt="Diagram">` },
+                en: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png" alt="Diagram">` }
+            },
+            16: {
+                ko: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png" alt="Diagram">` },
+                en: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png" alt="Diagram">` }
+            },
+            7: {
+                ko: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png" alt="Diagram">` },
+                en: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png" alt="Diagram">` }
+            },
+            8: {
+                ko: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png" alt="Diagram">` },
+                en: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png" alt="Diagram">` }
+            },
+            9: {
+                ko: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png" alt="Diagram">` },
+                en: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png" alt="Diagram">` }
+            },
+            10: {
+                ko: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png" alt="Diagram">` },
+                en: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png" alt="Diagram">` }
+            },
+            21: {
+                ko: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png" alt="Diagram">` },
+                en: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png" alt="Diagram">` }
+            },
+            22: {
+                ko: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png" alt="Diagram">` },
+                en: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png" alt="Diagram">` }
+            },
+            23: {
+                ko: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png" alt="Diagram">` },
+                en: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png" alt="Diagram">` }
+            },
+            24: {
+                ko: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png" alt="Diagram">` },
+                en: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png" alt="Diagram">` }
+            },
+            25: {
+                ko: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png" alt="Diagram">` },
+                en: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png" alt="Diagram">` }
+            },
+            26: {
+                ko: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png" alt="Diagram">` },
+                en: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png" alt="Diagram">` }
+            },
+            17: {
+                ko: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png" alt="Diagram">` }
+            },
+            18: {
+                ko: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png" alt="Diagram">` }
+            },
+            19: {
+                ko: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png" alt="Diagram">` }
+            },
+            20: {
+                ko: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png" alt="Diagram">` }
+            }
         };
 
         this.init();
@@ -1593,112 +1700,6 @@ class UnitessGalleryApp {
 
     }
 
-    explanationData = {
-        1: {
-            ko: { title: "TTTT", text: "", imageHTML: `<img src="symbol/TTTT.png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TTTT", text: "", imageHTML: `<img src="symbol/TTTT.png?v=${Date.now()}" alt="Diagram">` }
-        },
-        2: {
-            ko: { title: "CCCC", text: "", imageHTML: `<img src="symbol/CCCC.png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CCCC", text: "", imageHTML: `<img src="symbol/CCCC.png?v=${Date.now()}" alt="Diagram">` }
-        },
-        3: {
-            ko: { title: "C3C1C3C1(T)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(T).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "C3C1C3C1(T)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(T).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        4: {
-            ko: { title: "C3C1C3C1(C1)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(C1).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "C3C1C3C1(C1)", text: "", imageHTML: `<img src="symbol/C3C1C3C1(C1).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        11: {
-            ko: { title: "TCTC(T)", text: "", imageHTML: `<img src="symbol/TCTC(T).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TCTC(T)", text: "", imageHTML: `<img src="symbol/TCTC(T).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        12: {
-            ko: { title: "TCTC(C1)", text: "", imageHTML: `<img src="symbol/TCTC(C1).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TCTC(C1)", text: "", imageHTML: `<img src="symbol/TCTC(C1).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        5: {
-            ko: { title: "XYXY-A", text: "", imageHTML: `<img src="symbol/xyxy-A.png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "XYXY-A", text: "", imageHTML: `<img src="symbol/xyxy-A.png?v=${Date.now()}" alt="Diagram">` }
-        },
-        6: {
-            ko: { title: "XYXY-B", text: "", imageHTML: `<img src="symbol/xyxy-B.png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "XYXY-B", text: "", imageHTML: `<img src="symbol/xyxy-B.png?v=${Date.now()}" alt="Diagram">` }
-        },
-        13: {
-            ko: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        14: {
-            ko: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        15: {
-            ko: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        16: {
-            ko: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        7: {
-            ko: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        8: {
-            ko: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        9: {
-            ko: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        10: {
-            ko: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        21: {
-            ko: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        22: {
-            ko: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        23: {
-            ko: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        24: {
-            ko: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        25: {
-            ko: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        26: {
-            ko: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        17: {
-            ko: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        18: {
-            ko: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        19: {
-            ko: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        },
-        20: {
-            ko: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png?v=${Date.now()}" alt="Diagram">` },
-            en: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png?v=${Date.now()}" alt="Diagram">` }
-        }
-    };
 
     openModal(title, bodyHTML) {
         document.getElementById('modal-title').textContent = title;
@@ -1746,7 +1747,7 @@ class UnitessGalleryApp {
                 <div class="modal-section symbol-table-section">
                     <h3>${data.section1.header}</h3>
                     <div class="symbol-grid-wrapper">
-                        <img src="symbol/explain_1.png?v=${Date.now()}" class="guide-bg-image" alt="Symbols Diagram">
+                        <img src="symbol/explain_1.png" class="guide-bg-image" alt="Symbols Diagram">
                     </div>
                 </div>
 
@@ -1755,7 +1756,7 @@ class UnitessGalleryApp {
                         <h3>${data.section2.title}</h3>
                         <p class="modal-text">${data.section2.text}</p>
                         <div class="pattern-types-img">
-                            <img src="symbol/explain_2.png?v=${Date.now()}" class="guide-bg-image" alt="Pattern Grid">
+                            <img src="symbol/explain_2.png" class="guide-bg-image" alt="Pattern Grid">
                         </div>
                     </div>
                     <div class="modal-section">
@@ -2120,7 +2121,7 @@ class UnitessGalleryApp {
 
         if (contentArea) {
             contentArea.innerHTML = `
-                <img src="${randomImg}?v=${Date.now()}" alt="Escher Quiz" style="max-width:100%; max-height:100%; object-fit:contain;">
+                <img src="${randomImg}" alt="Escher Quiz" style="max-width:100%; max-height:100%; object-fit:contain;">
             `;
         }
 

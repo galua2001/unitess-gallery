@@ -6,7 +6,7 @@ class UnitessGalleryApp {
         this.masterCtx = this.masterCanvas.getContext('2d');
 
         this.strokes = [];
-        this.learnStrokes = []; // 학습 모드 전용 드로잉 배열 추가
+        this.learnStrokes = []; // ?�습 모드 ?�용 ?�로??배열 추�?
 
         // Learn Mode View State (Zoom/Pan)
         this.learnScale = 1.0;
@@ -20,7 +20,7 @@ class UnitessGalleryApp {
         this.isDrawing = false;
 
         // View State (Zoom/Pan)
-        this.scale = 0.9; // 시작 시 화면을 더 꽉 채우도록 변경
+        this.scale = 0.9; // ?�작 ???�면????�?채우?�록 변�?
         this.offsetX = 0;
         this.offsetY = 0;
         this.isPanning = false;
@@ -37,7 +37,7 @@ class UnitessGalleryApp {
         this.showCanvasGrid = true;
         this.currentLang = 'ko';
         this.currentPatternText = {
-            13: "합성 변환을 통해 X축 대칭 무늬를 형성하는 복합 패턴입니다."
+            13: "?�성 변?�을 ?�해 X�??��?무늬�??�성?�는 복합 ?�턴?�니??"
         };
 
         this.currentLearnRuleId = 1;
@@ -75,7 +75,7 @@ class UnitessGalleryApp {
                 alert_mode_ready: " Mode is being prepared!",
                 mode_falling: "Falling Game (Game 2)",
                 print_space_title: "My Print Space",
-                move_and_save: "🖨️",
+                move_and_save: "?���?,
                 btn_original_share: "Original Share",
                 sort_newest: "Newest",
                 sort_hearts: "Hearts",
@@ -85,76 +85,76 @@ class UnitessGalleryApp {
                 btn_confirm: "Share"
             },
             ko: {
-                menu_settings: "설정",
-                menu_modes: "다각형",
-                mode_square: "사각형",
-                mode_triangle: "삼각형",
-                mode_hexagon: "육각형",
-                mode_quiz: "퀴즈게임",
-                mode_learn: "학습",
-                menu_stroke: "브러쉬",
+                menu_settings: "?�정",
+                menu_modes: "?�각??,
+                mode_square: "?�각??,
+                mode_triangle: "?�각??,
+                mode_hexagon: "?�각??,
+                mode_quiz: "?�즈게임",
+                mode_learn: "?�습",
+                menu_stroke: "브러??,
                 label_width: "굵기",
-                label_color: "색상",
+                label_color: "?�상",
                 menu_view: "보기",
-                btn_reset_view: "초기화",
-                btn_toggle_labels: "레이블",
-                btn_toggle_canvas_grid: "그리드",
-                menu_actions: "작업",
-                btn_save_image: "이미지 저장",
-                btn_clear: "지우기",
-                menu_learn: "도움말",
-                menu_appearance: "테마 설정",
-                chat_title: "커뮤니티 채팅",
-                chat_placeholder: "작품에 대해 대화해보세요...",
-                label_tile_bg: "사각형 배경색",
-                btn_show_guide: "설명",
-                btn_gallery_help: "갤러리 설명",
-                alert_mode_ready: " Mode 준비 중입니다!",
-                mode_falling: "낙하 게임 (Game 2)",
-                print_space_title: "나의 프린트 공간",
-                move_and_save: "🖨️",
-                btn_original_share: "원본공유",
-                sort_newest: "최신순",
-                sort_hearts: "하트순",
-                share_title: "원본 공유하기",
-                share_prompt: "이 작품의 이름을 적어주세요:",
+                btn_reset_view: "초기??,
+                btn_toggle_labels: "?�이�?,
+                btn_toggle_canvas_grid: "그리??,
+                menu_actions: "?�업",
+                btn_save_image: "?��?지 ?�??,
+                btn_clear: "지?�기",
+                menu_learn: "?��?�?,
+                menu_appearance: "?�마 ?�정",
+                chat_title: "커�??�티 채팅",
+                chat_placeholder: "?�품???�???�?�해보세??..",
+                label_tile_bg: "?�각??배경??,
+                btn_show_guide: "?�명",
+                btn_gallery_help: "갤러�??�명",
+                alert_mode_ready: " Mode 준�?중입?�다!",
+                mode_falling: "?�하 게임 (Game 2)",
+                print_space_title: "?�의 ?�린??공간",
+                move_and_save: "?���?,
+                btn_original_share: "?�본공유",
+                sort_newest: "최신??,
+                sort_hearts: "?�트??,
+                share_title: "?�본 공유?�기",
+                share_prompt: "???�품???�름???�어주세??",
                 btn_cancel: "취소",
-                btn_confirm: "공유하기"
+                btn_confirm: "공유?�기"
             }
         };
 
         this.guideData = {
             ko: {
-                title: "Unitess 테셀레이션 이론 가이드",
+                title: "Unitess ?��??�이???�론 가?�드",
                 section1: {
-                    header: "8가지 변환 표시",
+                    header: "8가지 변???�시",
                     symbols: ["T, C0", "C1", "C", "C3", "G(y)", "G(x)", "G(y=x)", "G(y=-x)"]
                 },
                 section2: {
-                    title: "패턴의 종류",
-                    text: "9가지 기본변환마다 가운데 ⑨번 사각형 변환 8가지, ⑨번사각형 변의 대칭 4가지, 즉 8*4=32가지 중 중복없이 가능한 패턴이 26가지가 있다."
+                    title: "?�턴??종류",
+                    text: "9가지 기본변?�마??가?�데 ?�번 ?�각??변??8가지, ?�번?�각??변???��?4가지, �?8*4=32가지 �?중복?�이 가?�한 ?�턴??26가지가 ?�다."
                 },
                 section3: {
-                    title: "패턴 CCGG(C1 y=x)의 예 설명",
-                    desc1: "앞의 C1은 가운데 ⑨번 사각형 변환",
-                    desc2: "뒤의 y=x는 ⑨번사각형의 4변중 G변환에 해당하는 변환 설명",
-                    formula1: "⑨=C1, (①②③④)=CCG(y=x)G(y=x)",
-                    desc3: "⑨=C1인 사각형 4개변에 대한 변환표시",
-                    desc4: "이웃한 사각형들의 변의 변환 합성의 결과",
-                    formula2: "(⑤⑦)=C1*C*G(y=x)=G(x)",
-                    desc5: "⑤는 C1(90도 회전시킨후) 다시 C(180도 회전시킨 것)에 G(y=x) y=x축에 데칭이동시킨 결과는 x축 대칭이다.",
-                    formula3: "(⑥⑧)=C1*G(y=x)*G(y=x)=C1"
+                    title: "?�턴 CCGG(C1 y=x)?????�명",
+                    desc1: "?�의 C1?� 가?�데 ?�번 ?�각??변??,
+                    desc2: "?�의 y=x???�번?�각?�의 4변�?G변?�에 ?�당?�는 변???�명",
+                    formula1: "??C1, (?�②?�④)=CCG(y=x)G(y=x)",
+                    desc3: "??C1???�각??4개�????�??변?�표??,
+                    desc4: "?�웃???�각?�들??변??변???�성??결과",
+                    formula2: "(?�⑦)=C1*C*G(y=x)=G(x)",
+                    desc5: "?�는 C1(90???�전?�킨?? ?�시 C(180???�전?�킨 �???G(y=x) y=x축에 ?�칭?�동?�킨 결과??x�??��?��??",
+                    formula3: "(?�⑧)=C1*G(y=x)*G(y=x)=C1"
                 },
                 section4: {
-                    title: "학습 팁",
-                    tip: "※ TTTT 상태에서 다른 변환 버튼을 클릭하면 각 변환의 차이를 더 명확하게 확인할 수 있습니다. (Hint: 변의 빨간 중점을 연결한 곡선을 그려보세요!)"
+                    title: "?�습 ??,
+                    tip: "??TTTT ?�태?�서 ?�른 변??버튼???�릭?�면 �?변?�의 차이�???명확?�게 ?�인?????�습?�다. (Hint: 변??빨간 중점???�결??곡선??그려보세??)"
                 },
                 galleryHelp: {
-                    title: "Unitess 갤러리 활용 가이드",
+                    title: "Unitess 갤러�??�용 가?�드",
                     content: `
-                        <p class='modal-text'>사각형 안의 중점을 잇는 곡선을 그려보세요. 회전과 대칭이 조화롭게 어우러진 테셀레이션 패턴의 아름다움을 감상하실 수 있습니다.</p>
-                        <p class='modal-text'>설정 메뉴를 통해 이를 더 자세히 배우는 <b>학습 모드</b>, 재미있는 <b>게임</b>, 그리고 확장된 <b>삼각형과 육각형 부록 갤러리</b>도 만나보세요.</p>
-                        <p class='modal-text highlight-purple'>또한 작품을 프린트 하거나 원본을 공유해서 다른 사용자들과 영감을 나눠보세요.</p>
+                        <p class='modal-text'>?�각???�의 중점???�는 곡선??그려보세?? ?�전�??��?�� 조화�?�� ?�우?�진 ?��??�이???�턴???�름?��???감상?�실 ???�습?�다.</p>
+                        <p class='modal-text'>?�정 메뉴�??�해 ?��? ???�세??배우??<b>?�습 모드</b>, ?��??�는 <b>게임</b>, 그리�??�장??<b>?�각?�과 ?�각??부�?갤러�?/b>??만나보세??</p>
+                        <p class='modal-text highlight-purple'>?�한 ?�품???�린???�거???�본??공유?�서 ?�른 ?�용?�들�??�감???�눠보세??</p>
                     `
                 }
             },
@@ -166,22 +166,22 @@ class UnitessGalleryApp {
                 },
                 section2: {
                     title: "Types of Patterns",
-                    text: "For each of the 9 base transformations, there are 8 center (⑨) rotations and 4 edge symmetries. Out of 8*4=32 possibilities, 26 unique non-overlapping patterns exist."
+                    text: "For each of the 9 base transformations, there are 8 center (?? rotations and 4 edge symmetries. Out of 8*4=32 possibilities, 26 unique non-overlapping patterns exist."
                 },
                 section3: {
                     title: "Example Explanation: CCGG(C1 y=x)",
-                    desc1: "The leading 'C1' refers to the center ⑨ square transformation.",
-                    desc2: "The trailing 'y=x' describes the G-transformation applied to the 4 edges of square ⑨.",
-                    formula1: "⑨=C1, (①②③④)=CCG(y=x)G(y=x)",
-                    desc3: "Symmetry markers for the 4 edges of square ⑨=C1.",
+                    desc1: "The leading 'C1' refers to the center ??square transformation.",
+                    desc2: "The trailing 'y=x' describes the G-transformation applied to the 4 edges of square ??",
+                    formula1: "??C1, (?�②?�④)=CCG(y=x)G(y=x)",
+                    desc3: "Symmetry markers for the 4 edges of square ??C1.",
                     desc4: "Result of composite transformations of neighboring squares.",
-                    formula2: "(⑤⑦)=C1*C*G(y=x)=G(x)",
-                    desc5: "⑤ is the result of rotating 90°(C1), then 180°(C), followed by reflection across y=x (G(y=x)), resulting in X-axis symmetry.",
-                    formula3: "(⑥⑧)=C1*G(y=x)*G(y=x)=C1"
+                    formula2: "(?�⑦)=C1*C*G(y=x)=G(x)",
+                    desc5: "??is the result of rotating 90°(C1), then 180°(C), followed by reflection across y=x (G(y=x)), resulting in X-axis symmetry.",
+                    formula3: "(?�⑧)=C1*G(y=x)*G(y=x)=C1"
                 },
                 section4: {
                     title: "Learning Tip",
-                    tip: "※ Clicking other transformation buttons starting from the TTTT state allows you to see the differences more clearly. (Hint: Try drawing a curve connecting the red midpoints of the sides!)"
+                    tip: "??Clicking other transformation buttons starting from the TTTT state allows you to see the differences more clearly. (Hint: Try drawing a curve connecting the red midpoints of the sides!)"
                 },
                 galleryHelp: {
                     title: "Unitess Gallery Guide",
@@ -198,29 +198,29 @@ class UnitessGalleryApp {
         this.quizScore = 0;
         this.currentQuiz = null;
 
-        // 9대 핵심 대칭 그룹 정의
+        // 9?� ?�심 ?��?그룹 ?�의
         this.quizGroups = {
-            1: { name: "TTTT", label: "평행이동", symbol: "T", img: "symbol/TTTT.png", patterns: [1] },
-            2: { name: "CCCC", label: "회전", symbol: "C", img: "symbol/CCCC.png", patterns: [2] },
-            3: { name: "C3C1C3C1", label: "복합 회전", symbol: "C3C1", img: "symbol/C3C1C3C1(T).png", patterns: [3, 4] },
-            4: { name: "TCTC", label: "이동+회전", symbol: "TC", img: "symbol/TCTC(T).png", patterns: [11, 12] },
-            5: { name: "TGTG", label: "이동+글라이드", symbol: "TG", img: "symbol/tgtg(t x).png", patterns: [21, 22, 23, 24, 25, 26] },
-            6: { name: "CGCG", label: "회전+글라이드", symbol: "CG", img: "symbol/cgcg(T x).png", patterns: [13, 14, 15, 16] },
-            7: { name: "GGGG", label: "복합 글라이드", symbol: "GG", img: "symbol/gggg(T x).png", patterns: [7, 8, 9, 10] },
-            8: { name: "CCGG", label: "복합 회전+대칭", symbol: "CCGG", img: "symbol/ccgg(T y=x).png", patterns: [17, 18, 19, 20] },
-            9: { name: "XYXY", label: "축 대칭", symbol: "XY", img: "symbol/xyxy-A.png", patterns: [5, 6] }
+            1: { name: "TTTT", label: "?�행?�동", symbol: "T", img: "symbol/TTTT.png", patterns: [1] },
+            2: { name: "CCCC", label: "?�전", symbol: "C", img: "symbol/CCCC.png", patterns: [2] },
+            3: { name: "C3C1C3C1", label: "복합 ?�전", symbol: "C3C1", img: "symbol/C3C1C3C1(T).png", patterns: [3, 4] },
+            4: { name: "TCTC", label: "?�동+?�전", symbol: "TC", img: "symbol/TCTC(T).png", patterns: [11, 12] },
+            5: { name: "TGTG", label: "?�동+글?�이??, symbol: "TG", img: "symbol/tgtg(t x).png", patterns: [21, 22, 23, 24, 25, 26] },
+            6: { name: "CGCG", label: "?�전+글?�이??, symbol: "CG", img: "symbol/cgcg(T x).png", patterns: [13, 14, 15, 16] },
+            7: { name: "GGGG", label: "복합 글?�이??, symbol: "GG", img: "symbol/gggg(T x).png", patterns: [7, 8, 9, 10] },
+            8: { name: "CCGG", label: "복합 ?�전+?��?, symbol: "CCGG", img: "symbol/ccgg(T y=x).png", patterns: [17, 18, 19, 20] },
+            9: { name: "XYXY", label: "�??��?, symbol: "XY", img: "symbol/xyxy-A.png", patterns: [5, 6] }
         };
 
-        // 퀴즈 문제 데이터 (동일 그룹 내 무작위 이미지 선택 지원)
+        // ?�즈 문제 ?�이??(?�일 그룹 ??무작???��?지 ?�택 지??
         this.quizData = [
-            { id: 1, escherNo: "Symmetry No.1", groupId: 1, images: ["gameimage/tttt_1game.png", "gameimage/tttt_2.png", "gameimage/tttt_3.png"], hint: "한 방향으로 미끄러지듯 이동하는 가장 기본적인 평행이동 패턴입니다." },
-            { id: 2, escherNo: "Symmetry No.21", groupId: 2, images: ["gameimage/cccc_1game.png", "gameimage/cccc_2.png", "gameimage/cccc_3.png"], hint: "중심점을 기준으로 사방이 회전하며 맞물리는 구조입니다." },
-            { id: 3, escherNo: "Symmetry No.3", groupId: 3, images: ["gameimage/c3c1_2.png", "gameimage/c3c1_3.png"], hint: "서로 다른 회전 중심이 섞여 있는 복합 회전 패턴입니다." },
-            { id: 4, escherNo: "Symmetry No.11", groupId: 4, images: ["gameimage/tctc_1game.png", "gameimage/tctc_2game.png"], hint: "평행이동과 회전이 조화롭게 섞여 있습니다." },
-            { id: 5, escherNo: "Symmetry No.25", groupId: 5, images: ["gameimage/tgtg_1game.png", "gameimage/tgtg_2.png", "gameimage/tgtg_3.png", "gameimage/tgtg_4.png"], hint: "옆으로 이동하면서 동시에 반사(거울)되는 글라이드 대칭입니다." },
-            { id: 6, escherNo: "Symmetry No.45", groupId: 6, images: ["gameimage/cgcg_1game.png", "gameimage/cgcg_2.png", "gameimage/cgcg_3.png"], hint: "회전과 글라이드 대칭이 정교하게 결합되어 있습니다." },
-            { id: 7, escherNo: "Symmetry No.7", groupId: 7, images: ["gameimage/gggg_1game.png", "gameimage/gggg_2.png", "gameimage/gggg_3.png"], hint: "여러 방향의 글라이드 대칭이 복합적으로 나타납니다." },
-            { id: 8, escherNo: "Symmetry No.17", groupId: 8, images: ["gameimage/ccgg_1game.png", "gameimage/ccgg_2.png", "gameimage/ccgg_3.png"], hint: "회전과 반사가 모두 포함된 가장 복잡하고 완성도 높은 대칭군입니다." }
+            { id: 1, escherNo: "Symmetry No.1", groupId: 1, images: ["gameimage/tttt_1game.png", "gameimage/tttt_2.png", "gameimage/tttt_3.png"], hint: "??방향?�로 미끄?��????�동?�는 가??기본?�인 ?�행?�동 ?�턴?�니??" },
+            { id: 2, escherNo: "Symmetry No.21", groupId: 2, images: ["gameimage/cccc_1game.png", "gameimage/cccc_2.png", "gameimage/cccc_3.png"], hint: "중심?�을 기�??�로 ?�방???�전?�며 맞물리는 구조?�니??" },
+            { id: 3, escherNo: "Symmetry No.3", groupId: 3, images: ["gameimage/c3c1_2.png", "gameimage/c3c1_3.png"], hint: "?�로 ?�른 ?�전 중심???�여 ?�는 복합 ?�전 ?�턴?�니??" },
+            { id: 4, escherNo: "Symmetry No.11", groupId: 4, images: ["gameimage/tctc_1game.png", "gameimage/tctc_2game.png"], hint: "?�행?�동�??�전??조화�?�� ?�여 ?�습?�다." },
+            { id: 5, escherNo: "Symmetry No.25", groupId: 5, images: ["gameimage/tgtg_1game.png", "gameimage/tgtg_2.png", "gameimage/tgtg_3.png", "gameimage/tgtg_4.png"], hint: "?�으�??�동?�면???�시??반사(거울)?�는 글?�이???��?��?�다." },
+            { id: 6, escherNo: "Symmetry No.45", groupId: 6, images: ["gameimage/cgcg_1game.png", "gameimage/cgcg_2.png", "gameimage/cgcg_3.png"], hint: "?�전�?글?�이???��?�� ?�교?�게 결합?�어 ?�습?�다." },
+            { id: 7, escherNo: "Symmetry No.7", groupId: 7, images: ["gameimage/gggg_1game.png", "gameimage/gggg_2.png", "gameimage/gggg_3.png"], hint: "?�러 방향??글?�이???��?�� 복합?�으�??��??�니??" },
+            { id: 8, escherNo: "Symmetry No.17", groupId: 8, images: ["gameimage/ccgg_1game.png", "gameimage/ccgg_2.png", "gameimage/ccgg_3.png"], hint: "?�전�?반사가 모두 ?�함??가??복잡?�고 ?�성???��? ?��?��?�니??" }
         ];
 
         // Game 2: Falling Squares State
@@ -305,76 +305,76 @@ class UnitessGalleryApp {
                 en: { title: "XYXY-B", text: "", imageHTML: `<img src="symbol/xyxy-B.png" alt="Diagram">` }
             },
             13: {
-                ko: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png" alt="Diagram">` },
-                en: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T%20y).png" alt="Diagram">` }
+                ko: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T y).png" alt="Diagram">` },
+                en: { title: "CGCG (T y)", text: "", imageHTML: `<img src="symbol/cgcg(T y).png" alt="Diagram">` }
             },
             14: {
-                ko: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png" alt="Diagram">` },
-                en: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T%20x).png" alt="Diagram">` }
+                ko: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T x).png" alt="Diagram">` },
+                en: { title: "CGCG (T x)", text: "", imageHTML: `<img src="symbol/cgcg(T x).png" alt="Diagram">` }
             },
             15: {
-                ko: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png" alt="Diagram">` },
-                en: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20x).png" alt="Diagram">` }
+                ko: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1 x).png" alt="Diagram">` },
+                en: { title: "CGCG (C1 x)", text: "", imageHTML: `<img src="symbol/cgcg(C1 x).png" alt="Diagram">` }
             },
             16: {
-                ko: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png" alt="Diagram">` },
-                en: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1%20y=-x).png" alt="Diagram">` }
+                ko: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1 y=-x).png" alt="Diagram">` },
+                en: { title: "CGCG (C1 y)", text: "", imageHTML: `<img src="symbol/cgcg(C1 y=-x).png" alt="Diagram">` }
             },
             7: {
-                ko: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png" alt="Diagram">` },
-                en: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=x).png" alt="Diagram">` }
+                ko: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T y=x).png" alt="Diagram">` },
+                en: { title: "GGGG(T y=x)", text: "", imageHTML: `<img src="symbol/gggg(T y=x).png" alt="Diagram">` }
             },
             8: {
-                ko: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png" alt="Diagram">` },
-                en: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T%20y=-x).png" alt="Diagram">` }
+                ko: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T y=-x).png" alt="Diagram">` },
+                en: { title: "GGGG(T y=-x)", text: "", imageHTML: `<img src="symbol/gggg(T y=-x).png" alt="Diagram">` }
             },
             9: {
-                ko: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png" alt="Diagram">` },
-                en: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T%20x).png" alt="Diagram">` }
+                ko: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T x).png" alt="Diagram">` },
+                en: { title: "GGGG(T x)", text: "", imageHTML: `<img src="symbol/gggg(T x).png" alt="Diagram">` }
             },
             10: {
-                ko: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png" alt="Diagram">` },
-                en: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T%20y).png" alt="Diagram">` }
+                ko: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T y).png" alt="Diagram">` },
+                en: { title: "GGGG(T y)", text: "", imageHTML: `<img src="symbol/gggg(T y).png" alt="Diagram">` }
             },
             21: {
-                ko: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png" alt="Diagram">` },
-                en: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=-x).png" alt="Diagram">` }
+                ko: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t y=-x).png" alt="Diagram">` },
+                en: { title: "TGTG(T y=-x)", text: "", imageHTML: `<img src="symbol/tgtg(t y=-x).png" alt="Diagram">` }
             },
             22: {
-                ko: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png" alt="Diagram">` },
-                en: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y=x).png" alt="Diagram">` }
+                ko: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t y=x).png" alt="Diagram">` },
+                en: { title: "TGTG(T y=x)", text: "", imageHTML: `<img src="symbol/tgtg(t y=x).png" alt="Diagram">` }
             },
             23: {
-                ko: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png" alt="Diagram">` },
-                en: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t%20y).png" alt="Diagram">` }
+                ko: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t y).png" alt="Diagram">` },
+                en: { title: "TGTG(T y)", text: "", imageHTML: `<img src="symbol/tgtg(t y).png" alt="Diagram">` }
             },
             24: {
-                ko: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png" alt="Diagram">` },
-                en: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t%20x).png" alt="Diagram">` }
+                ko: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t x).png" alt="Diagram">` },
+                en: { title: "TGTG(T x)", text: "", imageHTML: `<img src="symbol/tgtg(t x).png" alt="Diagram">` }
             },
             25: {
-                ko: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png" alt="Diagram">` },
-                en: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=x).png" alt="Diagram">` }
+                ko: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1 y=x).png" alt="Diagram">` },
+                en: { title: "TGTG(C1 x)", text: "", imageHTML: `<img src="symbol/tgtg(C1 y=x).png" alt="Diagram">` }
             },
             26: {
-                ko: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png" alt="Diagram">` },
-                en: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1%20y=-x).png" alt="Diagram">` }
+                ko: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1 y=-x).png" alt="Diagram">` },
+                en: { title: "TGTG(C1 y)", text: "", imageHTML: `<img src="symbol/tgtg(C1 y=-x).png" alt="Diagram">` }
             },
             17: {
-                ko: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png" alt="Diagram">` },
-                en: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T%20y=x).png" alt="Diagram">` }
+                ko: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(T y=x)", text: "", imageHTML: `<img src="symbol/ccgg(T y=x).png" alt="Diagram">` }
             },
             18: {
-                ko: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png" alt="Diagram">` },
-                en: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y%20y=x).png" alt="Diagram">` }
+                ko: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(y y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y y=x).png" alt="Diagram">` }
             },
             19: {
-                ko: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png" alt="Diagram">` },
-                en: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1%20y=x).png" alt="Diagram">` }
+                ko: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1 y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(C1 y=x)", text: "", imageHTML: `<img src="symbol/ccgg(C1 y=x).png" alt="Diagram">` }
             },
             20: {
-                ko: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png" alt="Diagram">` },
-                en: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x%20y=x).png" alt="Diagram">` }
+                ko: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x y=x).png" alt="Diagram">` },
+                en: { title: "CCGG(y=x y=x)", text: "", imageHTML: `<img src="symbol/ccgg(y=x y=x).png" alt="Diagram">` }
             }
         };
 
@@ -407,7 +407,7 @@ class UnitessGalleryApp {
         this.enableZoomPan('triangle-gallery-overlay', '#triangle-gallery-overlay .appendix-content', 'triangle');
         this.enableZoomPan('hexagon-gallery-overlay', '#hexagon-gallery-overlay .appendix-content', 'hexagon');
 
-        // 윈도우 로드 혹은 초기화 직후 레이아웃이 틀어지는 경우를 대비해 추가 리사이즈 트리거
+        // ?�도??로드 ?��? 초기??직후 ?�이?�웃???�?��???경우�??�비해 추�? 리사?�즈 ?�리�?
         setTimeout(() => {
             if (this.resizeMaster) this.resizeMaster();
             this.syncAppendixCanvases('triangle');
@@ -443,8 +443,8 @@ class UnitessGalleryApp {
 
     createGallery() {
         const layout = [];
-        for (let r = 0; r < 4; r++) { // 4행으로 변경
-            for (let c = 0; c < 7; c++) { // 7열로 변경
+        for (let r = 0; r < 4; r++) { // 4?�으�?변�?
+            for (let c = 0; c < 7; c++) { // 7?�로 변�?
                 if (r === 0 && c === 0) continue; // Skip master position
                 if (layout.length >= 26) break;   // Max 26 patterns
                 layout.push({ r, c });
@@ -502,7 +502,7 @@ class UnitessGalleryApp {
             // Add Move & Save Button
             const saveBtn = document.createElement('button');
             saveBtn.className = 'save-move-btn';
-            saveBtn.textContent = '프린트'; // Initial text
+            saveBtn.textContent = '?�린??; // Initial text
             saveBtn.dataset.i18n = 'move_and_save';
             saveBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -515,7 +515,7 @@ class UnitessGalleryApp {
     }
 
     getLearnTileRule(id, r, c) {
-        // 사용자님께서 주신 3x3 번호 체계 매핑
+        // ?�용?�님께서 주신 3x3 번호 체계 매핑
         const mapping = [
             [5, 4, 8],
             [1, 9, 3],
@@ -621,7 +621,7 @@ class UnitessGalleryApp {
                 if (c_list.includes(num)) type = 'C';
                 else if (y_list.includes(num)) type = 'Y';
                 else if (x_list.includes(num)) type = 'X';
-                else type = 'T'; // 9번 마스터
+                else type = 'T'; // 9�?마스??
                 break;
             }
             case 14: { // CGCG (0 x)
@@ -735,26 +735,26 @@ class UnitessGalleryApp {
         return index; // Simply use index 0-25
     }
 
-    // 8가지 기본 변환 정의 (사용자 정의 기호)
+    // 8가지 기본 변???�의 (?�용???�의 기호)
     getTransform(type) {
         switch (type) {
             case 'T': return { rotation: 0, sx: 1, sy: 1 };    // 방향 (Identity)
-            case 'C': return { rotation: 180, sx: 1, sy: 1 };  // 180도 회전
-            case 'C1': return { rotation: 90, sx: 1, sy: 1 };   // 90도 회전
-            case 'C3': return { rotation: 270, sx: 1, sy: 1 };  // 270도 회전
-            case 'X': return { rotation: 0, sx: 1, sy: -1 };   // 상하 뒤집기
-            case 'Y': return { rotation: 0, sx: -1, sy: 1 };   // 좌우 뒤집기
-            case 'Y=X': return { rotation: 90, sx: -1, sy: 1 };  // 대각선 대칭
-            case 'Y=-X': return { rotation: 270, sx: -1, sy: 1 }; // 반대 대각선 대칭
+            case 'C': return { rotation: 180, sx: 1, sy: 1 };  // 180???�전
+            case 'C1': return { rotation: 90, sx: 1, sy: 1 };   // 90???�전
+            case 'C3': return { rotation: 270, sx: 1, sy: 1 };  // 270???�전
+            case 'X': return { rotation: 0, sx: 1, sy: -1 };   // ?�하 ?�집�?
+            case 'Y': return { rotation: 0, sx: -1, sy: 1 };   // 좌우 ?�집�?
+            case 'Y=X': return { rotation: 90, sx: -1, sy: 1 };  // ?�각선 ?��?
+            case 'Y=-X': return { rotation: 270, sx: -1, sy: 1 }; // 반�? ?�각선 ?��?
             default: return { rotation: 0, sx: 1, sy: 1 };
         }
     }
 
     getTileRule(id, r, c) {
-        // id: 1-26 (사용자 지정 번호)
-        // r, c: 0-4 (5x5 그리드 내 좌표)
+        // id: 1-26 (?�용??지??번호)
+        // r, c: 0-4 (5x5 그리????좌표)
         switch (id) {
-            case 1: // [1번] 예시: 모두 T
+            case 1: // [1�? ?�시: 모두 T
                 const t1 = this.getTransform('T');
                 return { rotation: t1.rotation, scaleX: t1.sx, scaleY: t1.sy };
 
@@ -1011,14 +1011,14 @@ class UnitessGalleryApp {
             }
             case 21: {
                 const num = r * 6 + c + 1; // 1-36 번호 체계
-                let t21_type = 'Y=-X'; // 기본값
+                let t21_type = 'Y=-X'; // 기본�?
 
-                // 사용자 지시 사항 반영
+                // ?�용??지???�항 반영
                 if (num >= 19 && num <= 24) t21_type = 'T';
                 else if (num >= 25 && num <= 30) t21_type = 'Y=-X';
                 else if (num >= 31 && num <= 36) t21_type = 'T';
                 else {
-                    // 1~18번은 기존의 rr % 3 로직의 일관성을 위해 유지 (rr=1일 때 T)
+                    // 1~18번�? 기존??rr % 3 로직???��??�을 ?�해 ?��? (rr=1????T)
                     if ((r % 3) === 1) t21_type = 'T';
                 }
 
@@ -1073,7 +1073,7 @@ class UnitessGalleryApp {
                 const t25 = this.getTransform(t25_type);
                 return { rotation: t25.rotation, scaleX: t25.sx, scaleY: t25.sy };
             }
-            case 26: // [26번] 25번 패턴에서 Y=X를 Y=-X로 변경 (복구)
+            case 26: // [26�? 25�??�턴?�서 Y=X�?Y=-X�?변�?(복구)
                 const num26 = r * 6 + c + 1;
                 let t26_type = 'Y=-X';
                 if ((num26 >= 1 && num26 <= 6) || (num26 >= 13 && num26 <= 18) || (num26 >= 25 && num26 <= 30)) {
@@ -1112,7 +1112,7 @@ class UnitessGalleryApp {
 
         // Touch Navigation (Mobile)
         this.viewport.addEventListener('touchstart', (e) => {
-            // 마스터 캔버스나 그 자식 요소(드로잉 영역) 터치 시 내비게이션 중단
+            // 마스??캔버?�나 �??�식 ?�소(?�로???�역) ?�치 ???�비게이??중단
             if (e.target.closest('#master-square')) {
                 this.isPanning = false;
                 return;
@@ -1145,7 +1145,7 @@ class UnitessGalleryApp {
         });
 
         window.addEventListener('touchmove', (e) => {
-            // 드로잉 중이거나 마스터 캔버스 위라면 내비게이션 무시
+            // ?�로??중이거나 마스??캔버???�라�??�비게이??무시
             if (this.isDrawing || e.target.closest('#master-square')) return;
 
             if (e.touches.length === 1 && this.isPanning) {
@@ -1163,7 +1163,7 @@ class UnitessGalleryApp {
                     e.touches[0].clientY - e.touches[1].clientY
                 );
                 const zoomFactor = currentDist / initialTouchDist;
-                this.scale = Math.min(Math.max(0.1, initialScale * zoomFactor), 4); // 최대 줌 4배로 확장
+                this.scale = Math.min(Math.max(0.1, initialScale * zoomFactor), 4); // 최�? �?4배로 ?�장
                 this.applyViewTransform();
                 if (e.cancelable) e.preventDefault();
             }
@@ -2128,7 +2128,7 @@ class UnitessGalleryApp {
         const randomIndex = Math.floor(Math.random() * this.quizData.length);
         this.currentQuiz = this.quizData[randomIndex];
 
-        // 해당 퀴즈 데이터 내의 여러 이미지 중 하나를 무작위 선택
+        // ?�당 ?�즈 ?�이???�의 ?�러 ?��?지 �??�나�?무작???�택
         const randomImg = this.currentQuiz.images[Math.floor(Math.random() * this.currentQuiz.images.length)];
 
         const contentArea = document.getElementById('quiz-question-content');
@@ -2136,7 +2136,7 @@ class UnitessGalleryApp {
         const questionText = document.getElementById('quiz-question-text');
 
         if (feedback) feedback.classList.add('hidden');
-        if (questionText) questionText.innerHTML = `Q. 에셔의 작품 <b style="color:#f1c40f">${this.currentQuiz.escherNo}</b> 에 사용된 대칭 그룹은?`;
+        if (questionText) questionText.innerHTML = `Q. ?�셔???�품 <b style="color:#f1c40f">${this.currentQuiz.escherNo}</b> ???�용???��?그룹?�?`;
 
         if (contentArea) {
             contentArea.innerHTML = `
@@ -2155,7 +2155,7 @@ class UnitessGalleryApp {
         feedback.classList.remove('hidden');
 
         if (selectedGroupId === this.currentQuiz.groupId) {
-            feedback.textContent = "정답입니다! ✨ 다음 문제로 넘어갑니다.";
+            feedback.textContent = "?�답?�니?? ???�음 문제�??�어갑니??";
             feedback.className = "quiz-feedback correct";
             this.quizScore += 10;
             const scoreEl = document.getElementById('quiz-score');
@@ -2163,10 +2163,10 @@ class UnitessGalleryApp {
 
             setTimeout(() => this.loadNextQuestion(), 1500);
         } else {
-            feedback.textContent = "아쉽습니다! 다시 한번 생각해보세요. ❌";
+            feedback.textContent = "?�쉽?�니?? ?�시 ?�번 ?�각?�보?�요. ??;
             feedback.className = "quiz-feedback wrong";
 
-            // 오답일 때는 다음 문제로 바로 넘어가지 않고, 피드백만 잠깐 보여줌
+            // ?�답???�는 ?�음 문제�?바로 ?�어가지 ?�고, ?�드백만 ?�깐 보여�?
             setTimeout(() => {
                 feedback.classList.add('hidden');
             }, 1000);
@@ -2211,7 +2211,7 @@ class UnitessGalleryApp {
         this.fallingScore = 0;
         this.isFallingPaused = false;
 
-        // UI 초기화: Start 버튼만 노출
+        // UI 초기?? Start 버튼�??�출
         const startBtn = document.getElementById('start-falling-btn');
         const pauseBtn = document.getElementById('pause-falling-btn');
         const stopBtn = document.getElementById('stop-falling-btn');
@@ -2241,7 +2241,7 @@ class UnitessGalleryApp {
         this.lastSpawnTime = 0;
         this.lastPauseCheck = performance.now();
 
-        // UI 전환: Start 숨기고 Pause/Stop 노출
+        // UI ?�환: Start ?�기�?Pause/Stop ?�출
         document.getElementById('start-falling-btn')?.classList.add('hidden');
         document.getElementById('pause-falling-btn')?.classList.remove('hidden');
         document.getElementById('stop-falling-btn')?.classList.remove('hidden');
@@ -2251,7 +2251,7 @@ class UnitessGalleryApp {
 
     resetFallingGame() {
         this.stopFallingGameLoop();
-        this.startFallingGame(); // 처음 대기 상태로 회귀
+        this.startFallingGame(); // 처음 ?��??�태�??��?
     }
 
     clearFallingSquares() {
@@ -2269,7 +2269,7 @@ class UnitessGalleryApp {
     }
 
     beginFallingPlay() {
-        this.stopFallingGameLoop(); // 중복 방지
+        this.stopFallingGameLoop(); // 중복 방�?
 
         this.clearFallingSquares();
         this.gameLoopActive = true;
@@ -2277,7 +2277,7 @@ class UnitessGalleryApp {
         this.lastSpawnTime = 0;
         this.lastPauseCheck = 0;
 
-        // UI 전환: Start 숨기고 Pause/Stop 노출
+        // UI ?�환: Start ?�기�?Pause/Stop ?�출
         const startBtn = document.getElementById('start-falling-btn');
         const pauseBtn = document.getElementById('pause-falling-btn');
         const stopBtn = document.getElementById('stop-falling-btn');
@@ -2305,7 +2305,7 @@ class UnitessGalleryApp {
         if (!this.gameLoopActive) return;
 
         if (this.isFallingPaused) {
-            // 일시정지 중에는 lastSpawnTime을 멈춘 시간만큼 밀어줌
+            // ?�시?��? 중에??lastSpawnTime??멈춘 ?�간만큼 밀?�줌
             if (this.lastPauseCheck > 0) {
                 const pauseDuration = timestamp - this.lastPauseCheck;
                 this.lastSpawnTime += pauseDuration;
@@ -2314,12 +2314,12 @@ class UnitessGalleryApp {
             this.fallingAnimationFrame = requestAnimationFrame((t) => this.fallingGameLoop(t));
             return;
         }
-        this.lastPauseCheck = 0; // 정지 해제
+        this.lastPauseCheck = 0; // ?��? ?�제
 
         if (!this.lastSpawnTime) this.lastSpawnTime = timestamp;
         const elapsed = timestamp - this.lastSpawnTime;
 
-        // 속도 조절 밸런싱 (1~5단계)
+        // ?�도 조절 밸런??(1~5?�계)
         const spawnIntervals = [4500, 3500, 2500, 1800, 1000];
         let spawnInterval = spawnIntervals[this.fallingLevel - 1] || 2500;
 
@@ -2336,7 +2336,7 @@ class UnitessGalleryApp {
         const board = document.getElementById('falling-game-board');
         if (!board) return;
 
-        // 낙하 속도 (안정화)
+        // ?�하 ?�도 (?�정??
         const speeds = [0.4, 0.7, 1.2, 2.0, 3.2];
         let speedMultiplier = speeds[this.fallingLevel - 1] || 1.2;
 
@@ -2350,7 +2350,7 @@ class UnitessGalleryApp {
             el: document.createElement('div')
         };
 
-        // 만약 처음부터 정답인(T) 상태라면 하나를 무조건 비틀어줌
+        // 만약 처음부???�답??T) ?�태?�면 ?�나�?무조�?비�??�줌
         if (square.rotation === 0 && square.scaleX === 1) {
             square.rotation = 90;
         }
@@ -2363,7 +2363,7 @@ class UnitessGalleryApp {
         canvas.height = 120;
         square.el.appendChild(canvas);
 
-        // 마우스 이벤트 통합 (이중 조작 체계: 클릭 위치 분할 + 우클릭)
+        // 마우???�벤???�합 (?�중 조작 체계: ?�릭 ?�치 분할 + ?�클�?
         square.el.onmousedown = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -2374,15 +2374,15 @@ class UnitessGalleryApp {
             const isRightClick = (e.button === 2) || (e.which === 3);
 
             if (isRightClick || isRightSide) {
-                // 오른쪽 클릭 또는 사각형의 오른쪽 절반 클릭: 대칭(반전)
+                // ?�른�??�릭 ?�는 ?�각?�의 ?�른�??�반 ?�릭: ?��?반전)
                 this.handleReflect(square);
             } else {
-                // 사각형의 왼쪽 절반 클릭: 회전
+                // ?�각?�의 ?�쪽 ?�반 ?�릭: ?�전
                 this.handleRotate(square);
             }
         };
 
-        // 브라우저 기본 우측 메뉴 원천 차단
+        // 브라?��? 기본 ?�측 메뉴 ?�천 차단
         square.el.oncontextmenu = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -2397,7 +2397,7 @@ class UnitessGalleryApp {
     handleRotate(square) {
         if (this.isFallingPaused) return;
 
-        // 회전 효과 (시각적 피드백 - 파란색)
+        // ?�전 ?�과 (?�각???�드�?- ?��???
         square.el.style.borderColor = "#3498db";
         setTimeout(() => { if (square.el) square.el.style.borderColor = "transparent"; }, 150);
 
@@ -2408,17 +2408,17 @@ class UnitessGalleryApp {
     handleReflect(square) {
         if (this.isFallingPaused) return;
 
-        // 보라색 섬광 피드백
+        // 보라???�광 ?�드�?
         square.el.style.border = "4px solid #9b59b6";
         setTimeout(() => { if (square.el) square.el.style.border = "3px solid transparent"; }, 200);
 
-        // Y축 대칭 (ScaleX 반전) - 무조건 좌우만 뒤집힘
+        // Y�??��?(ScaleX 반전) - 무조�?좌우�??�집??
         square.scaleX *= -1;
         this.finishFallingInteraction(square);
     }
 
     finishFallingInteraction(square) {
-        // T 상태 체크
+        // T ?�태 체크
         if (square.rotation === 0 && square.scaleX === 1) {
             this.resolveFallingSquare(square);
         } else {
@@ -2440,14 +2440,14 @@ class UnitessGalleryApp {
         ctx.save();
         ctx.translate(w / 2, h / 2);
 
-        // [최종 수정] 사용자의 요청: "오른쪽 클릭 = Y축 대칭(좌우 반전)"
-        // 사각형이 회전되어 있더라도 항상 화면상에서 좌우가 바뀌도록 Scale을 Rotate보다 '바깥'에 적용합니다. (코드상 위)
-        ctx.scale(square.scaleX, 1); // 2. 최종적으로 화면 기준 좌우 반전 적용
-        ctx.rotate(square.rotation * Math.PI / 180); // 1. 먼저 각도만큼 회전
+        // [최종 ?�정] ?�용?�의 ?�청: "?�른�??�릭 = Y�??��?좌우 반전)"
+        // ?�각?�이 ?�전?�어 ?�더?�도 ??�� ?�면?�에??좌우가 바뀌도�?Scale??Rotate보다 '바깥'???�용?�니?? (코드????
+        ctx.scale(square.scaleX, 1); // 2. 최종?�으�??�면 기�? 좌우 반전 ?�용
+        ctx.rotate(square.rotation * Math.PI / 180); // 1. 먼�? 각도만큼 ?�전
 
         ctx.translate(-w / 2, -h / 2);
 
-        // 만약 그린 무늬가 없다면 기본 캐릭터(비대칭 윙크 얼굴)를 그려줌
+        // 만약 그린 무늬가 ?�다�?기본 캐릭??비�?�??�크 ?�굴)�?그려�?
         if (strokes.length === 0) {
             ctx.strokeStyle = this.masterStrokeColor;
             ctx.lineWidth = 4;
@@ -2488,7 +2488,7 @@ class UnitessGalleryApp {
             s.y += s.speed;
             s.el.style.top = `${s.y}px`;
 
-            // 바닥에 닿으면 제거 (실패)
+            // 바닥???�으�??�거 (?�패)
             if (s.y > boardHeight) {
                 s.el.remove();
                 this.fallingSquares.splice(i, 1);
@@ -2590,7 +2590,7 @@ class UnitessGalleryApp {
     drawCanvasGrid(ctx, w, h) {
         const gridCount = 10;
         ctx.save();
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'; // 진하게 수정 (0.05 -> 0.15)
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'; // 진하�??�정 (0.05 -> 0.15)
         ctx.lineWidth = 1;
 
         for (let i = 1; i < gridCount; i++) {
@@ -2801,7 +2801,7 @@ class UnitessGalleryApp {
             // Add Move & Save Button for Appendix Shapes
             const saveBtn = document.createElement('button');
             saveBtn.className = 'save-move-btn';
-            saveBtn.textContent = '프린트';
+            saveBtn.textContent = '?�린??;
             saveBtn.dataset.i18n = 'move_and_save';
             saveBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -3230,7 +3230,7 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 6: { // T6 = CC6C6(1)
-                    // Rule from user: 1번에서만 180도 회전, 다른 곳은 60, -60 회전
+                    // Rule from user: 1번에?�만 180???�전, ?�른 곳�? 60, -60 ?�전
                     // Base `aa` is tile 7 (index 6).
                     const table = [
                         [0, 0],   // 1
@@ -3269,7 +3269,7 @@ class UnitessGalleryApp {
                     break;
                 }
                 case 7: { // T7 = CC6C6(2)
-                    // Rule from user: 2번에서 180도 회전
+                    // Rule from user: 2번에??180???�전
                     // Mathematically generated with E2=180, E1=60, E3=-60
                     const table = [
                         [0, 0],   // 1
@@ -3584,7 +3584,7 @@ class UnitessGalleryApp {
             div.innerHTML = `
                 <img src="${item.img}" style="width:100%; border-radius:4px;">
                 <div class="item-tag">${item.tag}</div>
-                <button class="remove-print-item" onclick="app.removePrintItem('${type}', ${index})">✕</button>
+                <button class="remove-print-item" onclick="app.removePrintItem('${type}', ${index})">??/button>
             `;
             container.appendChild(div);
         });
@@ -3597,7 +3597,7 @@ class UnitessGalleryApp {
 
     printPanel(type) {
         if (this.printSpaceData[type].length === 0) {
-            alert('인쇄할 패턴이 없습니다. 먼저 패턴을 이동저장해주세요.');
+            alert('?�쇄???�턴???�습?�다. 먼�? ?�턴???�동?�?�해주세??');
             return;
         }
 
@@ -3652,7 +3652,7 @@ class UnitessGalleryApp {
         const nameInput = document.getElementById('share-name-input');
         const name = nameInput.value.trim();
         if (!name) {
-            alert('저장이름을 입력해주세요!');
+            alert('?�?�이름을 ?�력?�주?�요!');
             return;
         }
 
@@ -3679,7 +3679,7 @@ class UnitessGalleryApp {
             this.renderSharedGallery();
 
             // Notification
-            this.appendMessage('sent', `새로운 작품을 공유했습니다: "${name}"`);
+            this.appendMessage('sent', `?�로???�품??공유?�습?�다: "${name}"`);
         }
     }
 
@@ -3705,7 +3705,7 @@ class UnitessGalleryApp {
 
         if (sorted.length === 0) {
             grid.innerHTML = `<div style="color:rgba(255,255,255,0.5); padding:40px; text-align:center; font-size:1.1rem;">
-                🔍 "<strong>${kw || ''}</strong>" 검색 결과가 없습니다.
+                ?�� "<strong>${kw || ''}</strong>" 검??결과가 ?�습?�다.
             </div>`;
             return;
         }
@@ -3715,11 +3715,11 @@ class UnitessGalleryApp {
             card.className = 'share-card';
 
             const timeStr = new Date(item.time).toLocaleString();
-            const typeLabel = item.type === 'square' ? '사각형' : (item.type === 'triangle' ? '삼각형' : '육각형');
+            const typeLabel = item.type === 'square' ? '?�각?? : (item.type === 'triangle' ? '?�각?? : '?�각??);
 
             card.innerHTML = `
                 <div class="share-card-type-tag">${typeLabel}</div>
-                <img src="${item.img}" class="share-card-img master-thumb" title="클릭하면 이 그림으로 돌아갑니다" style="cursor:pointer;">
+                <img src="${item.img}" class="share-card-img master-thumb" title="?�릭?�면 ??그림?�로 ?�아갑니?? style="cursor:pointer;">
                 <div class="share-card-info">
                     <div class="share-card-header">
                         <span class="share-card-name">${item.name}</span>
@@ -3727,10 +3727,10 @@ class UnitessGalleryApp {
                     </div>
                     <div class="share-card-footer">
                         <div class="heart-container ${item.liked ? 'liked' : ''}" onclick="app.toggleHeart(${item.id})">
-                            <span class="heart-icon">❤️</span>
+                            <span class="heart-icon">?�️</span>
                             <span class="heart-count">${item.hearts}</span>
                         </div>
-                        <button class="load-shared-btn" onclick="app.loadSharedPattern(${item.id})">🎨 불러오기</button>
+                        <button class="load-shared-btn" onclick="app.loadSharedPattern(${item.id})">?�� 불러?�기</button>
                     </div>
                 </div>
             `;
@@ -3781,7 +3781,7 @@ class UnitessGalleryApp {
                     if (el) el.classList.add('hidden');
                 });
 
-            // 기존 배열 참조를 유지하면서 내용만 교체 (드로잉 핸들러 closure 참조 보존)
+            // 기존 배열 참조�??��??�면???�용�?교체 (?�로???�들??closure 참조 보존)
             const loadedTriStrokes = JSON.parse(JSON.stringify(item.strokes));
             this.triangleStrokes.splice(0, this.triangleStrokes.length, ...loadedTriStrokes);
 
@@ -3798,7 +3798,7 @@ class UnitessGalleryApp {
                     if (el) el.classList.add('hidden');
                 });
 
-            // 기존 배열 참조를 유지하면서 내용만 교체 (드로잉 핸들러 closure 참조 보존)
+            // 기존 배열 참조�??��??�면???�용�?교체 (?�로???�들??closure 참조 보존)
             const loadedHexStrokes = JSON.parse(JSON.stringify(item.strokes));
             this.hexagonStrokes.splice(0, this.hexagonStrokes.length, ...loadedHexStrokes);
 
@@ -3808,7 +3808,7 @@ class UnitessGalleryApp {
             this.hexagonNeedsUpdate = true;
         }
 
-        this.appendMessage('received', `"${item.name}" 작품을 불러왔습니다!`);
+        this.appendMessage('received', `"${item.name}" ?�품??불러?�습?�다!`);
     }
 
     toggleHeart(id) {

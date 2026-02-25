@@ -241,6 +241,7 @@ class UnitessGalleryApp {
         this.printSpaceData = { square: [], triangle: [], hexagon: [] };
         this.sharedPatterns = []; // { id, img, name, hearts, time, liked }
         this.currentSort = 'time';
+        this.shareSearchKeyword = '';
         this.pendingShare = null;
 
         // Appendix Pattern Config (Colors matching the screenshot)
@@ -1546,6 +1547,24 @@ class UnitessGalleryApp {
                 this.renderSharedGallery();
             };
         });
+
+        // Share Search
+        const searchInput = document.getElementById('share-search-input');
+        const searchClear = document.getElementById('share-search-clear');
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                this.shareSearchKeyword = searchInput.value.trim().toLowerCase();
+                this.renderSharedGallery();
+            });
+        }
+        if (searchClear) {
+            searchClear.onclick = () => {
+                searchInput.value = '';
+                this.shareSearchKeyword = '';
+                this.renderSharedGallery();
+                searchInput.focus();
+            };
+        }
 
         // Naming Modal Actions
         document.getElementById('cancel-share').onclick = () => {
@@ -3669,6 +3688,13 @@ class UnitessGalleryApp {
         if (!grid) return;
 
         let sorted = [...this.sharedPatterns];
+
+        // Filter by search keyword
+        const kw = this.shareSearchKeyword || '';
+        if (kw) {
+            sorted = sorted.filter(p => p.name.toLowerCase().includes(kw));
+        }
+
         if (this.currentSort === 'heart') {
             sorted.sort((a, b) => b.hearts - a.hearts);
         } else {
@@ -3676,6 +3702,14 @@ class UnitessGalleryApp {
         }
 
         grid.innerHTML = '';
+
+        if (sorted.length === 0) {
+            grid.innerHTML = `<div style="color:rgba(255,255,255,0.5); padding:40px; text-align:center; font-size:1.1rem;">
+                🔍 "<strong>${kw || ''}</strong>" 검색 결과가 없습니다.
+            </div>`;
+            return;
+        }
+
         sorted.forEach(item => {
             const card = document.createElement('div');
             card.className = 'share-card';

@@ -443,33 +443,46 @@ body {
 }
 
 #pattern-detail-panel {
-    position: absolute;
-    /* 버튼판 위에 띄우기 */
-    top: 30px;
-    right: 50px;
-    z-index: 3000;
+    position: fixed;
+    top: 4vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4000;
     background: white;
     color: #333;
     border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 10px 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
     border: 2px solid #3498db;
-    width: 450px;
-    max-height: 80vh;
-    overflow-y: auto;
+    width: min(460px, 90vw);
+    max-height: 92vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #pattern-detail-panel.detail-hidden {
     display: none;
 }
 
+#detail-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.78rem;
+}
+
 #detail-content img {
+    flex: 1;
     width: 100%;
-    height: auto;
+    height: 0;
+    /* flex 컨테이너 내부에서 축소 허용 */
+    min-height: 0;
     display: block;
-    object-fit: fill;
-    /* 상자 비율에 상관없이 꽉 채움 */
+    object-fit: contain;
     border-radius: 4px;
+    margin-bottom: 4px;
 }
 
 .detail-header {
@@ -508,18 +521,11 @@ body {
     border-color: #e74c3c;
 }
 
-#detail-content {
-    font-size: 0.85rem;
-}
-
-#detail-content img {
-    margin-bottom: 8px;
-}
-
 .detail-text {
-    line-height: 1.4;
+    line-height: 1.35;
     color: #555;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    flex-shrink: 0;
 }
 
 .mini-tile canvas {
@@ -1489,14 +1495,15 @@ body {
 }
 
 .quiz-label {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     color: #ecf0f1;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 6px;
+    flex-shrink: 0;
 }
 
 .quiz-guide-tip {
@@ -1559,19 +1566,34 @@ body {
 
 .quiz-choice-area {
     background: rgba(0, 0, 0, 0.2) !important;
-    padding: 20px !important;
+    padding: 12px !important;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
     margin-top: 0 !important;
 }
 
 #quiz-options-container {
     flex: 1;
     overflow: hidden;
-    /* 스크롤바 제거 */
-    padding: 10px 0;
+    min-height: 0;
+    padding: 0;
+}
+
+/* ID+class 복합 선택자 → display:grid가 반드시 적용됨 */
+#quiz-options-container.quiz-grid-9 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 8px;
+    padding: 5px;
+    /* flex:1로 높이가 결정되고, aspect-ratio:1로 너비=높이 → 정사각형 그리드 */
+    aspect-ratio: 1 / 1;
+    align-self: center;
+    min-height: 0;
+    box-sizing: border-box;
 }
 
 .quiz-feedback {
@@ -1613,22 +1635,13 @@ body {
     }
 }
 
-/* 9 Group Quiz Grid */
-.quiz-grid-9 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    /* 간격 축소 */
-    padding: 5px;
-    height: 100%;
-}
+/* 9 Group Quiz Grid - #quiz-options-container.quiz-grid-9 복합 선택자에서 정의 */
 
 .quiz-group-card {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    padding: 5px;
-    /* 패딩을 최소화하여 공간 확보 */
+    padding: 4px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
@@ -1636,8 +1649,8 @@ body {
     align-items: center;
     gap: 2px;
     text-align: center;
-    height: 100%;
-    /* 부모 높이에 맞춤 */
+    overflow: hidden;
+    min-height: 0;
 }
 
 .quiz-group-card:hover {
@@ -1882,7 +1895,7 @@ body {
 
 .share-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--share-card-min, 220px), 1fr));
     gap: 25px;
     padding-bottom: 50px;
 }
@@ -2022,6 +2035,34 @@ body {
 .sort-btn.active {
     background: #e67e22;
     border-color: #e67e22;
+}
+
+/* 도형 필터 버튼 행 */
+.share-shape-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.shape-filter-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.shape-filter-btn.active {
+    background: #3498db;
+    border-color: #3498db;
+}
+
+.shape-filter-btn:hover {
+    background: rgba(52, 152, 219, 0.3);
+    border-color: #3498db;
 }
 
 .modal-card.mini {

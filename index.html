@@ -295,14 +295,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Compact Info Panel -->
-                <div id="pattern-detail-panel" class="detail-hidden">
-                    <div class="detail-header">
-                        <span id="detail-title">Pattern Info</span>
-                        <button id="close-detail">✕</button>
-                    </div>
-                    <div id="detail-content"></div>
-                </div>
             </div>
         </div>
 
@@ -448,15 +440,24 @@
 
         <!-- Original Share Overlay (Community Gallery) -->
         <div id="original-share-overlay" class="mode-overlay hidden">
-            <div class="learn-header">
-                <div class="header-left">
-                    <h1 data-i18n="btn_original_share">원본공유</h1>
-                    <div class="share-sort-controls">
-                        <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
-                        <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
+            <div class="learn-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div class="header-left">
+                        <h1 data-i18n="btn_original_share">원본공유</h1>
+                        <div class="share-sort-controls">
+                            <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
+                            <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
+                        </div>
                     </div>
+                    <button id="exit-share" class="exit-btn">✕</button>
                 </div>
-                <button id="exit-share" class="exit-btn">✕</button>
+                <!-- 도형 필터 버튼 행 -->
+                <div class="share-shape-filter">
+                    <button class="shape-filter-btn active" data-shape="all">전체</button>
+                    <button class="shape-filter-btn" data-shape="triangle">🔺 삼각형</button>
+                    <button class="shape-filter-btn" data-shape="square">⬛ 사각형</button>
+                    <button class="shape-filter-btn" data-shape="hexagon">⬡ 육각형</button>
+                </div>
             </div>
             <div class="share-gallery-container">
                 <div id="share-grid" class="share-grid">
@@ -478,6 +479,15 @@
             </div>
         </div>
 
+        <!-- Compact Info Panel (body level - outside transformed containers) -->
+        <div id="pattern-detail-panel" class="detail-hidden">
+            <div class="detail-header">
+                <span id="detail-title">Pattern Info</span>
+                <button id="close-detail">✕</button>
+            </div>
+            <div id="detail-content"></div>
+        </div>
+
         <!-- Explanation Modal -->
         <div id="explanation-modal" class="modal-overlay hidden">
             <div class="modal-card">
@@ -490,6 +500,13 @@
                 </div>
             </div>
         </div>
+
+        <!-- Firebase SDK (compat v10) -->
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+        <!-- Firebase 설정 (firebase-config.js 에서 YOUR_* 값 교체 필요) -->
+        <script src="firebase-config.js"></script>
 
         <script src="script.js"></script>
 </body>

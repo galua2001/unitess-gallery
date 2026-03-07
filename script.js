@@ -73,7 +73,7 @@ class UnitessGalleryApp {
                 btn_show_guide: "Guide",
                 btn_gallery_help: "Gallery Help",
                 alert_mode_ready: " Mode is being prepared!",
-                mode_falling: "Falling Game (Game 2)",
+                mode_falling: "Falling Game",
                 print_space_title: "My Print Space",
                 move_and_save: "🖨️",
                 btn_original_share: "Original Share",
@@ -110,7 +110,7 @@ class UnitessGalleryApp {
                 btn_show_guide: "설명",
                 btn_gallery_help: "갤러리 설명",
                 alert_mode_ready: " Mode 준비 중입니다!",
-                mode_falling: "낙하 게임 (Game 2)",
+                mode_falling: "낙하 게임",
                 print_space_title: "나의 프린트 공간",
                 move_and_save: "🖨️",
                 btn_original_share: "원본공유",
@@ -3522,7 +3522,7 @@ class UnitessGalleryApp {
             const grid = grids.find(g => g.id === id);
             if (!grid) return;
             tag = `${type.charAt(0).toUpperCase()}${id}`;
-            sourceCanvas = grid.canvas;
+            sourceCanvas = this.createPatternThumbnail(type, id);
         }
 
         if (!sourceCanvas) return;
@@ -3569,6 +3569,73 @@ class UnitessGalleryApp {
                     ctx.restore();
                 }
             }
+        } else if (type === 'triangle') {
+            const strokes = this.triangleStrokes;
+            const rows = 6;
+            const size = 600 / rows;
+            const triH = size * Math.sqrt(3) / 2;
+            const patternColor = '#3498db';
+
+            ctx.save();
+            ctx.translate(300, 300 - (rows * triH) / 2 + triH / 3);
+
+            let idCounterLocal = 0;
+            for (let r = 0; r < rows; r++) {
+                const numTris = 2 * r + 1;
+                const rowStartX = -(r * size / 2);
+                for (let i = 0; i < numTris; i++) {
+                    ctx.save();
+                    const tx = rowStartX + i * (size / 2);
+                    const isInverted = i % 2 === 1;
+                    const ty = isInverted ? (r - 1 / 3) * triH : r * triH;
+                    ctx.translate(tx, ty);
+                    const currentTileIdx = idCounterLocal++;
+
+                    ctx.save();
+                    this.applyAppendixSymmetry(ctx, id, type, currentTileIdx, isInverted ? 1 : 0);
+                    if (isInverted) ctx.rotate(Math.PI);
+                    const scaleFactorX = size / 0.98;
+                    const scaleFactorY = triH / 0.93;
+                    ctx.scale(scaleFactorX, scaleFactorY);
+                    ctx.translate(-0.5, -0.6033);
+                    this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, 0.04);
+                    ctx.restore();
+                    ctx.restore();
+                }
+            }
+            ctx.restore();
+        } else if (type === 'hexagon') {
+            const strokes = this.hexagonStrokes;
+            const size = 600 / 13;
+            const patternColor = '#9b59b6';
+
+            ctx.save();
+            ctx.translate(300, 300);
+            const hexPositions = [];
+            for (let r = -3; r <= 3; r++) {
+                for (let q = -3; q <= 3; q++) {
+                    if (Math.abs(q + r) <= 3) hexPositions.push({ q, r });
+                }
+            }
+            hexPositions.sort((a, b) => {
+                const tyA = a.r + 0.5 * a.q;
+                const tyB = b.r + 0.5 * b.q;
+                return tyA - tyB || a.q - b.q;
+            });
+
+            hexPositions.forEach((pos, idx) => {
+                ctx.save();
+                const tx = size * 1.5 * pos.q;
+                const ty = size * (Math.sqrt(3) * pos.r + (Math.sqrt(3) / 2) * pos.q);
+                ctx.translate(tx, ty);
+                ctx.save();
+                this.applyAppendixSymmetry(ctx, id, type, idx, 0, pos);
+                ctx.translate(-size, -size);
+                this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.strokeWidth * 0.8);
+                ctx.restore();
+                ctx.restore();
+            });
+            ctx.restore();
         }
         return tempCanvas;
     }

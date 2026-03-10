@@ -1,0 +1,16 @@
+{
+    "name": "Unitess Gallery",
+    "short_name": "Unitess",
+    "description": "26 Patterns Unitess Gallery",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "image.png",
+            "sizes": "192x192 512x512 any",
+            "type": "image/png"
+        }
+    ]
+}

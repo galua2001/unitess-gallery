@@ -90,7 +90,7 @@ class UnitessGalleryApp {
                 mode_square: "사각형",
                 mode_triangle: "삼각형",
                 mode_hexagon: "육각형",
-                mode_quiz: "퀴즈게임",
+                mode_quiz: "에셔그림맞추기",
                 mode_learn: "학습",
                 menu_stroke: "브러쉬",
                 label_width: "굵기",

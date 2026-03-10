@@ -351,11 +351,11 @@
             </div> <!-- Close quiz-content -->
         </div> <!-- Close quiz-mode-overlay -->
 
-        <!-- Falling Game Overlay (Game 2) -->
+        <!-- Falling Game Overlay -->
         <div id="falling-game-overlay" class="mode-overlay hidden">
             <div class="learn-header">
                 <div class="header-left">
-                    <h1 data-i18n="mode_falling">Falling Squares (Game 2)</h1>
+                    <h1 data-i18n="mode_falling">Falling Squares</h1>
                     <div class="falling-controls">
                         <div class="score-box">Score: <span id="falling-score">0</span></div>
                         <div class="speed-box">
@@ -504,16 +504,35 @@
 
         <script src="script.js"></script>
 
-        <!-- PWA Service Worker Registration -->
+        <!-- PWA Service Worker Registration & Auto-Update -->
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('./sw.js')
-                        .then(registration => {
-                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                        }, err => {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
+                        .then(reg => {
+                            console.log('SW registered:', reg.scope);
+                            
+                            // 신규 버전 발견 시 업데이트 체크
+                            reg.onupdatefound = () => {
+                                const installingWorker = reg.installing;
+                                installinonsnge = () => {
+                                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        // 새로운 서비스워커가 설치되었음을 사용자에게 알리거나 자동 새로고침
+                                        console.log('New version available. Reloading...');
+                                        window.location.reload();
+                                    }
+                                };
+                            };
+                        })
+                        .catch(err => console.log('SW registration failed:', err));
+                });
+                
+                // 서비스워커 제어권이 바뀌면(v3 -> v4 등) 화면을 자동으로 한 번 새로고침 해줍니다.
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
                 });
             }
         </script>

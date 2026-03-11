@@ -1610,15 +1610,7 @@ class UnitessGalleryApp {
             };
         }
 
-        // Shape Filter
-        document.querySelectorAll('.shape-filter-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.shape-filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.currentShapeFilter = btn.dataset.shape;
-                this.renderSharedGallery();
-            };
-        });
+        // Shape Filter is now handled by inline onclick calling app.setShapeFilter
 
         // 공유 갤러리 줌: 휠로 카드 크기 조절
         this.shareCardSize = 220; // 초기 카드 크기(px)
@@ -3833,14 +3825,28 @@ class UnitessGalleryApp {
         }
     }
 
+    setShapeFilter(shape) {
+        this.currentShapeFilter = shape;
+        document.querySelectorAll('.shape-filter-btn').forEach(b => {
+            if (b.dataset.shape === shape) {
+                b.style.background = '#3498db';
+                b.style.color = '#fff';
+            } else {
+                b.style.background = '#fff';
+                b.style.color = '#333';
+            }
+        });
+        this.renderSharedGallery();
+    }
+
     renderSharedGallery() {
         const grid = document.getElementById('share-grid');
         if (!grid) return;
 
-        // 1단계: 도형 필터
+        // 1단계: 도형 필터 (이전 데이터에서 type이 없는 경우도 정사각형으로 간주)
         let filtered = this.currentShapeFilter === 'all'
             ? [...this.sharedPatterns]
-            : this.sharedPatterns.filter(p => p.type === this.currentShapeFilter);
+            : this.sharedPatterns.filter(p => (p.type || 'square') === this.currentShapeFilter);
 
         // Filter by search keyword
         const kw = this.shareSearchKeyword || '';

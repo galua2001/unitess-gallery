@@ -3896,11 +3896,11 @@ class UnitessGalleryApp {
                         <span class="share-card-time">${timeStr}</span>
                     </div>
                     <div class="share-card-footer">
-                        <div class="heart-container ${item.liked ? 'liked' : ''}" onclick="app.toggleHeart(${item.id})">
+                        <div class="heart-container ${item.liked ? 'liked' : ''}" onclick="app.toggleHeart('${item.id}')">
                             <span class="heart-icon">❤️</span>
                             <span class="heart-count">${item.hearts}</span>
                         </div>
-                        <button class="load-shared-btn" onclick="app.loadSharedPattern(${item.id})">🎨 불러오기</button>
+                        <button class="load-shared-btn" onclick="app.loadSharedPattern('${item.id}')">🎨 불러오기</button>
                     </div>
                 </div>
             `;
@@ -3909,7 +3909,7 @@ class UnitessGalleryApp {
     }
 
     loadSharedPattern(id) {
-        const item = this.sharedPatterns.find(p => p.id === id);
+        const item = this.sharedPatterns.find(p => String(p.id) === String(id));
         if (!item || !item.strokes) return;
 
         // Close share overlay

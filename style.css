@@ -1885,45 +1885,12 @@ body {
     padding: 20px;
 }
 
-/* 원본공유: 전체화면 대신 오른쪽 사이드 패널로 */
-#original-share-overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: auto;
-    width: 480px;
-    height: 100vh;
-    background: #2c3e50;
-    z-index: 2500;
-    display: flex;
-    flex-direction: column;
-    padding: 24px 20px 20px;
-    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.4);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    overflow: hidden;
-}
 
-#original-share-overlay.hidden {
-    display: none;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
 
 .share-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(var(--share-card-min, 220px), 1fr));
+    gap: 25px;
     padding-bottom: 50px;
 }
 
@@ -1931,13 +1898,13 @@ body {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     color: #333;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.3s;
     position: relative;
-    height: 110px;
+    /* For type tag */
 }
 
 .share-card-type-tag {
@@ -1959,14 +1926,12 @@ body {
 }
 
 .share-card-img {
-    width: 110px;
-    min-width: 110px;
-    height: 110px;
+    width: 100%;
+    aspect-ratio: 1;
     background: #f0f0f0;
     display: block;
     object-fit: contain;
-    border-right: 1px solid #eee;
-    flex-shrink: 0;
+    border-bottom: 2px solid #eee;
 }
 
 .share-card-img.master-thumb {
@@ -1983,13 +1948,10 @@ body {
 }
 
 .share-card-info {
-    padding: 10px 12px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-    min-width: 0;
-    gap: 4px;
+    gap: 8px;
 }
 
 .share-card-header {

@@ -3870,7 +3870,7 @@ class UnitessGalleryApp {
             alert('삭제되었습니다.');
         } catch (e) {
             console.error('🔥 삭제 실패:', e);
-            alert('삭제 중 오류가 발생했습니다.');
+            alert('삭제 중 오류가 발생했습니다: ' + e.message);
         }
     }
 

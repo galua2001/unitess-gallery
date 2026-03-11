@@ -1133,6 +1133,8 @@ class UnitessGalleryApp {
     setupNavigation() {
         // Zoom with Scroll (Desktop)
         this.viewport.addEventListener('wheel', (e) => {
+            if (e.target.closest('.mode-overlay') || e.target.closest('.modal-overlay') || e.target.closest('#side-menu') || e.target.closest('#chat-panel')) return;
+
             e.preventDefault();
             const zoomSpeed = 0.001;
             const delta = e.deltaY;
@@ -1148,6 +1150,8 @@ class UnitessGalleryApp {
         // Pan with mouse (Desktop)
         this.viewport.addEventListener('mousedown', (e) => {
             if (e.target.closest('#master-square')) return; // Drawing area
+            if (e.target.closest('.mode-overlay') || e.target.closest('.modal-overlay') || e.target.closest('#side-menu') || e.target.closest('#chat-panel')) return;
+
             this.isPanning = true;
             this.lastMouseX = e.clientX;
             this.lastMouseY = e.clientY;
@@ -1158,6 +1162,10 @@ class UnitessGalleryApp {
         this.viewport.addEventListener('touchstart', (e) => {
             // 마스터 캔버스나 그 자식 요소(드로잉 영역) 터치 시 내비게이션 중단
             if (e.target.closest('#master-square')) {
+                this.isPanning = false;
+                return;
+            }
+            if (e.target.closest('.mode-overlay') || e.target.closest('.modal-overlay') || e.target.closest('#side-menu') || e.target.closest('#chat-panel')) {
                 this.isPanning = false;
                 return;
             }
@@ -1617,6 +1625,7 @@ class UnitessGalleryApp {
         const shareContainer = document.querySelector('.share-gallery-container');
         if (shareContainer) {
             shareContainer.addEventListener('wheel', (e) => {
+                e.stopPropagation();
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? -20 : 20;
                 this.shareCardSize = Math.min(500, Math.max(120, this.shareCardSize + delta));

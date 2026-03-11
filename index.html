@@ -108,6 +108,17 @@
                             data-i18n="btn_original_share">Share</button>
                     </div>
                 </div>
+
+                <div class="menu-section admin-only-section">
+                    <h3 style="color:#e74c3c;">Admin</h3>
+                    <div style="display:flex; gap:5px;">
+                        <input type="password" id="admin-pw-input" placeholder="Password"
+                            style="flex:1; padding:5px; font-size:12px; border-radius:4px; border:1px solid #ddd;">
+                        <button class="menu-btn mini"
+                            onclick="app.enableAdmin(document.getElementById('admin-pw-input').value)"
+                            style="width:auto; padding:5px 10px;">Login</button>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -457,6 +457,11 @@ class UnitessGalleryApp {
             if (this.useFirebase) {
                 this.loadFromFirebase();
             }
+            // 기존에 관리자 로그인을 했다면 자동 활성화
+            if (localStorage.getItem('unitess_admin') === 'true') {
+                this.isAdmin = true;
+                this.renderSharedGallery();
+            }
         }, 500);
     }
 
@@ -3839,8 +3844,13 @@ class UnitessGalleryApp {
         // 관리자 모드 활성화를 위한 비밀번호 (기본: admin1234)
         if (pw === 'admin1234') {
             this.isAdmin = true;
+            localStorage.setItem('unitess_admin', 'true'); // 상태 저장
             this.renderSharedGallery();
             alert('관리자 모드가 활성화되었습니다.');
+
+            // 입력창 초기화
+            const pwInput = document.getElementById('admin-pw-input');
+            if (pwInput) pwInput.value = '';
         } else {
             alert('비밀번호가 틀렸습니다.');
         }

@@ -26,6 +26,7 @@ class UnitessGalleryApp {
         this.isPanning = false;
         this.lastMouseX = 0;
         this.lastMouseY = 0;
+        this.isAdmin = false; // 관리자 모드 여부
 
         this.grids = [];
         this.galleryNeedsUpdate = true;
@@ -3834,6 +3835,35 @@ class UnitessGalleryApp {
         }
     }
 
+    enableAdmin(pw) {
+        // 관리자 모드 활성화를 위한 비밀번호 (기본: admin1234)
+        if (pw === 'admin1234') {
+            this.isAdmin = true;
+            this.renderSharedGallery();
+            alert('관리자 모드가 활성화되었습니다.');
+        } else {
+            alert('비밀번호가 틀렸습니다.');
+        }
+    }
+
+    async deleteFromFirebase(id) {
+        if (!confirm('정말 이 작품을 삭제하시겠습니까?')) return;
+
+        try {
+            if (this.useFirebase) {
+                await window.db.collection('shares').doc(String(id)).delete();
+                console.log('🔥 Firebase에서 삭제 완료:', id);
+            }
+            // 로컬 배열에서도 삭제
+            this.sharedPatterns = this.sharedPatterns.filter(p => String(p.id) !== String(id));
+            this.renderSharedGallery();
+            alert('삭제되었습니다.');
+        } catch (e) {
+            console.error('🔥 삭제 실패:', e);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+
     setShapeFilter(shape) {
         this.currentShapeFilter = shape;
         document.querySelectorAll('.shape-filter-btn').forEach(b => {
@@ -3900,7 +3930,10 @@ class UnitessGalleryApp {
                             <span class="heart-icon">❤️</span>
                             <span class="heart-count">${item.hearts}</span>
                         </div>
-                        <button class="load-shared-btn" onclick="app.loadSharedPattern('${item.id}')">🎨 불러오기</button>
+                        <div style="display:flex; gap:5px;">
+                            ${this.isAdmin ? `<button class="admin-delete-btn" onclick="app.deleteFromFirebase('${item.id}')">🗑️ 삭제</button>` : ''}
+                            <button class="load-shared-btn" onclick="app.loadSharedPattern('${item.id}')">🎨 불러오기</button>
+                        </div>
                     </div>
                 </div>
             `;

@@ -2048,6 +2048,22 @@ body {
     border-color: #e67e22;
 }
 
+.admin-delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-delete-btn:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
 .share-search-box {
     display: flex;
     align-items: center;

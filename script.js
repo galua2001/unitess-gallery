@@ -381,6 +381,47 @@ class UnitessGalleryApp {
         this.init();
     }
 
+    get useFirebase() {
+        return typeof firebase !== 'undefined' && window.db && window.storage;
+    }
+
+    async saveToFirebase(shareItem) {
+        const { name, time, type } = shareItem;
+        const docRef = await window.db.collection('shares').add({
+            name,
+            imageUrl: shareItem.img,
+            hearts: 0,
+            time,
+            type,
+            patternId: shareItem.patternId,
+            strokes: shareItem.strokes
+        });
+        return { ...shareItem, id: docRef.id };
+    }
+
+    async loadFromFirebase() {
+        try {
+            const likedIds = JSON.parse(localStorage.getItem('unitess_liked') || '[]');
+            const snap = await window.db.collection('shares')
+                .orderBy('time', 'desc').limit(300).get();
+            this.sharedPatterns = snap.docs.map(doc => ({
+                id: doc.id,
+                img: doc.data().imageUrl,
+                name: doc.data().name,
+                hearts: doc.data().hearts || 0,
+                time: doc.data().time,
+                type: doc.data().type,
+                patternId: doc.data().patternId,
+                strokes: doc.data().strokes,
+                liked: likedIds.includes(doc.id)
+            }));
+            this.renderSharedGallery();
+            console.log(`🔥 Firebase에서 ${this.sharedPatterns.length}개 작품 로드`);
+        } catch (e) {
+            console.warn('🔥 Firebase 로드 실패:', e);
+        }
+    }
+
     init() {
         this.setupMasterCanvas();
         this.createGallery();
@@ -412,6 +453,9 @@ class UnitessGalleryApp {
             if (this.resizeMaster) this.resizeMaster();
             this.syncAppendixCanvases('triangle');
             this.syncAppendixCanvases('hexagon');
+            if (this.useFirebase) {
+                this.loadFromFirebase();
+            }
         }, 500);
     }
 
@@ -1564,6 +1608,30 @@ class UnitessGalleryApp {
                 this.renderSharedGallery();
                 searchInput.focus();
             };
+        }
+
+        // Shape Filter
+        document.querySelectorAll('.shape-filter-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.shape-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.currentShapeFilter = btn.dataset.shape;
+                this.renderSharedGallery();
+            };
+        });
+
+        // 공유 갤러리 줌: 휠로 카드 크기 조절
+        this.shareCardSize = 220; // 초기 카드 크기(px)
+        const shareContainer = document.querySelector('.share-gallery-container');
+        if (shareContainer) {
+            shareContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -20 : 20;
+                this.shareCardSize = Math.min(500, Math.max(120, this.shareCardSize + delta));
+                document.getElementById('share-grid').style.setProperty(
+                    '--share-card-min', `${this.shareCardSize}px`
+                );
+            }, { passive: false });
         }
 
         // Naming Modal Actions
@@ -3715,7 +3783,7 @@ class UnitessGalleryApp {
         document.getElementById('share-name-input').focus();
     }
 
-    confirmOriginalShare() {
+    async confirmOriginalShare() {
         const nameInput = document.getElementById('share-name-input');
         const name = nameInput.value.trim();
         if (!name) {
@@ -3724,7 +3792,7 @@ class UnitessGalleryApp {
         }
 
         if (this.pendingShare) {
-            const shareItem = {
+            let shareItem = {
                 id: Date.now(),
                 img: this.pendingShare.img,
                 name: name,
@@ -3735,8 +3803,21 @@ class UnitessGalleryApp {
                 strokes: this.pendingShare.strokes,
                 liked: false
             };
-            this.sharedPatterns.push(shareItem);
+
+            // UI 변경
             document.getElementById('naming-modal').classList.add('hidden');
+
+            if (this.useFirebase) {
+                try {
+                    shareItem = await this.saveToFirebase(shareItem);
+                    console.log('🔥 Firebase 저장 성공:', shareItem.id);
+                } catch (e) {
+                    console.warn('🔥 Firebase 저장 실패', e);
+                }
+            }
+
+            // 최신순 정렬을 위해 unshift 사용하거나 renderSharedGallery가 순서 처리함.
+            this.sharedPatterns.unshift(shareItem);
             this.pendingShare = null;
 
             // Show shared gallery immediately
@@ -3746,7 +3827,9 @@ class UnitessGalleryApp {
             this.renderSharedGallery();
 
             // Notification
-            this.appendMessage('sent', `새로운 작품을 공유했습니다: "${name}"`);
+            if (typeof this.appendMessage === 'function') {
+                this.appendMessage('sent', `새로운 작품을 공유했습니다: "${name}"`);
+            }
         }
     }
 
@@ -3754,14 +3837,19 @@ class UnitessGalleryApp {
         const grid = document.getElementById('share-grid');
         if (!grid) return;
 
-        let sorted = [...this.sharedPatterns];
+        // 1단계: 도형 필터
+        let filtered = this.currentShapeFilter === 'all'
+            ? [...this.sharedPatterns]
+            : this.sharedPatterns.filter(p => p.type === this.currentShapeFilter);
 
         // Filter by search keyword
         const kw = this.shareSearchKeyword || '';
         if (kw) {
-            sorted = sorted.filter(p => p.name.toLowerCase().includes(kw));
+            filtered = filtered.filter(p => p.name.toLowerCase().includes(kw));
         }
 
+        // 2단계: 정렬
+        let sorted = filtered;
         if (this.currentSort === 'heart') {
             sorted.sort((a, b) => b.hearts - a.hearts);
         } else {
@@ -3878,8 +3966,8 @@ class UnitessGalleryApp {
         this.appendMessage('received', `"${item.name}" 작품을 불러왔습니다!`);
     }
 
-    toggleHeart(id) {
-        const item = this.sharedPatterns.find(p => p.id === id);
+    async toggleHeart(id) {
+        const item = this.sharedPatterns.find(p => String(p.id) === String(id));
         if (item) {
             if (item.liked) {
                 item.hearts--;
@@ -3888,6 +3976,23 @@ class UnitessGalleryApp {
                 item.hearts++;
                 item.liked = true;
             }
+
+            if (this.useFirebase) {
+                try {
+                    await window.db.collection('shares').doc(String(id)).update({ hearts: item.hearts });
+                } catch (e) {
+                    console.warn('🔥 하트 업데이트 실패:', e);
+                }
+
+                let likedIds = JSON.parse(localStorage.getItem('unitess_liked') || '[]');
+                if (item.liked) {
+                    likedIds.push(String(id));
+                } else {
+                    likedIds = likedIds.filter(lid => lid !== String(id));
+                }
+                localStorage.setItem('unitess_liked', JSON.stringify(likedIds));
+            }
+
             this.renderSharedGallery();
         }
     }

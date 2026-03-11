@@ -454,12 +454,31 @@
 
         <!-- Original Share Overlay (Community Gallery) -->
         <div id="original-share-overlay" class="mode-overlay hidden">
-            <div class="learn-header">
-                <div class="header-left">
-                    <h1 data-i18n="btn_original_share">원본공유</h1>
-                    <div class="share-sort-controls">
-                        <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
-                        <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
+            <div class="learn-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div class="header-left">
+                        <h1 data-i18n="btn_original_share">원본공유</h1>
+                        <div class="share-sort-controls">
+                            <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
+                            <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
+                        </div>
+                    </div>
+                    <button id="exit-share" class="exit-btn">✕</button>
+                </div>
+                <!-- 도형 필터 버튼 영역 + 검색 창 -->
+                <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">
+                    <div class="share-shape-filter" style="display:flex; gap:8px;">
+                        <button class="shape-filter-btn active" data-shape="all"
+                            style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">전체</button>
+                        <button class="shape-filter-btn" data-shape="triangle"
+                            style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">🔺
+                            삼각형</button>
+                        <button class="shape-filter-btn" data-shape="square"
+                            style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">🟩
+                            사각형</button>
+                        <button class="shape-filter-btn" data-shape="hexagon"
+                            style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; background:#fff; cursor:pointer;">🔶
+                            육각형</button>
                     </div>
                     <div class="share-search-box">
                         <span class="search-icon">🔍</span>
@@ -467,7 +486,6 @@
                         <button id="share-search-clear" title="지우기">✕</button>
                     </div>
                 </div>
-                <button id="exit-share" class="exit-btn">✕</button>
             </div>
             <div class="share-gallery-container">
                 <div id="share-grid" class="share-grid">
@@ -502,6 +520,12 @@
             </div>
         </div>
 
+        <!-- Firebase SDK (compat v10) -->
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+        <script src="firebase-config.js"></script>
+
         <script src="script.js"></script>
 
         <!-- PWA Service Worker Registration & Auto-Update -->
@@ -511,7 +535,7 @@
                     navigator.serviceWorker.register('./sw.js')
                         .then(reg => {
                             console.log('SW registered:', reg.scope);
-                            
+
                             // 신규 버전 발견 시 업데이트 체크
                             reg.onupdatefound = () => {
                                 const installingWorker = reg.installing;
@@ -526,7 +550,7 @@
                         })
                         .catch(err => console.log('SW registration failed:', err));
                 });
-                
+
                 // 서비스워커 제어권이 바뀌면(v3 -> v4 등) 화면을 자동으로 한 번 새로고침 해줍니다.
                 let refreshing = false;
                 navigator.serviceWorker.addEventListener('controllerchange', () => {

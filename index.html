@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -41,16 +41,16 @@
             <div class="print-space-items" id="square-print-items"></div>
         </div>
 
-        <!-- Gallery Guide Button -->
-        <button id="gallery-guide-btn" title="Gallery Guide">?</button>
+        <!-- Gallery Guide Button (Hidden) -->
+        <button id="gallery-guide-btn" title="Gallery Guide" style="display: none;">?</button>
 
-        <div id="side-menu" class="hidden">
+        <div id="side-menu">
             <div class="menu-content">
                 <div class="menu-header">
                     <div class="header-actions">
                         <select id="lang-select">
-                            <option value="ko">KO</option>
                             <option value="en">EN</option>
+                            <option value="ko">KO</option>
                         </select>
                         <button id="close-menu">✕</button>
                     </div>
@@ -122,8 +122,8 @@
             </div>
         </div>
 
-        <button id="chat-toggle">💬</button>
-        <button id="menu-toggle">☰</button>
+        <button id="chat-toggle" style="display: none;">💬</button>
+        <button id="menu-toggle" style="display: none;">☰</button>
 
         <!-- Chat Panel -->
         <div id="chat-panel" class="chat-hidden">
@@ -550,7 +550,7 @@
                             // 신규 버전 발견 시 업데이트 체크
                             reg.onupdatefound = () => {
                                 const installingWorker = reg.installing;
-                                installinonsnge = () => {
+                                installingWorker.onstatechange = () => {
                                     if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                         // 새로운 서비스워커가 설치되었음을 사용자에게 알리거나 자동 새로고침
                                         console.log('New version available. Reloading...');

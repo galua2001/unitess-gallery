@@ -34,9 +34,10 @@ class UnitessGalleryApp {
         this.hexagonNeedsUpdate = true;
         this.strokeWidth = 2;
         this.masterStrokeColor = '#ff0000';
+        this.currentTileBgColor = '#ffffff';
         this.showLabels = true;
         this.showCanvasGrid = true;
-        this.currentLang = 'ko';
+        this.currentLang = 'en';
         this.currentPatternText = {
             13: "합성 변환을 통해 X축 대칭 무늬를 형성하는 복합 패턴입니다."
         };
@@ -57,7 +58,7 @@ class UnitessGalleryApp {
                 mode_learn: "Learn",
                 menu_stroke: "Stroke Style",
                 label_width: "Width",
-                label_color: "Color (Master)",
+                label_color: "Background",
                 menu_modes: "Polygons",
                 menu_view: "View",
                 btn_reset_view: "Reset",
@@ -77,7 +78,7 @@ class UnitessGalleryApp {
                 mode_falling: "Falling Game",
                 print_space_title: "My Print Space",
                 move_and_save: "🖨️",
-                btn_original_share: "Original Share",
+                btn_original_share: "Shared Gallery",
                 sort_newest: "Newest",
                 sort_hearts: "Hearts",
                 share_title: "Share Original",
@@ -95,7 +96,7 @@ class UnitessGalleryApp {
                 mode_learn: "학습",
                 menu_stroke: "브러쉬",
                 label_width: "굵기",
-                label_color: "색상",
+                label_color: "배경색",
                 menu_view: "보기",
                 btn_reset_view: "초기화",
                 btn_toggle_labels: "레이블",
@@ -114,7 +115,7 @@ class UnitessGalleryApp {
                 mode_falling: "낙하 게임",
                 print_space_title: "나의 프린트 공간",
                 move_and_save: "🖨️",
-                btn_original_share: "원본공유",
+                btn_original_share: "공유 갤러리",
                 sort_newest: "최신순",
                 sort_hearts: "하트순",
                 share_title: "원본 공유하기",
@@ -504,10 +505,22 @@ class UnitessGalleryApp {
         layout.forEach((pos, index) => {
             const gridId = index + 1; // Sequential 1-26 for grouping
 
+            let groupColor = '#ffffff';
+            if (gridId === 1) groupColor = '#FF5555';
+            else if (gridId === 2) groupColor = '#55FF55';
+            else if (gridId >= 3 && gridId <= 4) groupColor = '#5555FF';
+            else if (gridId >= 5 && gridId <= 6) groupColor = '#FFFF55';
+            else if (gridId >= 7 && gridId <= 10) groupColor = '#FF55FF';
+            else if (gridId >= 11 && gridId <= 12) groupColor = '#55FFFF';
+            else if (gridId >= 13 && gridId <= 16) groupColor = '#FFAA00';
+            else if (gridId >= 17 && gridId <= 20) groupColor = '#AA55FF';
+            else if (gridId >= 21 && gridId <= 26) groupColor = '#00FF99';
+
             const gridDiv = document.createElement('div');
             gridDiv.className = `mini-grid grid-item col-${pos.c}`;
             gridDiv.style.gridRow = pos.r + 1;
             gridDiv.style.gridColumn = pos.c + 1;
+            gridDiv.style.border = `4px solid ${groupColor}`;
 
             // Add Pattern Label (Replacing Number)
             const label = document.createElement('div');
@@ -1409,13 +1422,26 @@ class UnitessGalleryApp {
                     const cw = tile.canvas.width;
                     const ch = tile.canvas.height;
                     ctx.clearRect(0, 0, cw, ch);
+                    
+                    // Fill pattern background with user selected color
+                    ctx.fillStyle = this.currentTileBgColor;
+                    ctx.fillRect(0, 0, cw, ch);
+
                     ctx.save();
                     ctx.translate(cw / 2, ch / 2);
                     ctx.rotate(tile.rule.rotation * Math.PI / 180);
                     ctx.scale(tile.rule.scaleX, tile.rule.scaleY);
                     ctx.translate(-cw / 2, -ch / 2);
-                    this.drawStrokes(ctx, cw, ch, groupColor);
+                    this.drawStrokes(ctx, cw, ch, '#ff0000');
                     ctx.restore();
+
+                    if (this.showLabels) {
+                        ctx.save();
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(0, 0, cw, ch);
+                        ctx.restore();
+                    }
                 });
             });
             this.galleryNeedsUpdate = false;
@@ -1544,13 +1570,23 @@ class UnitessGalleryApp {
         if (toggleGridBtn) toggleGridBtn.onclick = () => {
             this.showLabels = !this.showLabels;
             document.body.classList.toggle('labels-hidden', !this.showLabels);
+            this.galleryNeedsUpdate = true;
             this.triangleNeedsUpdate = true;
             this.hexagonNeedsUpdate = true;
         };
 
-        const toggleCanvasGridBtn = document.getElementById('toggle-canvas-grid');
-        if (toggleCanvasGridBtn) toggleCanvasGridBtn.onclick = () => {
-            this.showCanvasGrid = !this.showCanvasGrid;
+        const strokeColorBtn = document.getElementById('strokeColor');
+        if (strokeColorBtn) strokeColorBtn.oninput = (e) => {
+            this.currentTileBgColor = e.target.value;
+            
+            // Update master square background
+            document.documentElement.style.setProperty('--tile-bg', e.target.value);
+            const ms = document.querySelector('.master-square');
+            if (ms) ms.style.backgroundColor = e.target.value;
+            
+            this.galleryNeedsUpdate = true;
+            this.triangleNeedsUpdate = true;
+            this.hexagonNeedsUpdate = true;
         };
 
         // Appearance (Safely check if tileBgColor exists, though it was removed from UI)
@@ -3038,6 +3074,11 @@ class UnitessGalleryApp {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
+            // Draw Outer Pattern Border
+            ctx.strokeStyle = patternColor;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(4, 4, w - 8, h - 8);
+
             let idCounter = 1;
 
             if (type === 'triangle') {
@@ -3069,6 +3110,18 @@ class UnitessGalleryApp {
                         ctx.save();
                         this.applyAppendixSymmetry(ctx, grid.id, type, currentTileIdx, isInverted ? 1 : 0);
 
+                        // Fill Triangle Background with user selected color
+                        ctx.save();
+                        if (isInverted) ctx.rotate(Math.PI);
+                        ctx.fillStyle = this.currentTileBgColor;
+                        ctx.beginPath();
+                        ctx.moveTo(0, -triH * 2 / 3);
+                        ctx.lineTo(size / 2, triH / 3);
+                        ctx.lineTo(-size / 2, triH / 3);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+
                         if (isInverted) {
                             ctx.rotate(Math.PI);
                         }
@@ -3081,14 +3134,14 @@ class UnitessGalleryApp {
 
                         // Increased stroke width for better visibility on high-res
                         const scaledWidth = (this.strokeWidth * 0.8) / ((scaleFactorX + scaleFactorY) / 2);
-                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, Math.max(scaledWidth, 0.04));
+                        this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, '#ff0000', Math.max(scaledWidth, 0.04));
                         ctx.restore();
 
                         // 2. Draw Faint Border (If labels toggled)
                         if (this.showLabels) {
                             ctx.save();
                             if (isInverted) ctx.rotate(Math.PI);
-                            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
                             ctx.lineWidth = 1;
                             ctx.beginPath();
                             ctx.moveTo(0, -triH * 2 / 3);
@@ -3151,11 +3204,11 @@ class UnitessGalleryApp {
                     }
                     ctx.closePath();
 
-                    // ctx.fillStyle = `rgba(0,0,0,${bgAlpha})`;
-                    // ctx.fill();
+                    ctx.fillStyle = this.currentTileBgColor;
+                    ctx.fill();
 
                     if (this.showLabels) {
-                        ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
                         ctx.lineWidth = 1;
                         ctx.stroke();
                     }
@@ -3166,7 +3219,7 @@ class UnitessGalleryApp {
                     ctx.translate(-size, -size);
                     // Increased stroke width multiplier for hexagon thumbnails
                     const hexStrokeWidth = this.strokeWidth * 0.8;
-                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, hexStrokeWidth);
+                    this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, '#ff0000', hexStrokeWidth);
                     ctx.restore();
 
                     // 3. Draw ID Label (If toggled)

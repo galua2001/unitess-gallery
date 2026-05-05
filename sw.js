@@ -1,11 +1,13 @@
-const CACHE_NAME = 'unitess-gallery-v11';
+const CACHE_NAME = 'unitess-gallery-v12';
 const urlsToCache = [
     './',
     './index.html',
     './style.css',
     './script.js',
     './manifest.json',
-    './image.png'
+    './image.png',
+    './eraser.png',
+    './brush.png'
 ];
 
 self.addEventListener('install', event => {

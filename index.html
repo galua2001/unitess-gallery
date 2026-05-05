@@ -23,9 +23,11 @@
                     <canvas id="master-canvas"></canvas>
                 </div>
 
-                <!-- Floating Clear Button on Square -->
-                <button id="floating-clear" title="Clear Canvas">✕</button>
-                <button id="floating-share-square" class="floating-share-btn" title="Share Original">🌍</button>
+                <div class="floating-controls top-right">
+                    <button id="floating-clear" title="Clear Canvas">✕</button>
+                    <button id="floating-eraser" title="Eraser Mode">🧽</button>
+                    <button id="floating-share-square" class="floating-share-btn" title="Share Original">🌍</button>
+                </div>
             </div>
 
             <!-- Mini Grids will be injected here (26 total) -->
@@ -158,7 +160,10 @@
                     <h3 class="learn-area-label">원본 (Original)</h3>
                     <div class="learn-canvas-container">
                         <canvas id="learn-master-canvas"></canvas>
-                        <button id="learn-clear" class="learn-floating-clear" title="Clear Canvas">✕</button>
+                        <div class="floating-controls top-right">
+                            <button id="learn-clear" title="Clear Canvas">✕</button>
+                            <button id="learn-eraser" title="Eraser Mode">🧽</button>
+                        </div>
                         <div class="learn-pattern-id" id="current-pattern-id">1</div>
                     </div>
                 </div>
@@ -404,10 +409,11 @@
                             <canvas id="triangle-master-canvas"></canvas>
                         </div>
                         <div class="shape-label-tag">Master Triangle</div>
-                        <button id="clear-triangle-draw" class="appendix-clear-btn-outer"
-                            title="Clear Drawing">✕</button>
-                        <button id="floating-share-triangle" class="appendix-share-btn-outer"
-                            title="Share Original">🌍</button>
+                        <div class="floating-controls top-right appendix-controls">
+                            <button id="clear-triangle-draw" title="Clear Drawing">✕</button>
+                            <button id="triangle-eraser" title="Eraser Mode">🧽</button>
+                            <button id="floating-share-triangle" title="Share Original">🌍</button>
+                        </div>
                     </div>
                 </div>
                 <div id="triangle-gallery-grid" class="shape-grid triangle-grid">
@@ -441,10 +447,11 @@
                             <canvas id="hexagon-master-canvas"></canvas>
                         </div>
                         <div class="shape-label-tag">Master Hexagon</div>
-                        <button id="clear-hexagon-draw" class="appendix-clear-btn-outer"
-                            title="Clear Drawing">✕</button>
-                        <button id="floating-share-hexagon" class="appendix-share-btn-outer"
-                            title="Share Original">🌍</button>
+                        <div class="floating-controls top-right appendix-controls">
+                            <button id="clear-hexagon-draw" title="Clear Drawing">✕</button>
+                            <button id="hexagon-eraser" title="Eraser Mode">🧽</button>
+                            <button id="floating-share-hexagon" title="Share Original">🌍</button>
+                        </div>
                     </div>
                 </div>
                 <div id="hexagon-gallery-grid" class="shape-grid hexagon-grid">

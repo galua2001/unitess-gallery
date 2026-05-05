@@ -18,6 +18,7 @@ class UnitessGalleryApp {
         this.learnInitialTouchDist = null;
         this.learnInitialScale = 1;
         this.isDrawing = false;
+        this.isEraserMode = false;
 
         // View State (Zoom/Pan)
         this.scale = 0.9; // 시작 시 화면을 더 꽉 채우도록 변경
@@ -520,7 +521,21 @@ class UnitessGalleryApp {
             gridDiv.className = `mini-grid grid-item col-${pos.c}`;
             gridDiv.style.gridRow = pos.r + 1;
             gridDiv.style.gridColumn = pos.c + 1;
-            gridDiv.style.border = `4px solid ${groupColor}`;
+            gridDiv.style.border = `1px solid rgba(0, 0, 0, 0.15)`;
+
+            // 왼쪽 상단 꼭지점 표식 추가
+            const cornerMarker = document.createElement('div');
+            cornerMarker.className = 'corner-marker';
+            cornerMarker.style.position = 'absolute';
+            cornerMarker.style.top = '0';
+            cornerMarker.style.left = '0';
+            cornerMarker.style.width = '0';
+            cornerMarker.style.height = '0';
+            cornerMarker.style.borderTop = `15px solid ${groupColor}`;
+            cornerMarker.style.borderRight = '15px solid transparent';
+            cornerMarker.style.zIndex = '10';
+            cornerMarker.style.pointerEvents = 'none';
+            gridDiv.appendChild(cornerMarker);
 
             // Add Pattern Label (Replacing Number)
             const label = document.createElement('div');
@@ -1288,7 +1303,11 @@ class UnitessGalleryApp {
             this.galleryNeedsUpdate = true;
             const pos = getPos(e);
             const targetStrokes = this.isLearnMode ? this.learnStrokes : this.strokes;
-            targetStrokes.push({ points: [pos] });
+            targetStrokes.push({ 
+                points: [pos], 
+                type: this.isEraserMode ? 'eraser' : 'stroke',
+                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth // Eraser is slightly wider
+            });
         };
 
         const moveDrawing = (e) => {
@@ -1314,10 +1333,28 @@ class UnitessGalleryApp {
         window.addEventListener('touchmove', moveDrawing, { passive: false });
         window.addEventListener('touchend', stopDrawing);
 
+        // Toggle Eraser Mode
+        const toggleEraser = () => {
+            this.isEraserMode = !this.isEraserMode;
+            document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
+                btn.classList.toggle('active', this.isEraserMode);
+            });
+            // Also change cursor to indicate mode
+            const canvases = [this.masterCanvas, this.learnMasterCanvas, document.getElementById('triangle-master-canvas'), document.getElementById('hexagon-master-canvas')];
+            canvases.forEach(c => {
+                if(c) c.style.cursor = this.isEraserMode ? 'cell' : 'crosshair';
+            });
+        };
+
+        document.getElementById('floating-eraser').onclick = (e) => { e.stopPropagation(); toggleEraser(); };
+        const learnEraser = document.getElementById('learn-eraser');
+        if (learnEraser) learnEraser.onclick = (e) => { e.stopPropagation(); toggleEraser(); };
+
         // Clear buttons
         document.getElementById('floating-clear').onclick = (e) => {
             e.stopPropagation();
             this.strokes = [];
+            this.galleryNeedsUpdate = true;
         };
         const squareShare = document.getElementById('floating-share-square');
         if (squareShare) squareShare.onclick = (e) => {
@@ -1327,6 +1364,7 @@ class UnitessGalleryApp {
         document.getElementById('learn-clear').onclick = (e) => {
             e.stopPropagation();
             this.learnStrokes = [];
+            this.galleryNeedsUpdate = true;
         };
     }
 
@@ -2643,13 +2681,21 @@ class UnitessGalleryApp {
             return;
         }
 
-        ctx.strokeStyle = (ctx === this.masterCtx || ctx === this.learnMasterCtx || color === this.masterStrokeColor) ? this.masterStrokeColor : color;
-        ctx.lineWidth = this.strokeWidth;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 
         sourceStrokes.forEach(stroke => {
             if (stroke.points.length < 2) return;
+            
+            ctx.save();
+            if (stroke.type === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = (stroke.width || this.strokeWidth * 3) * (w / this.masterCanvas.width);
+            } else {
+                ctx.strokeStyle = (ctx === this.masterCtx || ctx === this.learnMasterCtx || color === this.masterStrokeColor) ? this.masterStrokeColor : color;
+                ctx.lineWidth = (stroke.width || this.strokeWidth) * (w / this.masterCanvas.width);
+            }
+
             ctx.beginPath();
             ctx.moveTo(stroke.points[0].x * w, stroke.points[0].y * h);
 
@@ -2662,6 +2708,7 @@ class UnitessGalleryApp {
             const last = stroke.points[stroke.points.length - 1];
             ctx.lineTo(last.x * w, last.y * h);
             ctx.stroke();
+            ctx.restore();
         });
         ctx.restore();
     }
@@ -2730,8 +2777,6 @@ class UnitessGalleryApp {
     static _drawStrokesOntoCanvasHelper(ctx, w, h, strokes, color, width) {
         if (!strokes || strokes.length === 0) return;
         ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = width;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 
@@ -2739,10 +2784,16 @@ class UnitessGalleryApp {
             const pts = stroke.points || stroke;
             if (!pts || pts.length < 2) return;
 
+            ctx.save();
+            if (stroke.type === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = (stroke.width || width * 3);
+            } else {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = (stroke.width || width);
+            }
+
             ctx.beginPath();
-            // normalized mapping: [0, 1] -> [0, w] or centered
-            // The drawing is intended to be centered around (0.5, 0.5)
-            // but we just map [0,1] to [0,w] directly for simplicity in master.
             ctx.moveTo(pts[0].x * w, pts[0].y * h);
             for (let i = 1; i < pts.length - 1; i++) {
                 const x1 = pts[i].x * w;
@@ -2755,6 +2806,7 @@ class UnitessGalleryApp {
             }
             ctx.lineTo(pts[pts.length - 1].x * w, pts[pts.length - 1].y * h);
             ctx.stroke();
+            ctx.restore();
         });
         ctx.restore();
     }
@@ -2818,7 +2870,11 @@ class UnitessGalleryApp {
             if (e.touches && e.touches.length > 1) return; // Multi-touch handled by Zoom/Pan logic
 
             drawing = true;
-            strokes.push({ points: [] });
+            strokes.push({ 
+                points: [], 
+                type: this.isEraserMode ? 'eraser' : 'stroke',
+                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth
+            });
             addPoint(e);
         };
 
@@ -2865,6 +2921,22 @@ class UnitessGalleryApp {
                 strokes.length = 0; // Clear the array
                 if (type === 'triangle') this.triangleNeedsUpdate = true;
                 else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
+            };
+        }
+
+        const eraserBtnId = type === 'triangle' ? 'triangle-eraser' : 'hexagon-eraser';
+        const eraserBtn = document.getElementById(eraserBtnId);
+        if (eraserBtn) {
+            eraserBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.isEraserMode = !this.isEraserMode;
+                document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
+                    btn.classList.toggle('active', this.isEraserMode);
+                });
+                const canvases = [this.masterCanvas, this.learnMasterCanvas, document.getElementById('triangle-master-canvas'), document.getElementById('hexagon-master-canvas')];
+                canvases.forEach(c => {
+                    if(c) c.style.cursor = this.isEraserMode ? 'cell' : 'crosshair';
+                });
             };
         }
 
@@ -3074,10 +3146,19 @@ class UnitessGalleryApp {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
-            // Draw Outer Pattern Border
-            ctx.strokeStyle = patternColor;
-            ctx.lineWidth = 8;
-            ctx.strokeRect(4, 4, w - 8, h - 8);
+            // 테두리를 얇고 연하게 변경
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(2, 2, w - 4, h - 4);
+
+            // 왼쪽 상단 꼭지점 표식 추가 (삼각형)
+            ctx.fillStyle = patternColor;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(40, 0);
+            ctx.lineTo(0, 40);
+            ctx.closePath();
+            ctx.fill();
 
             let idCounter = 1;
 

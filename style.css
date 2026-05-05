@@ -63,7 +63,7 @@ body {
     border: 3px solid var(--accent-color);
     border-radius: 12px;
     background: white;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .master-square {
@@ -78,50 +78,75 @@ body {
     /* 연필 대용으로 정밀한 십자 포인터 사용 */
 }
 
-#floating-clear {
+.floating-controls {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.1);
-    border: none;
+    display: flex;
+    gap: 5px;
+    z-index: 25;
+}
+
+.floating-controls.top-right {
+    top: -38px; /* Position above the container */
+    right: 0px;
+}
+
+.floating-controls button {
+    width: 32px; /* Slightly larger for easier clicking */
+    height: 32px;
+    border-radius: 8px; /* Square-ish buttons for a toolbar look */
+    background: white;
+    border: 2px solid #ddd;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 20;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+.floating-controls button:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
 
-/* Floating Master Share Buttons */
-.floating-share-btn,
-.appendix-share-btn-outer {
-    position: absolute;
-    top: 34px;
-    /* below Clear (5+24+5) */
-    right: 5px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(230, 126, 34, 0.4);
+.floating-controls button.active {
+    background: #e74c3c;
+    color: white;
+    border-color: #c0392b;
+}
+
+#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser {
+    background-image: url('eraser.png');
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: transparent; /* Hide the emoji text */
+    background-color: white;
+}
+
+#floating-eraser.active, #learn-eraser.active, #triangle-eraser.active, #hexagon-eraser.active {
+    background-image: url('brush.png');
+    background-color: #e74c3c;
+}
+
+#floating-share-square,
+#floating-share-triangle,
+#floating-share-hexagon {
+    background: rgba(230, 126, 34, 0.8);
     color: white;
     border: none;
-    cursor: pointer;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 20;
-    transition: all 0.2s;
 }
 
-.floating-share-btn:hover,
-.appendix-share-btn-outer:hover {
-    background: rgba(230, 126, 34, 0.8);
-    transform: scale(1.1);
+#floating-share-square:hover,
+#floating-share-triangle:hover,
+#floating-share-hexagon:hover {
+    background: rgba(230, 126, 34, 1);
+}
+
+.learn-floating-clear {
+    display: none; /* Removed in favor of floating-controls */
 }
 
 /* Grid Tiles */
@@ -860,6 +885,8 @@ body {
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
+    /* overflow: visible; */
+    /* margin-top: 40px; removed to keep square */
 }
 
 .learn-canvas-container canvas {
@@ -1788,11 +1815,12 @@ body {
     border: 3px solid var(--accent-color);
     border-radius: 12px;
     background: white;
-    overflow: hidden;
+    /* overflow: visible; */
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* margin-top: 40px; removed to keep square */
 }
 
 .master-shape-wrapper {
@@ -1806,6 +1834,7 @@ body {
     box-shadow: none;
     background: transparent;
     border-radius: 0;
+    /* overflow: visible; */
 }
 
 /* Geometric Clip Paths REMOVED to allow full grid display */

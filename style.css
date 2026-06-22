@@ -853,6 +853,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .learn-content {
@@ -1774,9 +1775,10 @@ body {
     background-color: var(--bg-color);
     /* Matches Square Bg */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    padding: 20px;
+    padding: 30px;
     position: fixed;
     top: 0;
     left: 0;

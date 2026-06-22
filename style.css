@@ -854,6 +854,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
     width: 100%;
+    margin-top: 15px; /* 약간 아래로 배치하여 모바일 상단 바에 가려지지 않게 함 */
 }
 
 .learn-content {
@@ -1785,7 +1786,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: auto;
-    z-index: 10;
+    z-index: 2500; /* 메뉴바(z-index: 1000) 위로 노출되도록 z-index 변경 */
 }
 
 #triangle-gallery-overlay .appendix-content {

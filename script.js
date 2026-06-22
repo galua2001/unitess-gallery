@@ -465,6 +465,35 @@ class UnitessGalleryApp {
                 this.renderSharedGallery();
             }
         }, 500);
+        this.setupScreenOrientation();
+    }
+
+    setupScreenOrientation() {
+        const handleOrientationChange = () => {
+            const portraitNotice = document.getElementById('portrait-notice');
+            if (portraitNotice) {
+                const isPortrait = window.innerHeight > window.innerWidth;
+                if (isPortrait && window.innerWidth < 1024) {
+                    portraitNotice.style.display = 'flex';
+                } else {
+                    portraitNotice.style.display = 'none';
+                }
+            }
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+        };
+
+        window.addEventListener('resize', handleOrientationChange);
+        window.addEventListener('orientationchange', handleOrientationChange);
+        
+        document.addEventListener('click', () => {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+        }, { once: true });
+        
+        handleOrientationChange();
     }
 
     setupMasterCanvas() {

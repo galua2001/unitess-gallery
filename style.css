@@ -2217,8 +2217,55 @@ body {
     filter: brightness(1.1);
 }
 
-/* Visibility Toggles */
 .labels-hidden .grid-label,
 .labels-hidden .shape-id-tag {
     display: none !important;
+}
+
+/* Portrait orientation notice overlay */
+#portrait-notice {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(43, 69, 112, 0.98);
+    color: white;
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+}
+
+#portrait-notice p {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 0 20px;
+    word-break: keep-all;
+}
+
+#portrait-notice .sub-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+#portrait-notice .phone-icon {
+    font-size: 3.5rem;
+    animation: rotatePhone 2s infinite ease-in-out;
+}
+
+@keyframes rotatePhone {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@media screen and (max-width: 1024px) and (orientation: portrait) {
+    #portrait-notice {
+        display: flex;
+    }
 }

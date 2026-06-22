@@ -147,12 +147,12 @@
         <!-- Learn Mode Overlay -->
         <div id="learn-mode-overlay" class="mode-overlay hidden">
             <div class="learn-header">
-                <div class="header-left">
+                <div class="header-left" style="display:flex; align-items:center; gap: 15px;">
+                    <button id="exit-learn" class="exit-btn">← 이전 (Back)</button>
                     <h1 data-i18n="mode_learn">Learn</h1>
                     <button id="show-general-explain" class="explain-guide-btn" data-i18n="btn_show_guide">설명
                         (Guide)</button>
                 </div>
-                <button id="exit-learn" class="exit-btn">✕</button>
             </div>
             <div class="learn-content">
                 <!-- Left: Master Drawing Area -->
@@ -331,13 +331,13 @@
         <!-- Quiz Mode Overlay -->
         <div id="quiz-mode-overlay" class="mode-overlay hidden">
             <div class="learn-header">
-                <div class="header-left">
+                <div class="header-left" style="display:flex; align-items:center; gap: 15px;">
+                    <button id="exit-quiz" class="exit-btn">← 이전 (Back)</button>
                     <h1 data-i18n="mode_quiz">Quiz Game</h1>
                     <div class="quiz-status">
                         <p id="quiz-score-display">Score: <span id="quiz-score">0</span></p>
                     </div>
                 </div>
-                <button id="exit-quiz" class="exit-btn">✕</button>
             </div>
 
             <div class="quiz-content">
@@ -370,7 +370,8 @@
         <!-- Falling Game Overlay -->
         <div id="falling-game-overlay" class="mode-overlay hidden">
             <div class="learn-header">
-                <div class="header-left">
+                <div class="header-left" style="display:flex; align-items:center; gap: 15px; flex-wrap: wrap;">
+                    <button id="exit-falling" class="exit-btn">← 이전 (Back)</button>
                     <h1 data-i18n="mode_falling">Falling Squares</h1>
                     <div class="falling-controls">
                         <div class="score-box">Score: <span id="falling-score">0</span></div>
@@ -387,7 +388,6 @@
                     <span class="guide-text">* 왼쪽 클릭: 90도 회전 / 오른쪽 클릭: Y축 대칭(좌우 반전)</span>
                     <span class="draw-tip">💡 '학습(Learn)' 모에서 나만의 캐릭터를 그리면 게임에 나타납니다!</span>
                 </div>
-                <button id="exit-falling" class="exit-btn">✕</button>
             </div>
             <div id="falling-game-board">
                 <!-- Falling squares will be spawned here -->
@@ -397,10 +397,10 @@
         <!-- Appendix: Triangle Gallery Overlay -->
         <div id="triangle-gallery-overlay" class="mode-overlay hidden">
             <div class="learn-header">
-                <div class="header-left">
+                <div class="header-left" style="display:flex; align-items:center; gap: 15px;">
+                    <button id="exit-triangle" class="exit-btn">← 이전 (Back)</button>
                     <h1 data-i18n="mode_triangle">Triangle Gallery (Appendix)</h1>
                 </div>
-                <button id="exit-triangle" class="exit-btn">✕</button>
             </div>
             <div class="appendix-content">
                 <div class="appendix-master-area">
@@ -435,10 +435,10 @@
         <!-- Appendix: Hexagon Gallery Overlay -->
         <div id="hexagon-gallery-overlay" class="mode-overlay hidden">
             <div class="learn-header">
-                <div class="header-left">
+                <div class="header-left" style="display:flex; align-items:center; gap: 15px;">
+                    <button id="exit-hexagon" class="exit-btn">← 이전 (Back)</button>
                     <h1 data-i18n="mode_hexagon">Hexagon Gallery (Appendix)</h1>
                 </div>
-                <button id="exit-hexagon" class="exit-btn">✕</button>
             </div>
             <div class="appendix-content">
                 <div class="appendix-master-area">
@@ -474,14 +474,14 @@
         <div id="original-share-overlay" class="mode-overlay hidden">
             <div class="learn-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <div class="header-left">
+                    <div class="header-left" style="display:flex; align-items:center; gap: 15px;">
+                        <button id="exit-share" class="exit-btn">← 이전 (Back)</button>
                         <h1 data-i18n="btn_original_share">원본공유</h1>
                         <div class="share-sort-controls">
                             <button class="sort-btn active" data-sort="time" data-i18n="sort_newest">최신순</button>
                             <button class="sort-btn" data-sort="heart" data-i18n="sort_hearts">하트순</button>
                         </div>
                     </div>
-                    <button id="exit-share" class="exit-btn">✕</button>
                 </div>
                 <!-- 도형 필터 버튼 영역 + 검색 창 -->
                 <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">

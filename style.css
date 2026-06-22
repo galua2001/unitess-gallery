@@ -1786,12 +1786,6 @@ body {
     z-index: 10;
 }
 
-#triangle-gallery-overlay .learn-header,
-#hexagon-gallery-overlay .learn-header {
-    display: none !important;
-    /* Hide exit button and header */
-}
-
 #triangle-gallery-overlay .appendix-content {
     grid-template-columns: repeat(4, 140px);
 }
@@ -2268,4 +2262,31 @@ body {
     #portrait-notice {
         display: flex;
     }
+}
+
+/* Back button styling */
+.exit-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.exit-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-4px); /* Slide left slightly to indicate going back */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.exit-btn:active {
+    transform: translateX(-2px) scale(0.97);
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'unitess-gallery-v16';
+const CACHE_NAME = 'unitess-gallery-v17';
 const urlsToCache = [
     './',
     './index.html',

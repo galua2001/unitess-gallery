@@ -416,9 +416,10 @@ class UnitessGalleryApp {
         }
 
         // 2. Firebase 데이터 로딩 및 병합
+        const likedIds = JSON.parse(localStorage.getItem('unitess_liked') || '[]');
+        let firebasePatterns = [];
+        
         try {
-            const likedIds = JSON.parse(localStorage.getItem('unitess_liked') || '[]');
-            let firebasePatterns = [];
             if (this.useFirebase) {
                 const snap = await window.db.collection('shares')
                     .orderBy('time', 'desc').limit(300).get();
@@ -435,65 +436,65 @@ class UnitessGalleryApp {
                 }));
                 console.log(`🔥 Firebase에서 ${firebasePatterns.length}개 작품 로드 성공`);
             }
-
-            // 병합 및 중복 제거
-            const patternMap = new Map();
-            this.sharedPatterns.forEach(p => {
-                patternMap.set(String(p.id), p);
-            });
-            firebasePatterns.forEach(p => {
-                patternMap.set(String(p.id), p);
-            });
-
-            this.sharedPatterns = Array.from(patternMap.values());
-            this.sharedPatterns.sort((a, b) => b.time - a.time);
-
-            // 최초 진입 시 데이터가 아예 없을 때 유저 혼란 방지를 위해 고품질 예시 샘플 자동 탑재
-            if (this.sharedPatterns.length === 0) {
-                const now = Date.now();
-                this.sharedPatterns = [
-                    {
-                        id: "sample_square_default",
-                        name: "사각형 대칭 꽃 (샘플)",
-                        img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23fff'/><circle cx='100' cy='100' r='45' fill='none' stroke='%233498db' stroke-width='8'/><path d='M100 10 L100 190 M10 100 L190 100' stroke='%23e74c3c' stroke-width='4'/></svg>",
-                        hearts: 15,
-                        time: now,
-                        type: "square",
-                        patternId: 1,
-                        strokes: [
-                            { points: [{x: 0.5, y: 0.1}, {x: 0.5, y: 0.9}], type: "stroke", width: 3, color: "#e74c3c" },
-                            { points: [{x: 0.1, y: 0.5}, {x: 0.9, y: 0.5}], type: "stroke", width: 3, color: "#e74c3c" }
-                        ],
-                        liked: false
-                    },
-                    {
-                        id: "sample_triangle_default",
-                        name: "삼각형 대칭 별 (샘플)",
-                        img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23fff'/><polygon points='100,20 180,160 20,160' fill='none' stroke='%232ecc71' stroke-width='6'/></svg>",
-                        hearts: 11,
-                        time: now - 60000,
-                        type: "triangle",
-                        patternId: 1,
-                        strokes: [
-                            { points: [{x: 0.5, y: 0.2}, {x: 0.8, y: 0.8}, {x: 0.2, y: 0.8}, {x: 0.5, y: 0.2}], type: "stroke", width: 3, color: "#2ecc71" }
-                        ],
-                        liked: false
-                    }
-                ];
-            }
-
-            // 로컬 저장소 백업 업데이트
-            try {
-                localStorage.setItem('unitess_shared_local', JSON.stringify(this.sharedPatterns));
-            } catch (e) {
-                console.warn('LocalStorage 백업 저장 실패:', e);
-            }
-
-            this.renderSharedGallery();
-            console.log(`🔥 Firebase와 병합 완료. 총 ${this.sharedPatterns.length}개 작품 렌더링 및 캐시 저장`);
         } catch (e) {
-            console.warn('🔥 Firebase 로드 및 병합 실패:', e);
+            console.warn('🔥 Firebase 로드 실패 (로컬 및 샘플 데이터 유지):', e);
         }
+
+        // 3. 병합 및 중복 제거
+        const patternMap = new Map();
+        this.sharedPatterns.forEach(p => {
+            patternMap.set(String(p.id), p);
+        });
+        firebasePatterns.forEach(p => {
+            patternMap.set(String(p.id), p);
+        });
+
+        this.sharedPatterns = Array.from(patternMap.values());
+        this.sharedPatterns.sort((a, b) => b.time - a.time);
+
+        // 최초 진입 시 데이터가 아예 없을 때 유저 혼란 방지를 위해 고품질 예시 샘플 자동 탑재
+        if (this.sharedPatterns.length === 0) {
+            const now = Date.now();
+            this.sharedPatterns = [
+                {
+                    id: "sample_square_default",
+                    name: "사각형 대칭 꽃 (샘플)",
+                    img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23fff'/><circle cx='100' cy='100' r='45' fill='none' stroke='%233498db' stroke-width='8'/><path d='M100 10 L100 190 M10 100 L190 100' stroke='%23e74c3c' stroke-width='4'/></svg>",
+                    hearts: 15,
+                    time: now,
+                    type: "square",
+                    patternId: 1,
+                    strokes: [
+                        { points: [{x: 0.5, y: 0.1}, {x: 0.5, y: 0.9}], type: "stroke", width: 3, color: "#e74c3c" },
+                        { points: [{x: 0.1, y: 0.5}, {x: 0.9, y: 0.5}], type: "stroke", width: 3, color: "#e74c3c" }
+                    ],
+                    liked: false
+                },
+                {
+                    id: "sample_triangle_default",
+                    name: "삼각형 대칭 별 (샘플)",
+                    img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23fff'/><polygon points='100,20 180,160 20,160' fill='none' stroke='%232ecc71' stroke-width='6'/></svg>",
+                    hearts: 11,
+                    time: now - 60000,
+                    type: "triangle",
+                    patternId: 1,
+                    strokes: [
+                        { points: [{x: 0.5, y: 0.2}, {x: 0.8, y: 0.8}, {x: 0.2, y: 0.8}, {x: 0.5, y: 0.2}], type: "stroke", width: 3, color: "#2ecc71" }
+                    ],
+                    liked: false
+                }
+            ];
+        }
+
+        // 로컬 저장소 백업 업데이트
+        try {
+            localStorage.setItem('unitess_shared_local', JSON.stringify(this.sharedPatterns));
+        } catch (e) {
+            console.warn('LocalStorage 백업 저장 실패:', e);
+        }
+
+        this.renderSharedGallery();
+        console.log(`🔥 Firebase와 병합 완료. 총 ${this.sharedPatterns.length}개 작품 렌더링 및 캐시 저장`);
     }
 
     cyclePenColor() {

@@ -25,7 +25,8 @@
 
                 <div class="floating-controls top-right">
                     <button id="floating-clear" title="Clear Canvas">✕</button>
-                    <button id="floating-eraser" title="Eraser Mode">🧽</button>
+                    <button id="floating-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
+                    <button id="floating-eraser" title="지우개 (Eraser)">🩹</button>
                     <button id="floating-share-square" class="floating-share-btn" title="Share Original">🌍</button>
                 </div>
             </div>
@@ -162,7 +163,8 @@
                         <canvas id="learn-master-canvas"></canvas>
                         <div class="floating-controls top-right">
                             <button id="learn-clear" title="Clear Canvas">✕</button>
-                            <button id="learn-eraser" title="Eraser Mode">🧽</button>
+                            <button id="learn-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
+                            <button id="learn-eraser" title="지우개 (Eraser)">🩹</button>
                         </div>
                         <div class="learn-pattern-id" id="current-pattern-id">1</div>
                     </div>
@@ -411,7 +413,8 @@
                         <div class="shape-label-tag">Master Triangle</div>
                         <div class="floating-controls top-right appendix-controls">
                             <button id="clear-triangle-draw" title="Clear Drawing">✕</button>
-                            <button id="triangle-eraser" title="Eraser Mode">🧽</button>
+                            <button id="triangle-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
+                            <button id="triangle-eraser" title="지우개 (Eraser)">🩹</button>
                             <button id="floating-share-triangle" title="Share Original">🌍</button>
                         </div>
                     </div>
@@ -449,7 +452,8 @@
                         <div class="shape-label-tag">Master Hexagon</div>
                         <div class="floating-controls top-right appendix-controls">
                             <button id="clear-hexagon-draw" title="Clear Drawing">✕</button>
-                            <button id="hexagon-eraser" title="Eraser Mode">🧽</button>
+                            <button id="hexagon-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
+                            <button id="hexagon-eraser" title="지우개 (Eraser)">🩹</button>
                             <button id="floating-share-hexagon" title="Share Original">🌍</button>
                         </div>
                     </div>
@@ -544,7 +548,7 @@
         <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
         <script src="firebase-config.js"></script>
 
-        <script src="script_v17.js"></script>
+        <script src="script_v17.js?v=10"></script>
 
         <!-- PWA Service Worker Registration & Auto-Update -->
         <script>

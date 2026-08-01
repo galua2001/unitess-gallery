@@ -34,7 +34,7 @@ class UnitessGalleryApp {
         this.triangleNeedsUpdate = true;
         this.hexagonNeedsUpdate = true;
         this.strokeWidth = 2;
-        this.masterStrokeColor = '#ff0000';
+        this.masterStrokeColor = '#000000';
         this.currentTileBgColor = '#ffffff';
         this.showLabels = true;
         this.showCanvasGrid = true;
@@ -403,26 +403,103 @@ class UnitessGalleryApp {
     }
 
     async loadFromFirebase() {
+        // 1. 로컬 저장소 캐시 선행 로딩
+        try {
+            const cachedData = localStorage.getItem('unitess_shared_local');
+            if (cachedData) {
+                this.sharedPatterns = JSON.parse(cachedData);
+                this.renderSharedGallery();
+                console.log(`📦 LocalStorage 캐시에서 ${this.sharedPatterns.length}개 작품 선행 로드`);
+            }
+        } catch (e) {
+            console.warn('📦 LocalStorage 캐시 로드 실패:', e);
+        }
+
+        // 2. Firebase 데이터 로딩 및 병합
         try {
             const likedIds = JSON.parse(localStorage.getItem('unitess_liked') || '[]');
-            const snap = await window.db.collection('shares')
-                .orderBy('time', 'desc').limit(300).get();
-            this.sharedPatterns = snap.docs.map(doc => ({
-                id: doc.id,
-                img: doc.data().imageUrl,
-                name: doc.data().name,
-                hearts: doc.data().hearts || 0,
-                time: doc.data().time,
-                type: doc.data().type,
-                patternId: doc.data().patternId,
-                strokes: doc.data().strokes,
-                liked: likedIds.includes(doc.id)
-            }));
+            let firebasePatterns = [];
+            if (this.useFirebase) {
+                const snap = await window.db.collection('shares')
+                    .orderBy('time', 'desc').limit(300).get();
+                firebasePatterns = snap.docs.map(doc => ({
+                    id: doc.id,
+                    img: doc.data().imageUrl,
+                    name: doc.data().name,
+                    hearts: doc.data().hearts || 0,
+                    time: doc.data().time,
+                    type: doc.data().type,
+                    patternId: doc.data().patternId,
+                    strokes: doc.data().strokes,
+                    liked: likedIds.includes(doc.id)
+                }));
+                console.log(`🔥 Firebase에서 ${firebasePatterns.length}개 작품 로드 성공`);
+            }
+
+            // 병합 및 중복 제거
+            const patternMap = new Map();
+            this.sharedPatterns.forEach(p => {
+                patternMap.set(String(p.id), p);
+            });
+            firebasePatterns.forEach(p => {
+                patternMap.set(String(p.id), p);
+            });
+
+            this.sharedPatterns = Array.from(patternMap.values());
+            this.sharedPatterns.sort((a, b) => b.time - a.time);
+
+            // 로컬 저장소 백업 업데이트
+            try {
+                localStorage.setItem('unitess_shared_local', JSON.stringify(this.sharedPatterns));
+            } catch (e) {
+                console.warn('LocalStorage 백업 저장 실패:', e);
+            }
+
             this.renderSharedGallery();
-            console.log(`🔥 Firebase에서 ${this.sharedPatterns.length}개 작품 로드`);
+            console.log(`🔥 Firebase와 병합 완료. 총 ${this.sharedPatterns.length}개 작품 렌더링 및 캐시 저장`);
         } catch (e) {
-            console.warn('🔥 Firebase 로드 실패:', e);
+            console.warn('🔥 Firebase 로드 및 병합 실패:', e);
         }
+    }
+
+    cyclePenColor() {
+        const colors = ['#000000', '#2ecc71', '#3498db', '#e74c3c'];
+        let idx = colors.indexOf(this.masterStrokeColor);
+        if (idx === -1) {
+            idx = 0;
+        } else {
+            idx = (idx + 1) % colors.length;
+        }
+        const newColor = colors[idx];
+        this.masterStrokeColor = newColor;
+
+        // 🎨 색상 버튼의 테두리를 현재 펜 색상으로 표시
+        const penColorBtns = document.querySelectorAll('#floating-pen-color, #learn-pen-color, #triangle-pen-color, #hexagon-pen-color');
+        penColorBtns.forEach(btn => {
+            if (btn) btn.style.border = `2px solid ${newColor}`;
+        });
+
+        // 지우개 모드 해제 (색상 선택 시 자동으로 펜 모드로 전환)
+        if (this.isEraserMode) {
+            this.isEraserMode = false;
+            document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
+                if (btn) btn.style.border = '';
+            });
+        }
+
+        // 캔버스 강제 업데이트 플래그 설정
+        this.galleryNeedsUpdate = true;
+        this.triangleNeedsUpdate = true;
+        this.hexagonNeedsUpdate = true;
+    }
+
+    toggleEraser() {
+        this.isEraserMode = !this.isEraserMode;
+        // 지우개 버튼들의 테두리로 활성화 상태 표시
+        const eraserBtns = document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser');
+        eraserBtns.forEach(btn => {
+            if (btn) btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
+        });
     }
 
     init() {
@@ -436,6 +513,10 @@ class UnitessGalleryApp {
         this.setupFallingGameMode();
         this.setupDrawingSystem();
         this.setupAppendixGalleries();
+        // 색상 버튼 초기 테두리 색상 설정
+        document.querySelectorAll('#floating-pen-color, #learn-pen-color, #triangle-pen-color, #hexagon-pen-color').forEach(btn => {
+            if (btn) btn.style.border = `2px solid ${this.masterStrokeColor}`;
+        });
         this.updateLanguage();
         this.applyViewTransform();
         this.renderLoop();
@@ -1335,7 +1416,8 @@ class UnitessGalleryApp {
             targetStrokes.push({ 
                 points: [pos], 
                 type: this.isEraserMode ? 'eraser' : 'stroke',
-                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth // Eraser is slightly wider
+                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth,
+                color: this.masterStrokeColor  // 획별 현재 펜 색상 저장
             });
         };
 
@@ -1362,22 +1444,17 @@ class UnitessGalleryApp {
         window.addEventListener('touchmove', moveDrawing, { passive: false });
         window.addEventListener('touchend', stopDrawing);
 
-        // Toggle Eraser Mode
-        const toggleEraser = () => {
-            this.isEraserMode = !this.isEraserMode;
-            document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
-                btn.classList.toggle('active', this.isEraserMode);
-            });
-            // Also change cursor to indicate mode
-            const canvases = [this.masterCanvas, this.learnMasterCanvas, document.getElementById('triangle-master-canvas'), document.getElementById('hexagon-master-canvas')];
-            canvases.forEach(c => {
-                if(c) c.style.cursor = this.isEraserMode ? 'cell' : 'crosshair';
-            });
-        };
+        // 🎨 색상 변경 버튼 → cyclePenColor()
+        const floatingPenColor = document.getElementById('floating-pen-color');
+        if (floatingPenColor) floatingPenColor.onclick = (e) => { e.stopPropagation(); this.cyclePenColor(); };
+        const learnPenColor = document.getElementById('learn-pen-color');
+        if (learnPenColor) learnPenColor.onclick = (e) => { e.stopPropagation(); this.cyclePenColor(); };
 
-        document.getElementById('floating-eraser').onclick = (e) => { e.stopPropagation(); toggleEraser(); };
+        // 🩹 지우개 버튼 → toggleEraser()
+        const floatingEraser = document.getElementById('floating-eraser');
+        if (floatingEraser) floatingEraser.onclick = (e) => { e.stopPropagation(); this.toggleEraser(); };
         const learnEraser = document.getElementById('learn-eraser');
-        if (learnEraser) learnEraser.onclick = (e) => { e.stopPropagation(); toggleEraser(); };
+        if (learnEraser) learnEraser.onclick = (e) => { e.stopPropagation(); this.toggleEraser(); };
 
         // Clear buttons
         document.getElementById('floating-clear').onclick = (e) => {
@@ -1499,7 +1576,7 @@ class UnitessGalleryApp {
                     ctx.rotate(tile.rule.rotation * Math.PI / 180);
                     ctx.scale(tile.rule.scaleX, tile.rule.scaleY);
                     ctx.translate(-cw / 2, -ch / 2);
-                    this.drawStrokes(ctx, cw, ch, '#ff0000');
+                    this.drawStrokes(ctx, cw, ch, this.masterStrokeColor);  // 획별 고유 색상 사용
                     ctx.restore();
 
                     if (this.showLabels) {
@@ -1691,6 +1768,10 @@ class UnitessGalleryApp {
             const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
             overlays.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('original-share-overlay').classList.remove('hidden');
+            // 검색창 초기화 후 갤러리 전체 표시
+            this.shareSearchKeyword = '';
+            const searchInput = document.getElementById('share-search-input');
+            if (searchInput) searchInput.value = '';
             this.renderSharedGallery();
             document.getElementById('side-menu').classList.add('hidden');
         };
@@ -2721,7 +2802,7 @@ class UnitessGalleryApp {
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.lineWidth = (stroke.width || this.strokeWidth * 3) * (w / this.masterCanvas.width);
             } else {
-                ctx.strokeStyle = (ctx === this.masterCtx || ctx === this.learnMasterCtx || color === this.masterStrokeColor) ? this.masterStrokeColor : color;
+                ctx.strokeStyle = stroke.color || color || this.masterStrokeColor;
                 ctx.lineWidth = (stroke.width || this.strokeWidth) * (w / this.masterCanvas.width);
             }
 
@@ -2765,11 +2846,17 @@ class UnitessGalleryApp {
         ctx.setLineDash([]);
         ctx.fillStyle = this.masterStrokeColor;
         ctx.globalAlpha = 0.6; // Slightly more opaque dots
-        const dotSize = 6;
+        const dotSize = 3;
         ctx.beginPath(); ctx.arc(w / 2, 0, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(w / 2, h, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(0, h / 2, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(w, h / 2, dotSize, 0, Math.PI * 2); ctx.fill();
+
+        // 꼭지점 4개에도 중점과 동일한 크기의 점 추가
+        ctx.beginPath(); ctx.arc(0, 0, dotSize, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w, 0, dotSize, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0, h, dotSize, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w, h, dotSize, 0, Math.PI * 2); ctx.fill();
 
         ctx.restore();
     }
@@ -2824,7 +2911,8 @@ class UnitessGalleryApp {
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.lineWidth = isScaled ? ((stroke.width || (base * 3)) * ratio) : (stroke.width || width * 3);
             } else {
-                ctx.strokeStyle = color;
+                // 획별 고유 색상(stroke.color)을 우선 사용, 없으면 글로벌 color 사용
+                ctx.strokeStyle = stroke.color || color;
                 ctx.lineWidth = isScaled ? ((stroke.width || base) * ratio) : (stroke.width || width);
             }
 
@@ -2908,7 +2996,8 @@ class UnitessGalleryApp {
             strokes.push({ 
                 points: [], 
                 type: this.isEraserMode ? 'eraser' : 'stroke',
-                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth
+                width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth,
+                color: this.masterStrokeColor
             });
             addPoint(e);
         };
@@ -2959,19 +3048,23 @@ class UnitessGalleryApp {
             };
         }
 
+        // 🎨 색상 변경 버튼 연결
+        const penColorBtnId = type === 'triangle' ? 'triangle-pen-color' : 'hexagon-pen-color';
+        const penColorBtn = document.getElementById(penColorBtnId);
+        if (penColorBtn) {
+            penColorBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.cyclePenColor();
+            };
+        }
+
+        // 🩹 지우개 버튼 → toggleEraser 복원
         const eraserBtnId = type === 'triangle' ? 'triangle-eraser' : 'hexagon-eraser';
         const eraserBtn = document.getElementById(eraserBtnId);
         if (eraserBtn) {
             eraserBtn.onclick = (e) => {
                 e.stopPropagation();
-                this.isEraserMode = !this.isEraserMode;
-                document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
-                    btn.classList.toggle('active', this.isEraserMode);
-                });
-                const canvases = [this.masterCanvas, this.learnMasterCanvas, document.getElementById('triangle-master-canvas'), document.getElementById('hexagon-master-canvas')];
-                canvases.forEach(c => {
-                    if(c) c.style.cursor = this.isEraserMode ? 'cell' : 'crosshair';
-                });
+                this.toggleEraser();
             };
         }
 
@@ -3118,7 +3211,7 @@ class UnitessGalleryApp {
         ctx.save();
         ctx.fillStyle = '#ff4757';
         midpoints.forEach(pt => {
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2); ctx.fill();
             ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(255, 71, 87, 0.5)';
             ctx.strokeStyle = 'white'; ctx.lineWidth = 1; ctx.stroke();
         });
@@ -3996,10 +4089,22 @@ class UnitessGalleryApp {
             this.sharedPatterns.unshift(shareItem);
             this.pendingShare = null;
 
+            // 로컬 스토리지에 백업 저장
+            try {
+                localStorage.setItem('unitess_shared_local', JSON.stringify(this.sharedPatterns));
+                console.log('📦 LocalStorage 백업 저장 완료');
+            } catch (e) {
+                console.warn('LocalStorage 백업 저장 실패:', e);
+            }
+
             // Show shared gallery immediately
             const overlays = ['learn-mode-overlay', 'quiz-mode-overlay', 'falling-game-overlay', 'triangle-gallery-overlay', 'hexagon-gallery-overlay'];
             overlays.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('original-share-overlay').classList.remove('hidden');
+            // 저장 후 검색창 초기화 → 방금 저장한 항목 포함 전체 표시
+            this.shareSearchKeyword = '';
+            const searchInput = document.getElementById('share-search-input');
+            if (searchInput) searchInput.value = '';
             this.renderSharedGallery();
 
             // Notification
@@ -4083,9 +4188,16 @@ class UnitessGalleryApp {
         grid.innerHTML = '';
 
         if (sorted.length === 0) {
-            grid.innerHTML = `<div style="color:rgba(255,255,255,0.5); padding:40px; text-align:center; font-size:1.1rem;">
-                🔍 "<strong>${kw || ''}</strong>" 검색 결과가 없습니다.
-            </div>`;
+            if (kw) {
+                grid.innerHTML = `<div style="color:rgba(255,255,255,0.5); padding:40px; text-align:center; font-size:1.1rem;">
+                    🔍 "<strong>${kw}</strong>" 검색 결과가 없습니다.
+                </div>`;
+            } else {
+                grid.innerHTML = `<div style="color:rgba(255,255,255,0.5); padding:60px 40px; text-align:center; font-size:1.1rem; line-height:2;">
+                    🎨 아직 공유된 작품이 없습니다.<br>
+                    <span style="font-size:0.9rem; opacity:0.7;">그림을 그리고 🌍 버튼으로 첫 작품을 공유해보세요!</span>
+                </div>`;
+            }
             return;
         }
 

@@ -528,11 +528,12 @@ class UnitessGalleryApp {
     }
 
     updateEraserButtonsUI() {
+        console.log("🖌️ [Debug] updateEraserButtonsUI called. isEraserMode:", this.isEraserMode);
         const eraserBtns = document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser');
         eraserBtns.forEach(btn => {
             if (btn) {
                 // 지우개 모드 활성화 시 지우개 반창고(🩹) 모양, 비활성화(펜 모드) 시 붓(🖌️) 모양으로 변경
-                btn.textContent = this.isEraserMode ? '🩹' : '🖌️';
+                btn.innerHTML = this.isEraserMode ? '🩹' : '🖌️';
                 btn.title = this.isEraserMode ? '지우개 (Eraser)' : '붓 (Pen)';
                 btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
             }

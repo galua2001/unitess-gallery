@@ -585,6 +585,8 @@ body {
     padding: 10px 20px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap; /* 좁은 화면에서 자동으로 다음 줄로 넘어가도록 설정 */
+    row-gap: 10px;   /* 줄바꿈 시 세로 간격 추가 */
     align-items: center;
     justify-content: space-between;
     width: 100%;

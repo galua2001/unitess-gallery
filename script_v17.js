@@ -518,9 +518,7 @@ class UnitessGalleryApp {
         // 지우개 모드 해제 (색상 선택 시 자동으로 펜 모드로 전환)
         if (this.isEraserMode) {
             this.isEraserMode = false;
-            document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser').forEach(btn => {
-                if (btn) btn.style.border = '';
-            });
+            this.updateEraserButtonsUI();
         }
 
         // 캔버스 강제 업데이트 플래그 설정
@@ -529,13 +527,21 @@ class UnitessGalleryApp {
         this.hexagonNeedsUpdate = true;
     }
 
-    toggleEraser() {
-        this.isEraserMode = !this.isEraserMode;
-        // 지우개 버튼들의 테두리로 활성화 상태 표시
+    updateEraserButtonsUI() {
         const eraserBtns = document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser');
         eraserBtns.forEach(btn => {
-            if (btn) btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
+            if (btn) {
+                // 지우개 모드 활성화 시 지우개 반창고(🩹) 모양, 비활성화(펜 모드) 시 붓(🖌️) 모양으로 변경
+                btn.textContent = this.isEraserMode ? '🩹' : '🖌️';
+                btn.title = this.isEraserMode ? '지우개 (Eraser)' : '붓 (Pen)';
+                btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
+            }
         });
+    }
+
+    toggleEraser() {
+        this.isEraserMode = !this.isEraserMode;
+        this.updateEraserButtonsUI();
     }
 
     init() {
@@ -553,6 +559,7 @@ class UnitessGalleryApp {
         document.querySelectorAll('#floating-pen-color, #learn-pen-color, #triangle-pen-color, #hexagon-pen-color').forEach(btn => {
             if (btn) btn.style.border = `2px solid ${this.masterStrokeColor}`;
         });
+        this.updateEraserButtonsUI(); // 초기 지우개/붓 아이콘 상태 동기화 (기본: 펜 모드이므로 🖌️)
         this.updateLanguage();
         this.applyViewTransform();
         this.renderLoop();

@@ -529,17 +529,18 @@ class UnitessGalleryApp {
         const eraserBtns = document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser');
         eraserBtns.forEach(btn => {
             if (btn) {
-                // 지우개 버튼을 펜 색상 순환(붓) 기능으로 완전 대체하므로 항상 붓(🖌️) 모양으로 고정
-                btn.innerHTML = '🖌️';
-                btn.title = '펜 색상 변경 (Color)';
-                btn.style.border = `2px solid ${this.masterStrokeColor}`;
+                // 지우개 모드 활성화 상태면 지우개(🩹) 표시, 펜 드로잉 상태면 붓(🖌️) 표시
+                btn.innerHTML = this.isEraserMode ? '🩹' : '🖌️';
+                btn.title = this.isEraserMode ? '지우개 모드 (Eraser Mode)' : '펜 모드 (Pen Mode)';
+                btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
             }
         });
     }
 
     toggleEraser() {
-        // 지우개 버튼을 누르면 지우개 모드 켜는 대신 펜 색상을 순환시킴
-        this.cyclePenColor();
+        // 지우개 모드를 토글하고 UI를 업데이트합니다.
+        this.isEraserMode = !this.isEraserMode;
+        this.updateEraserButtonsUI();
     }
 
     init() {

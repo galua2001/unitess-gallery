@@ -515,11 +515,9 @@ class UnitessGalleryApp {
             if (btn) btn.style.border = `2px solid ${newColor}`;
         });
 
-        // 지우개 모드 해제 (색상 선택 시 자동으로 펜 모드로 전환)
-        if (this.isEraserMode) {
-            this.isEraserMode = false;
-            this.updateEraserButtonsUI();
-        }
+        // 지우개 모드 해제 및 모든 지우개(붓) 버튼 테두리 색상 최신화
+        this.isEraserMode = false;
+        this.updateEraserButtonsUI();
 
         // 캔버스 강제 업데이트 플래그 설정
         this.galleryNeedsUpdate = true;
@@ -528,21 +526,20 @@ class UnitessGalleryApp {
     }
 
     updateEraserButtonsUI() {
-        console.log("🖌️ [Debug] updateEraserButtonsUI called. isEraserMode:", this.isEraserMode);
         const eraserBtns = document.querySelectorAll('#floating-eraser, #learn-eraser, #triangle-eraser, #hexagon-eraser');
         eraserBtns.forEach(btn => {
             if (btn) {
-                // 지우개 모드 활성화 시 지우개 반창고(🩹) 모양, 비활성화(펜 모드) 시 붓(🖌️) 모양으로 변경
-                btn.innerHTML = this.isEraserMode ? '🩹' : '🖌️';
-                btn.title = this.isEraserMode ? '지우개 (Eraser)' : '붓 (Pen)';
-                btn.style.border = this.isEraserMode ? '2px solid #e74c3c' : '';
+                // 지우개 버튼을 펜 색상 순환(붓) 기능으로 완전 대체하므로 항상 붓(🖌️) 모양으로 고정
+                btn.innerHTML = '🖌️';
+                btn.title = '펜 색상 변경 (Color)';
+                btn.style.border = `2px solid ${this.masterStrokeColor}`;
             }
         });
     }
 
     toggleEraser() {
-        this.isEraserMode = !this.isEraserMode;
-        this.updateEraserButtonsUI();
+        // 지우개 버튼을 누르면 지우개 모드 켜는 대신 펜 색상을 순환시킴
+        this.cyclePenColor();
     }
 
     init() {

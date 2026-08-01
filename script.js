@@ -572,9 +572,7 @@ class UnitessGalleryApp {
             if (this.resizeMaster) this.resizeMaster();
             this.syncAppendixCanvases('triangle');
             this.syncAppendixCanvases('hexagon');
-            if (this.useFirebase) {
-                this.loadFromFirebase();
-            }
+            this.loadFromFirebase();
             // 기존에 관리자 로그인을 했다면 자동 활성화
             if (localStorage.getItem('unitess_admin') === 'true') {
                 this.isAdmin = true;

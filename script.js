@@ -243,6 +243,7 @@ class UnitessGalleryApp {
         this.appendixStrokeWidth = 3;
         this.printSpaceData = { square: [], triangle: [], hexagon: [] };
         this.sharedPatterns = []; // { id, img, name, hearts, time, liked }
+        this.currentShapeFilter = 'all'; // 갤러리 기본 필터를 '전체'로 초기화하여 최초 진입 시 정상 노출되도록 함
         this.currentSort = 'time';
         this.shareSearchKeyword = '';
         this.pendingShare = null;

@@ -582,15 +582,14 @@ body {
 }
 
 .menu-content {
-    padding: 10px 20px;
+    padding: 6px 12px;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap; /* 좁은 화면에서 자동으로 다음 줄로 넘어가도록 설정 */
-    row-gap: 10px;   /* 줄바꿈 시 세로 간격 추가 */
+    flex-wrap: nowrap; /* 줄바꿈하지 않고 한 줄에 표시 */
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 15px;
+    gap: 8px;
 }
 
 @media (max-width: 768px) {
@@ -654,9 +653,9 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     border-right: 1px solid #eee;
-    padding-right: 15px;
+    padding-right: 8px;
 }
 
 .menu-section:last-child {
@@ -664,7 +663,7 @@ body {
 }
 
 .menu-section h3 {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--accent-color);
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -672,7 +671,7 @@ body {
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
-    margin-right: 5px;
+    margin-right: 3px;
     white-space: nowrap;
 }
 
@@ -686,13 +685,13 @@ body {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 4px 8px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     height: auto;
-    gap: 6px;
+    gap: 4px;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -705,11 +704,11 @@ body {
 }
 
 .mode-icon {
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .mode-card span {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     font-weight: bold;
 }
 

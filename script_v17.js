@@ -4155,8 +4155,8 @@ class UnitessGalleryApp {
     }
 
     enableAdmin(pw) {
-        // 관리자 모드 활성화를 위한 비밀번호 (기본: admin1234)
-        if (pw === 'admin1234') {
+        // 관리자 모드 활성화를 위한 비밀번호 (1234)
+        if (pw === '1234') {
             this.isAdmin = true;
             localStorage.setItem('unitess_admin', 'true'); // 상태 저장
             this.renderSharedGallery();

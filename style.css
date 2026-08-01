@@ -587,9 +587,9 @@ body {
     flex-direction: row;
     flex-wrap: nowrap; /* 줄바꿈하지 않고 한 줄에 표시 */
     align-items: center;
-    justify-content: space-between;
+    justify-content: center; /* 가운데로 정렬 모음 */
     width: 100%;
-    gap: 8px;
+    gap: 15px; /* 가운데 정렬에 적절한 간격 부여 */
 }
 
 @media (max-width: 768px) {

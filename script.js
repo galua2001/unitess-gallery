@@ -1688,18 +1688,24 @@ class UnitessGalleryApp {
 
 
         // Stroke Style
-        document.getElementById('lineWidth').oninput = (e) => {
-            this.strokeWidth = parseInt(e.target.value);
-            this.galleryNeedsUpdate = true;
-            this.triangleNeedsUpdate = true;
-            this.hexagonNeedsUpdate = true;
-        };
-        document.getElementById('strokeColor').oninput = (e) => {
-            this.masterStrokeColor = e.target.value;
-            this.galleryNeedsUpdate = true;
-            this.triangleNeedsUpdate = true;
-            this.hexagonNeedsUpdate = true;
-        };
+        const lineWidthEl = document.getElementById('lineWidth');
+        if (lineWidthEl) {
+            lineWidthEl.oninput = (e) => {
+                this.strokeWidth = parseInt(e.target.value);
+                this.galleryNeedsUpdate = true;
+                this.triangleNeedsUpdate = true;
+                this.hexagonNeedsUpdate = true;
+            };
+        }
+        const strokeColorEl = document.getElementById('strokeColor');
+        if (strokeColorEl) {
+            strokeColorEl.oninput = (e) => {
+                this.masterStrokeColor = e.target.value;
+                this.galleryNeedsUpdate = true;
+                this.triangleNeedsUpdate = true;
+                this.hexagonNeedsUpdate = true;
+            };
+        }
 
         // View Controls
         const resetViewBtn = document.getElementById('reset-view');

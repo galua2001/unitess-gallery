@@ -39,20 +39,20 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* 세로 중앙 정렬 추가 */
+    /* ?몃줈 以묒븰 ?뺣젹 異붽? */
 }
 
 #gallery-container {
     display: grid;
     grid-template-columns: repeat(7, 140px);
-    /* 7열 유지 */
+    /* 7???좎? */
     grid-auto-rows: 140px;
     gap: 15px;
-    /* 간격을 약간 넓혀 여유 공간 확보 */
+    /* 媛꾧꺽???쎄컙 ?볧? ?ъ쑀 怨듦컙 ?뺣낫 */
     padding: 40px;
     width: fit-content;
     transform-origin: center;
-    /* 중앙 기준 확대/축소 */
+    /* 以묒븰 湲곗? ?뺣?/異뺤냼 */
 }
 
 /* Master Square Styling */
@@ -60,7 +60,7 @@ body {
     grid-column: 1;
     grid-row: 1;
     position: relative;
-    border: 3px solid var(--accent-color);
+    border: 3px solid transparent;
     border-radius: 0;
     background: white;
     /* overflow: hidden; */
@@ -75,7 +75,7 @@ body {
     width: 100%;
     height: 100%;
     cursor: crosshair;
-    /* 연필 대용으로 정밀한 십자 포인터 사용 */
+    /* ?고븘 ??⑹쑝濡??뺣?????옄 ?ъ씤???ъ슜 */
 }
 
 .floating-controls {
@@ -87,7 +87,9 @@ body {
 
 .floating-controls.top-right {
     top: -38px; /* Position above the container */
-    right: 0px;
+    left: 0px;
+    right: auto;
+    width: max-content;
 }
 
 .floating-controls button {
@@ -449,10 +451,10 @@ body {
     overflow-y: auto;
     padding-right: 10px;
     margin-top: -60px;
-    /* 추가로 10px 더 올림 (총 60px) */
+    /* 異붽?濡?10px ???щ┝ (珥?60px) */
 }
 
-/* 스크롤바 커스텀 */
+/* ?ㅽ겕濡ㅻ컮 而ㅼ뒪? */
 .learn-selector-area::-webkit-scrollbar {
     width: 6px;
 }
@@ -470,7 +472,7 @@ body {
 
 #pattern-detail-panel {
     position: absolute;
-    /* 버튼판 위에 띄우기 */
+    /* 踰꾪듉???꾩뿉 ?꾩슦湲?*/
     top: 30px;
     right: 50px;
     z-index: 3000;
@@ -494,7 +496,7 @@ body {
     height: auto;
     display: block;
     object-fit: fill;
-    /* 상자 비율에 상관없이 꽉 채움 */
+    /* ?곸옄 鍮꾩쑉???곴??놁씠 苑?梨꾩? */
     border-radius: 4px;
 }
 
@@ -585,11 +587,11 @@ body {
     padding: 6px 12px;
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap; /* 줄바꿈하지 않고 한 줄에 표시 */
+    flex-wrap: nowrap; /* 以꾨컮轅덊븯吏 ?딄퀬 ??以꾩뿉 ?쒖떆 */
     align-items: center;
-    justify-content: center; /* 가운데로 정렬 모음 */
+    justify-content: center; /* 媛?대뜲濡??뺣젹 紐⑥쓬 */
     width: 100%;
-    gap: 15px; /* 가운데 정렬에 적절한 간격 부여 */
+    gap: 15px; /* 媛?대뜲 ?뺣젹???곸젅??媛꾧꺽 遺??*/
 }
 
 @media (max-width: 768px) {
@@ -855,7 +857,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
     width: 100%;
-    margin-top: 15px; /* 약간 아래로 배치하여 모바일 상단 바에 가려지지 않게 함 */
+    margin-top: 15px; /* ?쎄컙 ?꾨옒濡?諛곗튂?섏뿬 紐⑤컮???곷떒 諛붿뿉 媛?ㅼ?吏 ?딄쾶 ??*/
 }
 
 .learn-content {
@@ -952,7 +954,7 @@ body {
 
 .rule-btn {
     flex: 1;
-    /* 가로 가득 채우기 */
+    /* 媛濡?媛??梨꾩슦湲?*/
     padding: 6px 12px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1328,15 +1330,15 @@ body {
 .selector-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    /* 2열 배치 */
+    /* 2??諛곗튂 */
     gap: 4px;
-    /* 버튼 사이 간격 */
+    /* 踰꾪듉 ?ъ씠 媛꾧꺽 */
     margin-bottom: 12px;
 }
 
 .group-header {
     grid-column: 1 / -1;
-    /* 두 칸 모두 차지 */
+    /* ??移?紐⑤몢 李⑥? */
     font-weight: bold;
     color: #3498db;
     margin-bottom: 4px;
@@ -1388,7 +1390,7 @@ body {
 #chat-panel {
     position: fixed;
     top: 75px;
-    /* 상단 버튼 아래에 위치하도록 변경 */
+    /* ?곷떒 踰꾪듉 ?꾨옒???꾩튂?섎룄濡?蹂寃?*/
     left: 20px;
     width: 320px;
     height: 400px;
@@ -1436,7 +1438,7 @@ body {
 #chat-toggle {
     position: fixed;
     top: 20px;
-    /* 상단으로 이동 */
+    /* ?곷떒?쇰줈 ?대룞 */
     left: 20px;
     width: 45px;
     height: 45px;
@@ -1548,7 +1550,7 @@ body {
     flex: 1;
     display: grid;
     grid-template-columns: 0.8fr 1.2fr;
-    /* 에셔 영역을 좁게 수정 */
+    /* ?먯뀛 ?곸뿭??醫곴쾶 ?섏젙 */
     gap: 20px;
     padding: 10px 0;
     overflow: hidden;
@@ -1588,7 +1590,7 @@ body {
     background: white;
     border-radius: 12px;
     height: 320px;
-    /* 에셔 그림 영역 높이 축소 */
+    /* ?먯뀛 洹몃┝ ?곸뿭 ?믪씠 異뺤냼 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1637,7 +1639,7 @@ body {
 #quiz-options-container {
     flex: 1;
     overflow: hidden;
-    /* 스크롤바 제거 */
+    /* ?ㅽ겕濡ㅻ컮 ?쒓굅 */
     padding: 10px 0;
 }
 
@@ -1685,7 +1687,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    /* 간격 축소 */
+    /* 媛꾧꺽 異뺤냼 */
     padding: 5px;
     height: 100%;
 }
@@ -1695,7 +1697,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 5px;
-    /* 패딩을 최소화하여 공간 확보 */
+    /* ?⑤뵫??理쒖냼?뷀븯??怨듦컙 ?뺣낫 */
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
@@ -1704,7 +1706,7 @@ body {
     gap: 2px;
     text-align: center;
     height: 100%;
-    /* 부모 높이에 맞춤 */
+    /* 遺紐??믪씠??留욎땄 */
 }
 
 .quiz-group-card:hover {
@@ -1717,7 +1719,7 @@ body {
 .group-img-wrapper {
     width: 100%;
     flex: 1;
-    /* 가용 공간 모두 사용 */
+    /* 媛??怨듦컙 紐⑤몢 ?ъ슜 */
     background: white;
     border-radius: 6px;
     overflow: hidden;
@@ -1725,7 +1727,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 0;
-    /* 여백 제거 */
+    /* ?щ갚 ?쒓굅 */
 }
 
 .group-img-wrapper img {
@@ -1737,7 +1739,7 @@ body {
 .group-info {
     display: flex;
     flex-direction: row;
-    /* 가로로 배치하여 높이 절약 */
+    /* 媛濡쒕줈 諛곗튂?섏뿬 ?믪씠 ?덉빟 */
     justify-content: center;
     align-items: baseline;
     gap: 5px;
@@ -1748,15 +1750,15 @@ body {
 .group-name {
     font-size: 0.95rem;
     font-weight: 500;
-    /* 보통 두께 */
+    /* 蹂댄넻 ?먭퍡 */
     color: #f1c40f;
     text-transform: uppercase;
-    /* 대문자로 변경 */
+    /* ?臾몄옄濡?蹂寃?*/
 }
 
 .group-symbol {
     display: none;
-    /* 심볼은 이름과 중복되므로 숨김 처리 */
+    /* ?щ낵? ?대쫫怨?以묐났?섎?濡??④? 泥섎━ */
 }
 
 .escher-placeholder {
@@ -1787,7 +1789,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: auto;
-    z-index: 2500; /* 메뉴바(z-index: 1000) 위로 노출되도록 z-index 변경 */
+    z-index: 2500; /* 硫붾돱諛?z-index: 1000) ?꾨줈 ?몄텧?섎룄濡?z-index 蹂寃?*/
 }
 
 #triangle-gallery-overlay .appendix-content {
@@ -2296,7 +2298,7 @@ body {
 }
 
 @media screen and (max-height: 650px) {
-    /* 뷰포트 높이가 낮을 때 오버레이 스타일 및 헤더/정렬 버튼 크기 축소 */
+    /* 酉고룷???믪씠媛 ??쓣 ???ㅻ쾭?덉씠 ?ㅽ???諛??ㅻ뜑/?뺣젹 踰꾪듉 ?ш린 異뺤냼 */
     .mode-overlay {
         padding: 10px 20px;
     }
@@ -2318,4 +2320,82 @@ body {
         padding: 5px 12px;
         font-size: 0.8rem;
     }
+}. a i - g l o b a l - t o o l b a r   {   g r i d - r o w :   1 ;   g r i d - c o l u m n :   2   /   - 1 ;   d i s p l a y :   f l e x ;   j u s t i f y - c o n t e n t :   f l e x - s t a r t ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   1 5 p x ;   p a d d i n g :   1 0 p x ;   z - i n d e x :   1 0 0 ;   p o s i t i o n :   r e l a t i v e ;   }   . a i - g l o b a l - b t n   {   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   1 0 p x ;   p a d d i n g :   8 p x   1 6 p x ;   f o n t - s i z e :   1 6 p x ;   f o n t - w e i g h t :   b o l d ;   b o r d e r - r a d i u s :   8 p x ;   b o r d e r :   2 p x   s o l i d ;   c u r s o r :   p o i n t e r ;   b a c k g r o u n d :   w h i t e ;   b o x - s h a d o w :   0   4 p x   6 p x   r g b a ( 0 , 0 , 0 , 0 . 1 ) ;   t r a n s i t i o n :   a l l   0 . 2 s ;   }   . a i - g l o b a l - b t n : h o v e r   {   t r a n s f o r m :   t r a n s l a t e Y ( - 2 p x ) ;   b o x - s h a d o w :   0   6 p x   1 2 p x   r g b a ( 0 , 0 , 0 , 0 . 1 5 ) ;   }   . a i - r a t i n g - d r o p d o w n   {   p o s i t i o n :   a b s o l u t e ;   t o p :   1 0 0 % ;   l e f t :   0 ;   m a r g i n - t o p :   1 0 p x ;   b a c k g r o u n d :   w h i t e ;   p a d d i n g :   1 5 p x ;   b o r d e r - r a d i u s :   1 2 p x ;   b o x - s h a d o w :   0   1 0 p x   2 5 p x   r g b a ( 0 , 0 , 0 , 0 . 2 ) ;   b o r d e r :   2 p x   s o l i d   # c c c ;   z - i n d e x :   9 9 9 9 9 ;   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   g a p :   1 0 p x ;   } 
+ 
+ 
+
+.ai-global-toolbar {
+    grid-row: 1;
+    grid-column: 2 / -1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
+}
+.ai-global-thumbnail {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+.ai-global-thumbnail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.ai-global-thumbnail.geometric {
+    border-color: #3498db;
+}
+.ai-global-thumbnail.cursive {
+    border-color: #9b59b6;
+}
+/* For hexagon grid, thumbnails should match hexagon shape items size approx 135x117? Actually 100px is fine for toolbar */
+.hexagon-grid .ai-global-thumbnail {
+    width: 100px;
+    height: 100px;
+}
+.ai-rating-dropdown {
+    position: absolute;
+    top: 40px; /* just below the top toolbar */
+    left: -50px; /* push it to the left outside the grid */
+    background: white;
+    padding: 10px 5px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 2px solid #ddd;
+    z-index: 99999;
+}
+
+.ai-toolbar-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-left: 10px; /* spacing from the drawing tools */
+}
+.ai-toolbar-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.ai-toolbar-thumb.geometric {
+    border-color: #3498db;
+}
+.ai-toolbar-thumb.cursive {
+    border-color: #9b59b6;
 }

@@ -1512,6 +1512,184 @@ class UnitessGalleryApp {
             this.learnStrokes = [];
             this.galleryNeedsUpdate = true;
         };
+
+        // AI Generate and Rating logic
+        const modes = ['square', 'triangle', 'hexagon'];
+        let bestGenData = { square: null, triangle: null, hexagon: null }; // 모드별 우수 유전자
+
+        const kpData = {
+            square: [
+                {x:0,y:0}, {x:0.5,y:0}, {x:1,y:0},
+                {x:0,y:0.5}, {x:0.5,y:0.5}, {x:1,y:0.5},
+                {x:0,y:1}, {x:0.5,y:1}, {x:1,y:1}
+            ],
+            triangle: [
+                {x:0.5, y:0}, {x:0, y:1}, {x:1, y:1}, // vertices
+                {x:0.25, y:0.5}, {x:0.75, y:0.5}, {x:0.5, y:1}, // midpoints
+                {x:0.5, y:0.666} // center
+            ],
+            hexagon: [
+                {x:0.5, y:0}, {x:1, y:0.25}, {x:1, y:0.75}, {x:0.5, y:1}, {x:0, y:0.75}, {x:0, y:0.25}, // vertices
+                {x:0.75, y:0.125}, {x:1, y:0.5}, {x:0.75, y:0.875}, {x:0.25, y:0.875}, {x:0, y:0.5}, {x:0.25, y:0.125}, // midpoints
+                {x:0.5, y:0.5} // center
+            ]
+        };
+
+        modes.forEach(mode => {
+            const btnGeometric = document.getElementById(`${mode}-ai-geometric`);
+            const btnCursive = document.getElementById(`${mode}-ai-cursive`);
+            const btnMixed = document.getElementById(`${mode}-ai-mixed`);
+            const btnRune = document.getElementById(`${mode}-ai-rune`);
+            const ratingPanel = document.getElementById(`${mode}-ai-rating-panel`);
+            
+            if ((btnGeometric || btnCursive) && ratingPanel) {
+                let currentGenData = []; 
+
+                const generateAICell = (e, styleMode) => {
+                    e.stopPropagation();
+                    
+                    if (mode === 'square') this.strokes = [];
+                    else if (mode === 'triangle') this.triangleStrokes = [];
+                    else if (mode === 'hexagon') this.hexagonStrokes = [];
+                    
+                    currentGenData = [];
+                    const kp = kpData[mode];
+                    
+                    const best = bestGenData[mode];
+                    const useEvolution = best !== null && Math.random() < 0.8;
+                    const strokeCount = useEvolution ? best.length : Math.floor(Math.random() * (mode==='hexagon'?6:4)) + (mode==='hexagon'?5:3);
+                    
+                    for (let i=0; i<strokeCount; i++) {
+                        let start, end, cp1, cp2;
+                        
+                        if (useEvolution && best[i]) {
+                            const parent = best[i];
+                            start = Math.random() < 0.3 ? kp[Math.floor(Math.random() * kp.length)] : parent.start;
+                            end = Math.random() < 0.3 ? kp[Math.floor(Math.random() * kp.length)] : parent.end;
+                        } else {
+                            if (styleMode === 'rune') {
+                                if (i === 0) {
+                                    let bestStem = { start: kp[0], end: kp[1], dist: 0 };
+                                    for(let a=0; a<kp.length; a++) {
+                                        for(let b=0; b<kp.length; b++) {
+                                            if (Math.abs(kp[a].x - kp[b].x) < 0.1 && Math.abs(kp[a].y - kp[b].y) > bestStem.dist) {
+                                                bestStem = { start: kp[a], end: kp[b], dist: Math.abs(kp[a].y - kp[b].y) };
+                                            }
+                                        }
+                                    }
+                                    start = bestStem.start;
+                                    end = bestStem.end;
+                                } else {
+                                    const prevStrokes = currentGenData;
+                                    const randomPrev = prevStrokes[Math.floor(Math.random() * prevStrokes.length)];
+                                    start = Math.random() < 0.5 ? randomPrev.start : randomPrev.end;
+                                    let attempts = 0;
+                                    do {
+                                        end = kp[Math.floor(Math.random() * kp.length)];
+                                        attempts++;
+                                    } while (Math.abs(start.y - end.y) < 0.1 && attempts < 10);
+                                }
+                            } else {
+                                start = kp[Math.floor(Math.random() * kp.length)];
+                                end = kp[Math.floor(Math.random() * kp.length)];
+                            }
+                        }
+                        
+                        let currentStyle = styleMode;
+                        if (styleMode === 'mixed') {
+                            currentStyle = Math.random() < 0.5 ? 'geometric' : 'cursive';
+                        } else if (styleMode === 'rune') {
+                            currentStyle = 'geometric';
+                        }
+
+                        if (currentStyle === 'geometric') {
+                            cp1 = { x: start.x, y: start.y };
+                            cp2 = { x: end.x, y: end.y };
+                        } else {
+                            const dx = end.x - start.x;
+                            const dy = end.y - start.y;
+                            const bulge = (Math.random() - 0.5) * 1.5; 
+                            cp1 = { 
+                                x: Math.max(-0.2, Math.min(1.2, start.x + dx * 0.2 - dy * bulge)), 
+                                y: Math.max(-0.2, Math.min(1.2, start.y + dy * 0.2 + dx * bulge)) 
+                            };
+                            cp2 = { 
+                                x: Math.max(-0.2, Math.min(1.2, end.x - dx * 0.2 - dy * bulge)), 
+                                y: Math.max(-0.2, Math.min(1.2, end.y - dy * 0.2 + dx * bulge)) 
+                            };
+                        }
+                        
+                        currentGenData.push({ start, end, cp1, cp2, style: currentStyle });
+                        
+                        const points = [];
+                        const steps = 30;
+                        for (let j=0; j<=steps; j++) {
+                            const t = j / steps;
+                            const u = 1 - t;
+                            const px = (u*u*u)*start.x + 3*(u*u)*t*cp1.x + 3*u*(t*t)*cp2.x + (t*t*t)*end.x;
+                            const py = (u*u*u)*start.y + 3*(u*u)*t*cp1.y + 3*u*(t*t)*cp2.y + (t*t*t)*end.y;
+                            points.push({x: px, y: py});
+                        }
+                        
+                        const aiColors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#e67e22', '#34495e'];
+                        const randomColor = aiColors[Math.floor(Math.random() * aiColors.length)];
+                        
+                        const strokeData = {
+                            points: points,
+                            type: 'stroke',
+                            width: this.strokeWidth,
+                            color: randomColor
+                        };
+                        
+                        if (mode === 'square') this.strokes.push(strokeData);
+                        else if (mode === 'triangle') this.triangleStrokes.push(strokeData);
+                        else if (mode === 'hexagon') this.hexagonStrokes.push(strokeData);
+                    }
+                    
+                    if (mode === 'square') this.galleryNeedsUpdate = true;
+                    else if (mode === 'triangle') this.triangleNeedsUpdate = true;
+                    else if (mode === 'hexagon') this.hexagonNeedsUpdate = true;
+                    
+                    ratingPanel.classList.remove('hidden');
+                };
+
+                if (btnGeometric) btnGeometric.onclick = (e) => generateAICell(e, 'geometric');
+                if (btnCursive) btnCursive.onclick = (e) => generateAICell(e, 'cursive');
+                if (btnMixed) btnMixed.onclick = (e) => generateAICell(e, 'mixed');
+                if (btnRune) btnRune.onclick = (e) => generateAICell(e, 'rune');
+
+                const ratingBtns = ratingPanel.querySelectorAll('.rating-btn');
+                ratingBtns.forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        const score = parseInt(btn.getAttribute('data-score'));
+                        
+                        if (score >= 4) {
+                            bestGenData[mode] = currentGenData;
+                        } else if (score <= 2) {
+                            bestGenData[mode] = null;
+                        }
+                        
+                        const trainingData = JSON.parse(localStorage.getItem('ai_training_data') || '[]');
+                        let strokesToSave = [];
+                        if (mode === 'square') strokesToSave = this.strokes;
+                        else if (mode === 'triangle') strokesToSave = this.triangleStrokes;
+                        else if (mode === 'hexagon') strokesToSave = this.hexagonStrokes;
+                        
+                        trainingData.push({
+                            timestamp: Date.now(),
+                            mode: mode,
+                            score: score,
+                            genData: currentGenData,
+                            strokes: JSON.parse(JSON.stringify(strokesToSave))
+                        });
+                        localStorage.setItem('ai_training_data', JSON.stringify(trainingData));
+                        
+                        ratingPanel.classList.add('hidden');
+                    };
+                });
+            }
+        });
     }
 
     renderLoop() {
@@ -2891,8 +3069,8 @@ class UnitessGalleryApp {
         // Optional: Larger dots for better visibility
         ctx.setLineDash([]);
         ctx.fillStyle = this.masterStrokeColor;
-        ctx.globalAlpha = 0.6; // Slightly more opaque dots
-        const dotSize = 3;
+        ctx.globalAlpha = 1.0; // Fully opaque dots for high visibility
+        const dotSize = 6; // Increased dot size to make them bolder
         ctx.beginPath(); ctx.arc(w / 2, 0, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(w / 2, h, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(0, h / 2, dotSize, 0, Math.PI * 2); ctx.fill();
@@ -3257,7 +3435,7 @@ class UnitessGalleryApp {
         ctx.save();
         ctx.fillStyle = '#ff4757';
         midpoints.forEach(pt => {
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2); ctx.fill();
             ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(255, 71, 87, 0.5)';
             ctx.strokeStyle = 'white'; ctx.lineWidth = 1; ctx.stroke();
         });

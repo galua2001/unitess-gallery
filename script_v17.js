@@ -1548,9 +1548,9 @@ class UnitessGalleryApp {
                 const generateAICell = (e, styleMode) => {
                     e.stopPropagation();
                     
-                    if (mode === 'square') this.strokes = [];
-                    else if (mode === 'triangle') this.triangleStrokes = [];
-                    else if (mode === 'hexagon') this.hexagonStrokes = [];
+                    if (mode === 'square') this.strokes.length = 0;
+                    else if (mode === 'triangle') this.triangleStrokes.length = 0;
+                    else if (mode === 'hexagon') this.hexagonStrokes.length = 0;
                     
                     currentGenData = [];
                     const kp = kpData[mode];
@@ -2585,6 +2585,7 @@ class UnitessGalleryApp {
 
         strokes.forEach(stroke => {
             if (stroke.points.length < 2) return;
+            
             ctx.beginPath();
             ctx.moveTo(stroke.points[0].x * w, stroke.points[0].y * h);
             for (let i = 1; i < stroke.points.length - 1; i++) {
@@ -2594,7 +2595,18 @@ class UnitessGalleryApp {
             }
             const last = stroke.points[stroke.points.length - 1];
             ctx.lineTo(last.x * w, last.y * h);
+            
+            ctx.save();
+            if (stroke.type === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = stroke.width || weight * 3;
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = stroke.color || color;
+                ctx.lineWidth = stroke.width || weight;
+            }
             ctx.stroke();
+            ctx.restore();
         });
         ctx.restore();
     }

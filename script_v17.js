@@ -541,6 +541,12 @@ class UnitessGalleryApp {
 
     
     toggleDrawMode() {
+        // Turn off eraser if it was on
+        if (this.isEraserMode) {
+            this.isEraserMode = false;
+            this.updateEraserButtonsUI();
+        }
+        
         if (this.drawMode === 'freehand') {
             this.drawMode = 'line';
         } else if (this.drawMode === 'line') {
@@ -3098,15 +3104,27 @@ class UnitessGalleryApp {
 
             ctx.beginPath();
             ctx.moveTo(stroke.points[0].x * w, stroke.points[0].y * h);
-
-            for (let i = 1; i < stroke.points.length - 1; i++) {
-                const xc = (stroke.points[i].x * w + stroke.points[i + 1].x * w) / 2;
-                const yc = (stroke.points[i].y * h + stroke.points[i + 1].y * h) / 2;
-                ctx.quadraticCurveTo(stroke.points[i].x * w, stroke.points[i].y * h, xc, yc);
+            
+            if (stroke.mode === 'line') {
+                const last = stroke.points[stroke.points.length - 1];
+                ctx.lineTo(last.x * w, last.y * h);
+            } else if (stroke.mode === 'curve') {
+                const p0 = stroke.points[0];
+                const p1 = stroke.points[stroke.points.length - 1];
+                const dx = p1.x - p0.x;
+                const dy = p1.y - p0.y;
+                const cx = (p0.x + p1.x)/2 - dy * 0.5;
+                const cy = (p0.y + p1.y)/2 + dx * 0.5;
+                ctx.quadraticCurveTo(cx * w, cy * h, p1.x * w, p1.y * h);
+            } else {
+                for (let i = 1; i < stroke.points.length - 1; i++) {
+                    const xc = (stroke.points[i].x * w + stroke.points[i + 1].x * w) / 2;
+                    const yc = (stroke.points[i].y * h + stroke.points[i + 1].y * h) / 2;
+                    ctx.quadraticCurveTo(stroke.points[i].x * w, stroke.points[i].y * h, xc, yc);
+                }
+                const last = stroke.points[stroke.points.length - 1];
+                ctx.lineTo(last.x * w, last.y * h);
             }
-
-            const last = stroke.points[stroke.points.length - 1];
-            ctx.lineTo(last.x * w, last.y * h);
             ctx.stroke();
             ctx.restore();
         });
@@ -3208,16 +3226,29 @@ class UnitessGalleryApp {
 
             ctx.beginPath();
             ctx.moveTo(pts[0].x * w, pts[0].y * h);
-            for (let i = 1; i < pts.length - 1; i++) {
-                const x1 = pts[i].x * w;
-                const y1 = pts[i].y * h;
-                const x2 = pts[i + 1].x * w;
-                const y2 = pts[i + 1].y * h;
-                const xc = (x1 + x2) / 2;
-                const yc = (y1 + y2) / 2;
-                ctx.quadraticCurveTo(x1, y1, xc, yc);
+            
+            if (stroke.mode === 'line') {
+                ctx.lineTo(pts[pts.length - 1].x * w, pts[pts.length - 1].y * h);
+            } else if (stroke.mode === 'curve') {
+                const p0 = pts[0];
+                const p1 = pts[pts.length - 1];
+                const dx = p1.x - p0.x;
+                const dy = p1.y - p0.y;
+                const cx = (p0.x + p1.x)/2 - dy * 0.5;
+                const cy = (p0.y + p1.y)/2 + dx * 0.5;
+                ctx.quadraticCurveTo(cx * w, cy * h, p1.x * w, p1.y * h);
+            } else {
+                for (let i = 1; i < pts.length - 1; i++) {
+                    const x1 = pts[i].x * w;
+                    const y1 = pts[i].y * h;
+                    const x2 = pts[i + 1].x * w;
+                    const y2 = pts[i + 1].y * h;
+                    const xc = (x1 + x2) / 2;
+                    const yc = (y1 + y2) / 2;
+                    ctx.quadraticCurveTo(x1, y1, xc, yc);
+                }
+                ctx.lineTo(pts[pts.length - 1].x * w, pts[pts.length - 1].y * h);
             }
-            ctx.lineTo(pts[pts.length - 1].x * w, pts[pts.length - 1].y * h);
             ctx.stroke();
             ctx.restore();
         });

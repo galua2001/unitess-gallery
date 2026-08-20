@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="image.png">
 
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=35">
 </head>
 
 <body>
@@ -27,6 +27,7 @@
                     <button id="floating-clear" title="Clear Canvas">✕</button>
                     <button id="floating-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                     <button id="floating-eraser" title="지우개 (Eraser)">🩹</button>
+                            <button id="floating-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
                     <button id="floating-share-square" class="floating-share-btn" title="Share Original">🌍</button>
                     <div id="square-ai-geometric" class="ai-toolbar-thumb geometric" style="background-image: url('ai-thumb-geometric.jpg');" title="각진 기호 스타일"></div>
                     <div id="square-ai-cursive" class="ai-toolbar-thumb cursive" style="background-image: url('ai-thumb-cursive.jpg');" title="우아한 곡선 스타일"></div>
@@ -427,6 +428,7 @@
                             <button id="clear-triangle-draw" title="Clear Drawing">✕</button>
                             <button id="triangle-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                             <button id="triangle-eraser" title="지우개 (Eraser)">🩹</button>
+                            <button id="triangle-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
                             <button id="floating-share-triangle" title="Share Original">🌍</button>
                             <div id="triangle-ai-geometric" class="ai-toolbar-thumb geometric" style="background-image: url('ai-thumb-geometric.jpg');" title="각진 기호 스타일"></div>
                             <div id="triangle-ai-cursive" class="ai-toolbar-thumb cursive" style="background-image: url('ai-thumb-cursive.jpg');" title="우아한 곡선 스타일"></div>
@@ -478,6 +480,7 @@
                             <button id="clear-hexagon-draw" title="Clear Drawing">✕</button>
                             <button id="hexagon-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                             <button id="hexagon-eraser" title="지우개 (Eraser)">🩹</button>
+                            <button id="hexagon-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
                             <button id="floating-share-hexagon" title="Share Original">🌍</button>
                             <div id="hexagon-ai-geometric" class="ai-toolbar-thumb geometric" style="background-image: url('ai-thumb-geometric.jpg');" title="각진 기호 스타일"></div>
                             <div id="hexagon-ai-cursive" class="ai-toolbar-thumb cursive" style="background-image: url('ai-thumb-cursive.jpg');" title="우아한 곡선 스타일"></div>
@@ -584,7 +587,7 @@
         <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
         <script src="firebase-config.js"></script>
 
-        <script src="script_v17.js?v=34"></script>
+        <script src="script_v17.js?v=35"></script>
 
         <!-- PWA Service Worker Force Unregister & Cache Clear -->
         <script>

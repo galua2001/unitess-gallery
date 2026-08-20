@@ -1486,8 +1486,7 @@ class UnitessGalleryApp {
                 points: [pos], 
                 type: this.isEraserMode ? 'eraser' : 'stroke',
                 width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth,
-                color: this.masterStrokeColor,
-                mode: this.isEraserMode ? 'freehand' : this.drawMode
+                color: this.masterStrokeColor  // 획별 현재 펜 색상 저장
             });
         };
 
@@ -1496,12 +1495,7 @@ class UnitessGalleryApp {
             if (e.type === 'touchmove') e.preventDefault();
             const pos = getPos(e);
             const targetStrokes = this.isLearnMode ? this.learnStrokes : this.strokes;
-            const stroke = targetStrokes[targetStrokes.length - 1];
-            if ((stroke.mode === 'line' || stroke.mode === 'curve') && stroke.points.length >= 1) {
-                stroke.points[1] = pos;
-            } else {
-                stroke.points.push(pos);
-            }
+            targetStrokes[targetStrokes.length - 1].points.push(pos);
             this.galleryNeedsUpdate = true;
         };
 
@@ -2629,26 +2623,13 @@ class UnitessGalleryApp {
             
             ctx.beginPath();
             ctx.moveTo(stroke.points[0].x * w, stroke.points[0].y * h);
-            if (stroke.mode === 'line') {
-                const last = stroke.points[stroke.points.length - 1];
-                ctx.lineTo(last.x * w, last.y * h);
-            } else if (stroke.mode === 'curve') {
-                const p0 = stroke.points[0];
-                const p1 = stroke.points[stroke.points.length - 1];
-                const dx = p1.x - p0.x;
-                const dy = p1.y - p0.y;
-                const cx = (p0.x + p1.x)/2 - dy * 0.5;
-                const cy = (p0.y + p1.y)/2 + dx * 0.5;
-                ctx.quadraticCurveTo(cx * w, cy * h, p1.x * w, p1.y * h);
-            } else {
-                for (let i = 1; i < stroke.points.length - 1; i++) {
-                    const xc = (stroke.points[i].x * w + stroke.points[i + 1].x * w) / 2;
-                    const yc = (stroke.points[i].y * h + stroke.points[i + 1].y * h) / 2;
-                    ctx.quadraticCurveTo(stroke.points[i].x * w, stroke.points[i].y * h, xc, yc);
-                }
-                const last = stroke.points[stroke.points.length - 1];
-                ctx.lineTo(last.x * w, last.y * h);
+            for (let i = 1; i < stroke.points.length - 1; i++) {
+                const xc = (stroke.points[i].x * w + stroke.points[i + 1].x * w) / 2;
+                const yc = (stroke.points[i].y * h + stroke.points[i + 1].y * h) / 2;
+                ctx.quadraticCurveTo(stroke.points[i].x * w, stroke.points[i].y * h, xc, yc);
             }
+            const last = stroke.points[stroke.points.length - 1];
+            ctx.lineTo(last.x * w, last.y * h);
             
             ctx.save();
             if (stroke.type === 'eraser') {
@@ -3287,8 +3268,7 @@ class UnitessGalleryApp {
                 points: [], 
                 type: this.isEraserMode ? 'eraser' : 'stroke',
                 width: this.isEraserMode ? this.strokeWidth * 3 : this.strokeWidth,
-                color: this.masterStrokeColor,
-                mode: this.isEraserMode ? 'freehand' : this.drawMode
+                color: this.masterStrokeColor
             });
             addPoint(e);
         };
@@ -3311,12 +3291,7 @@ class UnitessGalleryApp {
             if (!this.isPointInShape(nx, ny, type)) return;
 
             if (strokes.length > 0) {
-                const stroke = strokes[strokes.length - 1];
-                if ((stroke.mode === 'line' || stroke.mode === 'curve') && stroke.points.length >= 1) {
-                    stroke.points[1] = { x: nx, y: ny };
-                } else {
-                    stroke.points.push({ x: nx, y: ny });
-                }
+                strokes[strokes.length - 1].points.push({ x: nx, y: ny });
                 if (type === 'triangle') this.triangleNeedsUpdate = true;
                 else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
             }

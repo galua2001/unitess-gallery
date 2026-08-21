@@ -3179,7 +3179,7 @@ class UnitessGalleryApp {
         ctx.setLineDash([]);
         ctx.fillStyle = this.masterStrokeColor;
         ctx.globalAlpha = 1.0; // Fully opaque dots for high visibility
-        const dotSize = 6; // Increased dot size to make them bolder
+        const dotSize = 3; // Increased dot size to make them bolder
         ctx.beginPath(); ctx.arc(w / 2, 0, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(w / 2, h, dotSize, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(0, h / 2, dotSize, 0, Math.PI * 2); ctx.fill();
@@ -3575,7 +3575,7 @@ class UnitessGalleryApp {
         // 5. Draw Vertices and Midpoints
         ctx.save();
         ctx.fillStyle = this.masterStrokeColor; // 사각형과 동일하게 검정색 (또는 설정된 색상)
-        const dotSize = 6; // 사각형의 꼭지점(dotSize=6)과 동일한 크기 적용
+        const dotSize = 3; // 사각형의 꼭지점(dotSize=6)과 동일한 크기 적용
         
         // 꼭지점 표시
         corners.forEach(pt => {

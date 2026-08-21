@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="image.png">
 
-    <link rel="stylesheet" href="style.css?v=37">
+    <link rel="stylesheet" href="style.css?v=39">
 </head>
 
 <body>
@@ -25,6 +25,7 @@
 
                 <div class="floating-controls top-right">
                     <button id="floating-clear" title="Clear Canvas">✕</button>
+                    <button id="floating-undo" title="되돌리기 (Undo)">↩️</button>
                     <button id="floating-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                     <button id="floating-eraser" title="지우개 (Eraser)">🩹</button>
                             <button id="floating-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
@@ -434,6 +435,7 @@
                         <div class="shape-label-tag">Master Triangle</div>
                         <div class="floating-controls top-right appendix-controls">
                             <button id="clear-triangle-draw" title="Clear Drawing">✕</button>
+                            <button id="triangle-undo" title="되돌리기 (Undo)">↩️</button>
                             <button id="triangle-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                             <button id="triangle-eraser" title="지우개 (Eraser)">🩹</button>
                             <button id="triangle-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
@@ -494,6 +496,7 @@
                         <div class="shape-label-tag">Master Hexagon</div>
                         <div class="floating-controls top-right appendix-controls">
                             <button id="clear-hexagon-draw" title="Clear Drawing">✕</button>
+                            <button id="hexagon-undo" title="되돌리기 (Undo)">↩️</button>
                             <button id="hexagon-pen-color" title="펜 색상 변경 (Pen Color)">🎨</button>
                             <button id="hexagon-eraser" title="지우개 (Eraser)">🩹</button>
                             <button id="hexagon-draw-mode" title="그리기 모드: 자유곡선" class="draw-mode-btn">✏️</button>
@@ -611,7 +614,7 @@
         <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
         <script src="firebase-config.js"></script>
 
-        <script src="script_v17.js?v=37"></script>
+        <script src="script_v17.js?v=39"></script>
 
         <!-- PWA Service Worker Force Unregister & Cache Clear -->
         <script>

@@ -1566,6 +1566,14 @@ class UnitessGalleryApp {
             this.strokes = [];
             this.galleryNeedsUpdate = true;
         };
+        const floatingUndo = document.getElementById('floating-undo');
+        if (floatingUndo) {
+            floatingUndo.onclick = (e) => {
+                e.stopPropagation();
+                this.strokes.pop();
+                this.galleryNeedsUpdate = true;
+            };
+        }
         const squareShare = document.getElementById('floating-share-square');
         if (squareShare) squareShare.onclick = (e) => {
             e.stopPropagation();
@@ -3387,6 +3395,16 @@ class UnitessGalleryApp {
         if (clearBtn) {
             clearBtn.onclick = () => {
                 strokes.length = 0; // Clear the array
+                if (type === 'triangle') this.triangleNeedsUpdate = true;
+                else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
+            };
+        }
+        
+        const undoBtnId = type === 'triangle' ? 'triangle-undo' : 'hexagon-undo';
+        const undoBtn = document.getElementById(undoBtnId);
+        if (undoBtn) {
+            undoBtn.onclick = () => {
+                strokes.pop();
                 if (type === 'triangle') this.triangleNeedsUpdate = true;
                 else if (type === 'hexagon') this.hexagonNeedsUpdate = true;
             };

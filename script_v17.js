@@ -3527,13 +3527,14 @@ class UnitessGalleryApp {
 
         ctx.restore(); // REMOVE CLIP for guide lines
 
-        // 4. Draw Base Shape Outline (Dashed) & Midpoints
+        // 4. Draw Base Shape Outline (Dashed) & Collect Points
         ctx.save();
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 2;
         ctx.setLineDash([5, 5]);
 
         const midpoints = [];
+        const corners = [];
         if (type === 'triangle') {
             // Even Larger Triangle Vertices: Height 0.93, Width 0.98
             const v1 = { x: w * 0.5, y: h * 0.02 };
@@ -3546,6 +3547,7 @@ class UnitessGalleryApp {
             ctx.lineTo(v3.x, v3.y);
             ctx.closePath();
             ctx.stroke();
+            corners.push(v1, v2, v3);
             midpoints.push({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
             midpoints.push({ x: (v2.x + v3.x) / 2, y: (v2.y + v3.y) / 2 });
             midpoints.push({ x: (v3.x + v1.x) / 2, y: (v3.y + v1.y) / 2 });
@@ -3564,18 +3566,25 @@ class UnitessGalleryApp {
             ctx.closePath(); ctx.stroke();
             for (let i = 0; i < 6; i++) {
                 const v1 = vertices[i]; const v2 = vertices[(i + 1) % 6];
+                corners.push(v1);
                 midpoints.push({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
             }
         }
         ctx.restore();
 
-        // 5. Draw Midpoint Markers
+        // 5. Draw Vertices and Midpoints
         ctx.save();
-        ctx.fillStyle = '#ff4757';
+        ctx.fillStyle = this.masterStrokeColor; // 사각형과 동일하게 검정색 (또는 설정된 색상)
+        const dotSize = 6; // 사각형의 꼭지점(dotSize=6)과 동일한 크기 적용
+        
+        // 꼭지점 표시
+        corners.forEach(pt => {
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, dotSize, 0, Math.PI * 2); ctx.fill();
+        });
+        
+        // 중점 표시
         midpoints.forEach(pt => {
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2); ctx.fill();
-            ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(255, 71, 87, 0.5)';
-            ctx.strokeStyle = 'white'; ctx.lineWidth = 1; ctx.stroke();
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, dotSize, 0, Math.PI * 2); ctx.fill();
         });
         ctx.restore();
     }

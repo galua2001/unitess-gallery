@@ -581,6 +581,23 @@ class UnitessGalleryApp {
     init() {
         this.setupMasterCanvas();
         this.createGallery();
+        
+        // Bind print controls
+        document.querySelectorAll('.print-grid-toggle').forEach(el => {
+            el.addEventListener('change', (e) => {
+                this.regeneratePrintSpaceImages(e.target.dataset.type);
+            });
+        });
+        document.querySelectorAll('.print-size-select').forEach(el => {
+            el.addEventListener('change', (e) => {
+                const type = e.target.dataset.type;
+                const size = parseInt(e.target.value);
+                const itemsContainer = document.getElementById(`${type}-print-items`);
+                if (itemsContainer) {
+                    itemsContainer.style.setProperty('grid-template-columns', `repeat(${size}, 1fr)`, 'important');
+                }
+            });
+        });
         this.setupNavigation();
         this.setupMenu();
         this.setupChat();
@@ -4176,11 +4193,15 @@ class UnitessGalleryApp {
         let sourceCanvas = null;
         let tag = "";
 
+        let printGrid = true;
+        const toggle = document.querySelector(`.print-grid-toggle[data-type="${type}"]`);
+        if (toggle) printGrid = toggle.checked;
+        
         if (type === 'square') {
             const grid = this.grids.find(g => g.ruleSet === id);
             if (!grid) return;
             tag = grid.symbol || `S${id}`;
-            sourceCanvas = this.createPatternThumbnail(type, id);
+            sourceCanvas = this.createPatternThumbnail(type, id, printGrid);
         } else {
             const grids = type === 'triangle' ? this.triangleGrids : this.hexagonGrids;
             const grid = grids.find(g => g.id === id);
@@ -4192,14 +4213,14 @@ class UnitessGalleryApp {
         if (!sourceCanvas) return;
 
         const dataUrl = sourceCanvas.toDataURL();
-        this.printSpaceData[type].push({ img: dataUrl, tag: tag });
+        this.printSpaceData[type].push({ img: dataUrl, tag: tag, id: id });
         this.updatePrintSpaceUI(type);
 
         const panel = document.getElementById(`${type}-print-space`);
         if (panel) panel.classList.remove('hidden');
     }
 
-    createPatternThumbnail(type, id) {
+    createPatternThumbnail(type, id, printGrid = true) {
         const tempCanvas = document.createElement('canvas');
         // Increase resolution for printing (4x of original 150x150)
         tempCanvas.width = 600;
@@ -4230,6 +4251,11 @@ class UnitessGalleryApp {
                     ctx.scale(rule.scaleX, rule.scaleY);
                     ctx.translate(-size / 2, -size / 2);
                     this.drawStrokes(ctx, size, size, groupColor);
+                    if (printGrid) {
+                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(0, 0, size, size);
+                    }
                     ctx.restore();
                 }
             }
@@ -4264,6 +4290,20 @@ class UnitessGalleryApp {
                     ctx.translate(-0.5, -0.6033);
                     this.drawStrokesOntoCanvas(ctx, 1, 1, strokes, patternColor, 0.04);
                     ctx.restore();
+                    // We are now back to the state after `ctx.translate(tx, ty)`
+                    if (printGrid) {
+                        ctx.save();
+                        if (isInverted) ctx.rotate(Math.PI);
+                        ctx.beginPath();
+                        ctx.moveTo(0, -triH*2/3);
+                        ctx.lineTo(size/2, triH/3);
+                        ctx.lineTo(-size/2, triH/3);
+                        ctx.closePath();
+                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
                     ctx.restore();
                 }
             }
@@ -4297,11 +4337,40 @@ class UnitessGalleryApp {
                 ctx.translate(-size, -size);
                 this.drawStrokesOntoCanvas(ctx, size * 2, size * 2, strokes, patternColor, this.strokeWidth * 0.8);
                 ctx.restore();
+                if (printGrid) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (Math.PI / 3) * i - Math.PI / 6;
+                        const px = size * Math.cos(angle);
+                        const py = size * Math.sin(angle);
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
                 ctx.restore();
             });
             ctx.restore();
         }
         return tempCanvas;
+    }
+
+    regeneratePrintSpaceImages(type) {
+        const toggle = document.querySelector(`.print-grid-toggle[data-type="${type}"]`);
+        const printGrid = toggle ? toggle.checked : true;
+        
+        // Re-generate all images in printSpaceData
+        this.printSpaceData[type] = this.printSpaceData[type].map(item => {
+            const sourceCanvas = this.createPatternThumbnail(type, item.id, printGrid);
+            if (sourceCanvas) {
+                return { ...item, img: sourceCanvas.toDataURL() };
+            }
+            return item;
+        });
+        this.updatePrintSpaceUI(type);
     }
 
     updatePrintSpaceUI(type) {

@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="image.png">
 
-    <link rel="stylesheet" href="style.css?v=36">
+    <link rel="stylesheet" href="style.css?v=37">
 </head>
 
 <body>
@@ -50,8 +50,16 @@
         <!-- Square Print Space -->
         <div id="square-print-space" class="print-space-panel hidden">
             <div class="print-space-header">
-                <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
-                <button class="print-btn" onclick="app.printPanel('square')">프린트</button>
+                <h3 data-i18n="print_space_title">프린트 스페이스</h3>
+                <div class="print-controls" style="display:flex; gap:10px; align-items:center;">
+                    <label style="font-size:12px;"><input type="checkbox" class="print-grid-toggle" data-type="square" checked> 격자 표시</label>
+                    <select class="print-size-select" data-type="square" style="font-size:12px; padding:2px;">
+                        <option value="1">1장/페이지</option>
+                        <option value="2" selected>2장/페이지</option>
+                        <option value="4">4장/페이지</option>
+                    </select>
+                </div>
+                <button class="print-btn" onclick="app.printPanel('square')">출력</button>
                 <button class="close-print-space">✕</button>
             </div>
             <div class="print-space-items" id="square-print-items"></div>
@@ -453,8 +461,16 @@
             <!-- Triangle Print Space -->
             <div id="triangle-print-space" class="print-space-panel hidden">
                 <div class="print-space-header">
-                    <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
-                    <button class="print-btn" onclick="app.printPanel('triangle')">프린트</button>
+                    <h3 data-i18n="print_space_title">프린트 스페이스</h3>
+                    <div class="print-controls" style="display:flex; gap:10px; align-items:center;">
+                        <label style="font-size:12px;"><input type="checkbox" class="print-grid-toggle" data-type="triangle" checked> 격자 표시</label>
+                        <select class="print-size-select" data-type="triangle" style="font-size:12px; padding:2px;">
+                            <option value="1">1장/페이지</option>
+                            <option value="2" selected>2장/페이지</option>
+                            <option value="4">4장/페이지</option>
+                        </select>
+                    </div>
+                    <button class="print-btn" onclick="app.printPanel('triangle')">출력</button>
                     <button class="close-print-space">✕</button>
                 </div>
                 <div class="print-space-items" id="triangle-print-items"></div>
@@ -505,8 +521,16 @@
             <!-- Hexagon Print Space -->
             <div id="hexagon-print-space" class="print-space-panel hidden">
                 <div class="print-space-header">
-                    <h3 data-i18n="print_space_title">나의 프린트 공간</h3>
-                    <button class="print-btn" onclick="app.printPanel('hexagon')">프린트</button>
+                    <h3 data-i18n="print_space_title">프린트 스페이스</h3>
+                    <div class="print-controls" style="display:flex; gap:10px; align-items:center;">
+                        <label style="font-size:12px;"><input type="checkbox" class="print-grid-toggle" data-type="hexagon" checked> 격자 표시</label>
+                        <select class="print-size-select" data-type="hexagon" style="font-size:12px; padding:2px;">
+                            <option value="1">1장/페이지</option>
+                            <option value="2" selected>2장/페이지</option>
+                            <option value="4">4장/페이지</option>
+                        </select>
+                    </div>
+                    <button class="print-btn" onclick="app.printPanel('hexagon')">출력</button>
                     <button class="close-print-space">✕</button>
                 </div>
                 <div class="print-space-items" id="hexagon-print-items"></div>
@@ -587,7 +611,7 @@
         <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
         <script src="firebase-config.js"></script>
 
-        <script src="script_v17.js?v=36"></script>
+        <script src="script_v17.js?v=37"></script>
 
         <!-- PWA Service Worker Force Unregister & Cache Clear -->
         <script>
